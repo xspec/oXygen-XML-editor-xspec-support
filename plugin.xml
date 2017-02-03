@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- The plugin.dtd file is located in the OXYGEN_INSATALL_DIR/plugins directory -->
+<!DOCTYPE plugin SYSTEM "../plugin.dtd">
+
+<plugin
+ id="com.oxygenxml.xspec.XSpecSupportPlugin"
+ name="com.oxygenxml.xspec.XSpecSupportPlugin"
+ description="Test"
+ version="${project.nosnapshot.version}"
+ vendor="SyncRO"
+ class="com.oxygenxml.xspec.XSpecSupportPlugin"
+ classLoaderType="preferReferencedResources">
+ <runtime>
+  <library name="lib/${project.build.finalName}.jar" scope="global"/>
+  <library name="lib/" scope="global"/>
+ </runtime>
+ 
+ <extension type="WorkspaceAccess" class="com.oxygenxml.xspec.XSpecSupportPluginExtension"/>
+ 
+ <view id="com.oxygenxml.xspec.results"/>
+ 
+ <toolbar id="com.oxygenxml.xspec" initialSide="NORTH" initialRow="1"/>
+ 
+</plugin>
