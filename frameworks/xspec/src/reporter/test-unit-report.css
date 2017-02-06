@@ -1,0 +1,69 @@
+
+.test-failed:hover,
+.test-show:hover,
+.test-run:hover {
+    text-decoration:underline;
+    cursor:pointer;
+}
+
+
+p.failed,
+p.skipped,
+p.passed {
+    color: rgb(0, 0, 150);
+    font-weight: bold;
+}
+
+
+p.failed:before {content:url('../../resources/fail12.png') " "}
+p.skipped:before{content:url('../../resources/pending12.png') " ";}
+p.passed:before {content:url('../../resources/succes12.png') " "}
+
+div.failure,
+p {
+    
+	margin-left: 5%;
+}
+
+
+img {
+	position: relative;
+	}
+
+
+pre {
+	padding-left: 5%;
+	margin-left: 5%;
+	}
+
+body {
+    font-family:arial, helvetica, sans-serif;
+    font-size:12px;
+}
+
+
+
+.same {
+  background-color: rgb(206, 239, 174);
+}
+
+.diff {
+  background-color: #FCC;
+}
+
+.whitespace {
+	font-style: italic;
+	color: #999;
+	background: white;
+}
+
+.ignored {
+  font-style: italic;
+  color: #999;
+  background: white;
+}
+
+.missed {
+  background-color: #A33;
+  color: white;
+}

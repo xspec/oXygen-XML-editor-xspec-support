@@ -94,10 +94,18 @@ public class Bridge {
       String xpath = "//*:expect[@label=\"" + testName
           + "\" or *:label=\"" + testName
           + "\"]";
+      
+      if (logger.isDebugEnabled()) {
+    	  logger.debug("Show test XPath: " + xpath);
+      }
 
       try {
         WSXMLTextNodeRange[] ranges = textpage.findElementsByXPath(xpath);
         if (ranges != null && ranges.length > 0) {
+        	
+            if (logger.isDebugEnabled()) {
+          	  logger.debug("Got range: " + ranges[0]);
+            }
 
           int start = textpage.getOffsetOfLineStart(ranges[0].getStartLine()) + ranges[0].getStartColumn() - 1;
           int end = textpage.getOffsetOfLineEnd(ranges[0].getStartLine()) - 1;

@@ -1,11 +1,13 @@
 package com.oxygenxml.xspec;
 
 import java.awt.event.ActionEvent;
+import java.io.File;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.JComponent;
 
+import ro.sync.exml.options.APIAccessibleOptionTags;
 import ro.sync.exml.plugin.workspace.WorkspaceAccessPluginExtension;
 import ro.sync.exml.workspace.api.standalone.StandalonePluginWorkspace;
 import ro.sync.exml.workspace.api.standalone.ToolbarComponentsCustomizer;
@@ -28,6 +30,20 @@ public class XSpecSupportPluginExtension implements WorkspaceAccessPluginExtensi
   @Override
   public void applicationStarted(final StandalonePluginWorkspace pluginWorkspaceAccess) {
     resultsPresenter = new XSpecResultsPresenter(pluginWorkspaceAccess);
+    
+    String[] additional = (String[]) pluginWorkspaceAccess.getGlobalObjectProperty(
+    		APIAccessibleOptionTags.ADDITIONAL_FRAMEWORKS_DIRECTORIES);
+    if (additional != null && additional.length > 0) {
+    	String[] additionalFrameworks = new String[additional.length + 1];
+    	System.arraycopy(additional, 0, additionalFrameworks, 0, additional.length);
+    } else {
+    	additional = new String[1];
+    }
+    
+    additional[additional.length - 1] = 
+    		new File(XSpecSupportPlugin.getInstance().getDescriptor().getBaseDir(), "frameworks").getAbsolutePath();
+    
+    pluginWorkspaceAccess.setGlobalObjectProperty(APIAccessibleOptionTags.ADDITIONAL_FRAMEWORKS_DIRECTORIES, additional);
     
     // Intercept the view creation.
     pluginWorkspaceAccess.addViewComponentCustomizer(new ViewComponentCustomizer() {

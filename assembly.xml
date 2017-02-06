@@ -9,6 +9,16 @@
 	<formats>
 		<format>zip</format>
 	</formats>
+	
+	<fileSets>
+		<fileSet>
+			<directory>frameworks</directory>
+			<outputDirectory>/frameworks</outputDirectory>
+			<includes>
+				<include>**/*</include>
+			</includes>
+		</fileSet>
+	</fileSets>
 		
 	<files>
 		<file>
