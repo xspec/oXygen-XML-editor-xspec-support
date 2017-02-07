@@ -82,7 +82,7 @@ public class Bridge {
     });
   }
 
-  public void showTestAWT(String testName) {
+  private void showTestAWT(String testName) {
     // Just in case the file is no longer opened.
     pluginWorkspace.open(xspec);
 
@@ -137,7 +137,7 @@ public class Bridge {
     });
   }
 
-  public void runScenarioAWT(String testName) {
+  private void runScenarioAWT(String testName) {
     // Just in case the file is no longer opened.
     pluginWorkspace.open(xspec);
 
