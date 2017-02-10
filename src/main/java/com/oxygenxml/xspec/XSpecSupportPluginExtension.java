@@ -46,13 +46,17 @@ public class XSpecSupportPluginExtension implements WorkspaceAccessPluginExtensi
     	if (!found) {
     		String[] additionalFrameworks = new String[additional.length + 1];
     		System.arraycopy(additional, 0, additionalFrameworks, 0, additional.length);
-    	}
+    		
+        	additionalFrameworks[additionalFrameworks.length - 1] = 
+        			absolutePath;
+        	
+        	additional = additionalFrameworks;
+    	} 
     } else {
     	additional = new String[1];
+    	additional[0] = absolutePath;
     }
     
-	additional[additional.length - 1] = 
-    		absolutePath;
     
     pluginWorkspaceAccess.setGlobalObjectProperty(APIAccessibleOptionTags.ADDITIONAL_FRAMEWORKS_DIRECTORIES, additional);
     
