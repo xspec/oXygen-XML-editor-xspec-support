@@ -1,16 +1,21 @@
+
+=======
 # oXygen-XML-editor-xspec-support
 
 An oxygen XML Editor plugin intended to help those that create XSpec scenarios.
 
-Installation
-------------
+Install as Add-On
+-----------------
 
-The fastest way to install it is through Oxygen's add-on system:
+1. In the oXygen menu, open _Help » Install new add-ons..._
+2. In the field _Show add-ons from_, add this URL: `https://raw.githubusercontent.com/AlexJitianu/oXygen-XML-editor-xspec-support/master/build/update_site.xml`
+3. The _XSpec Helper View_ add-on will be displayed. Follow the steps to install it and restart oXygen.
+4. Optional: check _Enable automatic updates checking_ in _Options » Preferences » Add-ons_ to get update notifications
 
-1. inside Oxygen go to Help->Install new add-ons... and paste: https://raw.githubusercontent.com/AlexJitianu/oXygen-XML-editor-xspec-support/master/build/update_site.xml
-2. follow the installation procedure
+Alternative installation method
+-----
 
-An alterantive method is to download the [ZIP package](https://github.com/AlexJitianu/oXygen-XML-editor-xspec-support/blob/master/build/xspec.support-1.0-SNAPSHOT-plugin.zip?raw=true) and unzip it inside {OxygenInstallDir}/plugins
+An alternative method is to download the [ZIP package](https://github.com/AlexJitianu/oXygen-XML-editor-xspec-support/blob/master/build/xspec.support-1.0-SNAPSHOT-plugin.zip?raw=true) and unzip it inside {OxygenInstallDir}/plugins
 
 
 Known issues
@@ -38,3 +43,4 @@ How to customize it
 -------------------
 On the XML XSpec report, an XSLT is applied that generates HTML. This HTML is opened inside the view. The XSLT in question 
 is: {pluginDirectory}/frameworks/xspec/src/reporter/unit-report-oxygen.xsl
+
