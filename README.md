@@ -35,8 +35,10 @@ How to use it
 1. On the toolbar click on the action "XSpec Run"
 1. A view named "XSpec Test Results" will be opened. 
 
+**Note**: At this point you can switch to the XSLT and use the "Run" actions in the view to execute the scenarios.
 
-What you can do inside the "XSpec Test Results" view:
+
+#### What you can do inside the "XSpec Test Results" view:
 
 1. For each test threre is a "Show" action that will select in the editor the coresponding test
 1. For each scenario there is a "Run" action that will run just that scenario
