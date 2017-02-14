@@ -15,8 +15,6 @@ Install as Add-On
 Alternative installation method
 -----
 
-An alternative method is to:
-
 1. download the plugin [ZIP package](https://github.com/AlexJitianu/oXygen-XML-editor-xspec-support/raw/master/build/xspec.support-1.0-SNAPSHOT-plugin.zip) and unzip it inside `{OxygenInstallDir}/plugins`
 2. download the framework [ZIP package](https://github.com/AlexJitianu/oXygen-XML-editor-xspec-support/raw/master/build/xspec.zip) and unzip it inside `{OxygenInstallDir}/frameworks`
 
