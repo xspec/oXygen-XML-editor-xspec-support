@@ -10,7 +10,7 @@
 		<format>zip</format>
 	</formats>
 	
-	<fileSets>
+	<!--<fileSets>
 		<fileSet>
 			<directory>frameworks</directory>
 			<outputDirectory>/frameworks</outputDirectory>
@@ -18,7 +18,7 @@
 				<include>**/*</include>
 			</includes>
 		</fileSet>
-	</fileSets>
+	</fileSets>-->
 		
 	<files>
 		<file>

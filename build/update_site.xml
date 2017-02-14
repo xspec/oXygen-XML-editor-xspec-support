@@ -15,8 +15,9 @@
             </head>
             <body>
                 <div>
+                    <p style="color:red">This plugin also requires the <b>XSpec Framework</b>. Please install them both.</p>
                     <p>A proof of concept plugin that contributes a view that presents the results of an XSpec 
-                        transformation. After instalation, to use it, open an XSpec file and invoke the "XSpec Run"
+                        transformation. After instalation, to use it, open an XSpec file and invoke the <b>XSpec Run</b>
                         action from the toolbar.</p>
                     
                 </div>
@@ -25,4 +26,29 @@
         </xt:description>
         <xt:license></xt:license>
     </xt:extension>
+    
+    <xt:extension xmlns:xt="http://www.oxygenxml.com/ns/extension"
+        id="com.oxygenxml.xspec.XSpecSupportFramework">
+        <xt:location href="xspec.zip"/>
+        <xt:version>0.0.2</xt:version>
+        <xt:oxy_version>18.0+</xt:oxy_version>
+        <xt:type>framework</xt:type>
+        <xt:author>Alex Jitianu</xt:author>
+        <xt:name>XSpec Framework (required by the XSpec Helper view plugin)</xt:name>
+        <xt:description><html xmlns="http://www.w3.org/1999/xhtml">
+            <head>
+                <title>XSpec Helper view</title>
+            </head>
+            <body>
+                <div>
+                    <p style="color:red">This framework is required by the <b>XSpec Helper view</b> plugin. Please install them both.</p>
+                    <p>A customized version of the oXygen's built-in XSpec framework. It contributes a transformation scenario
+                        named "XSpec Report" that generates an HTML report that will be loaded by the <b>XSpec Helper view</b></p>
+                </div>
+            </body>
+        </html>
+        </xt:description>
+        <xt:license></xt:license>
+    </xt:extension>
+    
 </xt:extensions>

@@ -69,6 +69,7 @@ public class XSpecUtil {
         });
       } catch (TransformationScenarioNotFoundException e1) {
         logger.error(e1, e1);
+        pluginWorkspaceAccess.showErrorMessage("Required \"XSpec Report\" scenario not found. Please install the XSpec framework as well.");
       }
     }
   }
