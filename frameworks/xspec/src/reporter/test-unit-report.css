@@ -1,4 +1,10 @@
 
+/* Not for presenting. Metadata. */
+.embeded.diff.data {
+    display:none;
+}
+
+.test-diff:hover,
 .test-failed:hover,
 .test-show:hover,
 .test-run:hover {
@@ -22,7 +28,7 @@ p.passed:before {content:url('../../resources/succes12.png') " "}
 div.failure,
 p {
     
-	margin-left: 5%;
+	margin-left: 20px;
 }
 
 

@@ -23,7 +23,7 @@
                 xmlns:pkg="http://expath.org/ns/pkg"
                 xmlns:xhtml="http://www.w3.org/1999/xhtml"
                 xmlns:fn="http://www.w3.org/2005/xpath-functions"
-                exclude-result-prefixes="x xs test pkg xhtml fn">
+                exclude-result-prefixes="x xs test pkg xhtml fn xsl">
     
     <xsl:param name="report-css-uri" select="
         resolve-uri('test-unit-report.css')"/>
@@ -32,6 +32,8 @@
         resolve-uri('test-report.js')"/>
         
     <xsl:output name="escaped" method="xml" omit-xml-declaration="yes" indent="yes"/>
+    
+    <xsl:output  method="html" omit-xml-declaration="yes" indent="no"/>
     
     <xsl:import href="format-utils.xsl"/>
 
@@ -92,6 +94,9 @@
                 <span class="test-status">[<xsl:value-of select="$status"/>]</span>
                 <span>&#160;</span>
                 <span class="test-show" onclick="showTest(getAttribute('data-label'))" data-label="{xs:string(x:label/text())}">[Show]</span>
+                
+                <span>&#160;</span>
+                <span class="test-diff" onclick="showDiff(this.parentElement.parentElement)">[Diff]</span>
 
             </p>
             <xsl:choose>
@@ -99,11 +104,13 @@
                 <xsl:when test="@successful='false'">
                     <div class="failure" id="{$id}" style="display:none;">
                         <xsl:call-template name="diff"/>
+                        
                         <!--
                         <xsl:apply-templates select="x:expect"/>
                         -->
                         
                     </div>
+                    <xsl:call-template name="embedDiff"/>
                 </xsl:when>
             </xsl:choose>
         </div>
@@ -116,11 +123,11 @@
         <table class="xspecResult">
             <thead>
                 <tr>
-                    <th>Result</th>
-                    <th>
+                    <th style="font-size:14px;">Result</th>
+                    <th style="font-size:14px;">
                         <xsl:choose>
                             <xsl:when test="x:result">Expecting</xsl:when>
-                            <xsl:otherwise>Expected Result</xsl:otherwise>
+                            <xsl:otherwise>Expected</xsl:otherwise>
                         </xsl:choose>
                     </th>
                 </tr>
@@ -135,9 +142,7 @@
                     <td>
                         <xsl:choose>
                             <xsl:when test="not(x:result) and x:expect/@test">
-                                <pre>
-                <xsl:value-of select="@test" />
-              </pre>
+                                <pre><xsl:value-of select="@test" /></pre>
                             </xsl:when>
                             <xsl:otherwise>
                                 <xsl:apply-templates select="x:expect" mode="x:value">
@@ -151,13 +156,57 @@
         </table>
     </xsl:template>
     
+    <xsl:template name="embedDiff">
+        <xsl:variable name="result" as="element(x:result)"
+            select="if (x:result) then x:result else ../x:result" />
+        
+        <div class="embeded.diff.data" style="display:none;">
+            <div class="embeded.diff.result" style="white-space:pre;">
+                <xsl:apply-templates select="$result/node()" mode="copy">
+                    <xsl:with-param name="level" select="0"/>
+                </xsl:apply-templates>
+            </div>
+            <div class="embeded.diff.expected" style="white-space:pre;">
+                <xsl:apply-templates select="x:expect/node()" mode="copy">
+                    <xsl:with-param name="level" select="0"/>
+                </xsl:apply-templates>                
+            </div>
+        </div>
+        
+    </xsl:template>
+    
+    
+    <xsl:template match="node() | @*" mode="copy" >
+        <xsl:param name="level" as="xs:integer"/>
+        <xsl:message>Copy|<xsl:value-of select="node-name(.)"/>|<xsl:value-of select="."/>|</xsl:message>
+        <xsl:copy copy-namespaces="no">
+            <xsl:apply-templates select="node() | @*" mode="copy">
+                <xsl:with-param name="level" select="$level + 1"></xsl:with-param>
+            </xsl:apply-templates>
+        </xsl:copy>
+    </xsl:template>
+    
+    <xsl:template match="text()[not(normalize-space())]" mode="copy">
+        <xsl:param name="level" as="xs:integer"  />
+        <xsl:value-of select="concat('&#xA;', substring(., string-length(.) - 3*$level + 1))" />
+    </xsl:template> 
+    
+    <!-- If the indent node is last we consider the indent level smaller -->
+    <xsl:template match="text()[not(normalize-space())][empty(following-sibling::*)]" mode="copy">
+        <xsl:param name="level" as="xs:integer"  />
+        <xsl:value-of select="concat('&#xA;', substring(., string-length(.) - 3*($level - 1) + 1))" />
+    </xsl:template> 
+    
+    
     <xsl:template match="*" mode="x:value">
         <xsl:param name="comparison" as="element()?" select="()" />
         <xsl:variable name="expected" as="xs:boolean" select=". instance of element(x:expect)" />
         <xsl:choose>
             <xsl:when test="@href or node()">
                 <xsl:if test="@select">
-                    <p>XPath <code><xsl:value-of select="@select" /></code> from:</p>
+                    
+                    <!--<p>XPath <code><xsl:value-of select="@select" /></code> from:</p>-->
+                    
                 </xsl:if>
                 <xsl:choose>
                     <xsl:when test="@href">
@@ -217,5 +266,8 @@
     </xsl:template>
     
     -->
-    
+
+
+
+
 </xsl:stylesheet>

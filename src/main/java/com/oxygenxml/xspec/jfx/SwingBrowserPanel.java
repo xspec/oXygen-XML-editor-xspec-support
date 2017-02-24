@@ -254,9 +254,6 @@ public class SwingBrowserPanel extends JPanel {
     Platform.runLater(new Runnable() {
       @Override
       public void run() {
-        
-        
-        System.out.println("set content");
         engine.loadContent(content);
       }
     });

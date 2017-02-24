@@ -65,9 +65,15 @@ public class XSpecResultsPresenter extends JPanel {
     panel = new SwingBrowserPanel(new BrowserInteractor() {
       @Override
       public void pageLoaded() {
-        // The XSpec results were loaded by the WebEngine.
-        // Install the Javascript->Java bridge.
-        xspecBridge = Bridge.install(panel.getWebEngine(), XSpecResultsPresenter.this, pluginWorkspace, xspec);
+        if (xspec != null) {
+          if (xspecBridge != null) {
+            // A little house keeping.
+            xspecBridge.dispose();
+          }
+          // The XSpec results were loaded by the WebEngine.
+          // Install the Javascript->Java bridge.
+          xspecBridge = Bridge.install(panel.getWebEngine(), XSpecResultsPresenter.this, pluginWorkspace, xspec);
+        }
       }
       
       @Override
@@ -95,5 +101,32 @@ public class XSpecResultsPresenter extends JPanel {
     pluginWorkspace.showView(RESULTS, false);
     
     panel.loadURL(results);
+  }
+
+  /**
+   * Loads the results of an XSpec script.
+   * 
+   * @param xspec The executed XSpec.
+   * @param results The results.
+   */
+  public void loadContent(String content) {
+    this.xspec = null;
+    
+    panel.loadContent(content);
+    
+    pluginWorkspace.showView(RESULTS, false);
+  }  
+  
+  /**
+   * Dispose.
+   */
+  public void dispose() {
+    if (xspecBridge != null) {
+      xspecBridge.dispose();
+    }
+  }
+  
+  public URL getXspec() {
+    return xspec;
   }
 }

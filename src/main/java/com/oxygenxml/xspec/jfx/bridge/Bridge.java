@@ -1,17 +1,35 @@
 package com.oxygenxml.xspec.jfx.bridge;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStream;
 import java.lang.reflect.InvocationTargetException;
+import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 
 import javafx.scene.web.WebEngine;
 
 import javax.swing.JTextArea;
 import javax.swing.SwingUtilities;
 import javax.swing.text.BadLocationException;
+import javax.xml.transform.Result;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerConfigurationException;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.TransformerFactoryConfigurationError;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
 
+import net.sf.saxon.jaxp.IdentityTransformer;
 import netscape.javascript.JSObject;
 
 import org.apache.log4j.Logger;
+import org.w3c.dom.Node;
+import org.w3c.dom.ls.LSSerializer;
 
 import ro.sync.exml.workspace.api.PluginWorkspace;
 import ro.sync.exml.workspace.api.editor.WSEditor;
@@ -94,18 +112,18 @@ public class Bridge {
       String xpath = "//*:expect[@label=\"" + testName
           + "\" or *:label=\"" + testName
           + "\"]";
-      
+
       if (logger.isDebugEnabled()) {
-    	  logger.debug("Show test XPath: " + xpath);
+        logger.debug("Show test XPath: " + xpath);
       }
 
       try {
         WSXMLTextNodeRange[] ranges = textpage.findElementsByXPath(xpath);
         if (ranges != null && ranges.length > 0) {
-        	
-            if (logger.isDebugEnabled()) {
-          	  logger.debug("Got range: " + ranges[0]);
-            }
+
+          if (logger.isDebugEnabled()) {
+            logger.debug("Got range: " + ranges[0]);
+          }
 
           int start = textpage.getOffsetOfLineStart(ranges[0].getStartLine()) + ranges[0].getStartColumn() - 1;
           int end = textpage.getOffsetOfLineEnd(ranges[0].getStartLine()) - 1;
@@ -138,10 +156,16 @@ public class Bridge {
   }
 
   private void runScenarioAWT(String testName) {
-    // Just in case the file is no longer opened.
-    pluginWorkspace.open(xspec);
 
-    final WSEditor editor = pluginWorkspace.getEditorAccess(xspec, PluginWorkspace.MAIN_EDITING_AREA);
+    WSEditor e = pluginWorkspace.getEditorAccess(xspec, PluginWorkspace.MAIN_EDITING_AREA);
+    if (e == null) {
+      // Just in case the file is no longer opened.
+      pluginWorkspace.open(xspec);
+      
+      e = pluginWorkspace.getEditorAccess(xspec, PluginWorkspace.MAIN_EDITING_AREA);
+    }
+    
+    final WSEditor editor = e;
 
     WSEditorPage currentPage = editor.getCurrentPage();
     if (currentPage instanceof WSXMLTextEditorPage) {
@@ -239,11 +263,82 @@ public class Bridge {
                 }
               });
         }
-      } catch (XPathException e) {
-        e.printStackTrace();
-      } catch (BadLocationException e) {
-        e.printStackTrace();
+      } catch (XPathException ex) {
+        ex.printStackTrace();
+      } catch (BadLocationException ex) {
+        ex.printStackTrace();
       }
     }
+  }
+
+  /**
+   * Temporary files created for the Diff Files.
+   */
+  private Map<Integer, File> compareFiles = new HashMap<Integer, File>(); 
+
+  /**
+   * Shows the Oxygen Diff files with the given content.
+   *  
+   * @param left Left side content.
+   * @param right Right side content.
+   */
+  public void showDiff(String left, String right) {
+    if (logger.isDebugEnabled()) {
+      logger.debug("Show diff");
+
+      logger.debug("Left "  + left.getClass());
+      logger.debug("Right "  + right.getClass());
+
+      logger.debug("Left content " + left);
+      logger.debug("Right content " + right);
+    }
+
+    int leftKey = left.hashCode();
+    int rightKey = right.hashCode();
+
+    File f1 = compareFiles.get(leftKey);
+    File f2 = compareFiles.get(rightKey);
+
+    try {
+      if (f1 == null) {
+        f1 = File.createTempFile("result_", ".xml");
+        FileOutputStream fos = new FileOutputStream(f1);
+        try {
+          fos.write(((String)left).getBytes("UTF-8"));
+        } finally {
+          fos.close();
+        }
+        compareFiles.put(leftKey, f1);
+      }
+
+      if (f2 == null) {
+        f2 = File.createTempFile("expected_", ".xml");
+        FileOutputStream fos2 = new FileOutputStream(f2);
+        try {
+          fos2.write(((String)right).getBytes("UTF-8"));
+        } finally {
+          fos2.close();
+        }
+
+        compareFiles.put(rightKey, f2);
+      } 
+
+      ((StandalonePluginWorkspace)pluginWorkspace).openDiffFilesApplication(f1.toURI().toURL(), f2.toURI().toURL());
+
+    } catch (Exception e) {
+      e.printStackTrace();
+    }
+  }
+
+  /**
+   * The bridge will not be used anymore. Dispose any resources kept internally.
+   */
+  public void dispose() {
+    Collection<File> values = compareFiles.values();
+    for (File file : values) {
+      file.delete();
+    }
+
+    compareFiles.clear();
   }
 }
