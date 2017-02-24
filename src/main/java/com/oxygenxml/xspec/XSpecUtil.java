@@ -79,9 +79,10 @@ public class XSpecUtil {
       final XSpecResultsPresenter resultsPresenter,
       final TransformationFeedback feedback) {
 
-    resultsPresenter.loadContent(PENDING);
-
     final WSEditor wsEditor = getXSpecEditor(pluginWorkspaceAccess, resultsPresenter);
+    
+    resultsPresenter.loadContent(PENDING);
+    
     if (wsEditor != null) {
       try {
         wsEditor.runTransformationScenarios(new String[] {SCENARIO_NAME}, new TransformationFeedback() {
@@ -125,6 +126,7 @@ public class XSpecUtil {
   private static WSEditor getXSpecEditor(
       final StandalonePluginWorkspace pluginWorkspaceAccess, XSpecResultsPresenter resultsPresenter) {
     WSEditor currentEditorAccess = pluginWorkspaceAccess.getCurrentEditorAccess(PluginWorkspace.MAIN_EDITING_AREA);
+    
     boolean isXspecOn = false;
     if (currentEditorAccess != null) {
       String extension = URLUtil.getExtension(currentEditorAccess.getEditorLocation().toString());
@@ -151,10 +153,7 @@ public class XSpecUtil {
           currentEditorAccess = candidate;
         }
       }
-      
-      return currentEditorAccess;
     }
-    
     
     return currentEditorAccess;
   }
