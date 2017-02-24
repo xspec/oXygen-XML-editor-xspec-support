@@ -91,16 +91,16 @@ public class Bridge {
    * 
    * @param testName Test name.
    */
-  public void showTest(final String testName) {
+  public void showTest(final String testName, final String scenarioName) {
     SwingUtilities.invokeLater(new Runnable() {
       @Override
       public void run() {
-        showTestAWT(testName);
+        showTestAWT(testName, scenarioName);
       }
     });
   }
 
-  private void showTestAWT(String testName) {
+  private void showTestAWT(String testName, String scenarioName) {
     // Just in case the file is no longer opened.
     pluginWorkspace.open(xspec);
 
@@ -111,8 +111,10 @@ public class Bridge {
       WSXMLTextEditorPage textpage = (WSXMLTextEditorPage) currentPage;
       String xpath = "//*:expect[@label=\"" + testName
           + "\" or *:label=\"" + testName
-          + "\"]";
-
+          + "\"][parent::*:scenario[@label=\"" + scenarioName
+          + "\" or *:label/text()=\"" + scenarioName
+          + "\"]]";
+      
       if (logger.isDebugEnabled()) {
         logger.debug("Show test XPath: " + xpath);
       }

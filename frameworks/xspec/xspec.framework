@@ -531,7 +531,7 @@
 									<String>${frameworkDir}/</String>
 								</field>
 								<field name="showConsoleAlways">
-									<Boolean>true</Boolean>
+									<Boolean>false</Boolean>
 								</field>
 								<field name="advancedOptionsMap">
 									<null/>
@@ -935,7 +935,7 @@
 					</field>
 					<field name="defaultTransformationScenarios">
 						<list>
-							<String>XSpec Report</String>
+							<String>XSpec for XSLT</String>
 						</list>
 					</field>
 					<field name="extensionsBundleClassName">

@@ -93,7 +93,7 @@
                 <span>&#160;</span>
                 <span class="test-status">[<xsl:value-of select="$status"/>]</span>
                 <span>&#160;</span>
-                <span class="test-show" onclick="showTest(getAttribute('data-label'))" data-label="{xs:string(x:label/text())}">[Show]</span>
+                <span class="test-show" onclick="showTest(this)" data-label="{xs:string(x:label/text())}">[Show]</span>
                 
                 <span>&#160;</span>
                 <span class="test-diff" onclick="showDiff(this.parentElement.parentElement)">[Diff]</span>

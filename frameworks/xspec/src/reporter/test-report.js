@@ -20,9 +20,17 @@ function toggleResult(test) {
 }
 
 
-function showTest(test) {
+function showTest(element) {
 
-    xspecBridge.showTest(test);
+
+    var test = element.getAttribute('data-label');
+    
+    var scenario = getAncestor(element, "testsuite");
+    
+    var scenarioName = scenario.getAttribute('data-name');
+    
+    
+    xspecBridge.showTest(test, scenarioName);
     
 }
 
@@ -58,4 +66,14 @@ function showDiff(test) {
     
   xspecBridge.showDiff(left.innerHTML, right.innerHTML);
     
+}
+
+
+function getAncestor(element, ancestorClass) {
+    var node = element;
+    while (node != null && node.className != ancestorClass) {
+        node = node.parentElement;
+    }
+
+    return node;
 }
