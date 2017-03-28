@@ -179,7 +179,8 @@
         </xsl:if>
         <xsl:value-of select="normalize-space(x:label(.))"/>
      </message>
-    <x:scenario>
+    <!-- Oxygen Patch : Keep the location of the scenario for backmapping. -->
+    <x:scenario  source="{@source}">
       <xsl:if test="$pending-p">
         <xsl:attribute name="pending" select="$pending" />
       </xsl:if>

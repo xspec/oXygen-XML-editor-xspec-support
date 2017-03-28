@@ -78,7 +78,8 @@
 
    <xsl:template match="x:scenario" mode="x:gather-specs">
       <xsl:param name="xslt-version" as="xs:string" tunnel="yes" required="yes"/>
-      <x:scenario xslt-version="{$xslt-version}">
+      <!-- Oxygen Patch : Keep the location of the scenario for backmapping. -->
+      <x:scenario xslt-version="{$xslt-version}" source="{base-uri(.)}">
          <xsl:copy-of select="@*"/>
          <xsl:apply-templates mode="x:gather-specs"/>
       </x:scenario>

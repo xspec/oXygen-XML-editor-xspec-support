@@ -28,16 +28,22 @@ function showTest(element) {
     var scenario = getAncestor(element, "testsuite");
     
     var scenarioName = scenario.getAttribute('data-name');
+    var scenarioLocation = scenario.getAttribute('data-source');
     
     
-    xspecBridge.showTest(test, scenarioName);
+    xspecBridge.showTest(test, scenarioName, scenarioLocation);
     
 }
 
 
-function runScenario(test) {
+function runScenario(currentNode) {
+
+    var scenario = getAncestor(currentNode, "testsuite");
     
-    xspecBridge.runScenario(test);
+    var scenarioName = scenario.getAttribute('data-name');
+    var scenarioLocation = scenario.getAttribute('data-source');
+    
+    xspecBridge.runScenario(scenarioName, scenarioLocation);
     
 }
 

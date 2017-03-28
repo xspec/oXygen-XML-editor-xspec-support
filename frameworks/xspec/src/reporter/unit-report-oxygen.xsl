@@ -53,12 +53,13 @@
     <xsl:template match="x:scenario">
         <div class="testsuite">
             <xsl:attribute name="data-name" select="x:label"/>
+            <xsl:attribute name="data-source" select="@source"/>
             <xsl:attribute name="data-tests" select="count(.//x:test)"/>
             <xsl:attribute name="data-failures" select="count(.//x:test[@successful='false'])"/>
             
             <span><xsl:value-of select="x:label"/></span>
             <span>&#160;</span>
-            <span class="test-run" data-label="{xs:string(x:label/text())}" onclick="runScenario(getAttribute('data-label'))" >[Run]</span>
+            <span class="test-run" onclick="runScenario(this)" >[Run]</span>
             
             <xsl:apply-templates select="x:test"/>
             <xsl:apply-templates select="x:scenario" />

@@ -2,8 +2,6 @@ package com.oxygenxml.xspec.jfx.bridge;
 
 import java.io.File;
 import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.OutputStream;
 import java.lang.reflect.InvocationTargetException;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -16,20 +14,10 @@ import javafx.scene.web.WebEngine;
 import javax.swing.JTextArea;
 import javax.swing.SwingUtilities;
 import javax.swing.text.BadLocationException;
-import javax.xml.transform.Result;
-import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerConfigurationException;
-import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.TransformerFactoryConfigurationError;
-import javax.xml.transform.dom.DOMSource;
-import javax.xml.transform.stream.StreamResult;
 
-import net.sf.saxon.jaxp.IdentityTransformer;
 import netscape.javascript.JSObject;
 
 import org.apache.log4j.Logger;
-import org.w3c.dom.Node;
-import org.w3c.dom.ls.LSSerializer;
 
 import ro.sync.exml.workspace.api.PluginWorkspace;
 import ro.sync.exml.workspace.api.editor.WSEditor;
@@ -90,21 +78,29 @@ public class Bridge {
    * Invoked from Javascript. Shows an XSpect test (<expect> element).
    * 
    * @param testName Test name.
+   * @param scenarioName Scenario name.
+   * @param scenarioLocation System id of the file that contains the scenario.
    */
-  public void showTest(final String testName, final String scenarioName) {
+  public void showTest(final String testName, final String scenarioName, final String scenarioLocation) {
     SwingUtilities.invokeLater(new Runnable() {
       @Override
       public void run() {
-        showTestAWT(testName, scenarioName);
+        showTestAWT(testName, scenarioName, scenarioLocation);
       }
     });
   }
 
-  private void showTestAWT(String testName, String scenarioName) {
+  private void showTestAWT(String testName, String scenarioName, String scenarioLocation) {
     // Just in case the file is no longer opened.
-    pluginWorkspace.open(xspec);
+    URL toOpen = xspec;
+    try {
+      toOpen = new URL(scenarioLocation);
+    } catch (MalformedURLException e1) {
+      e1.printStackTrace();
+    }
+    pluginWorkspace.open(toOpen);
 
-    WSEditor editor = pluginWorkspace.getEditorAccess(xspec, PluginWorkspace.MAIN_EDITING_AREA);
+    WSEditor editor = pluginWorkspace.getEditorAccess(toOpen, PluginWorkspace.MAIN_EDITING_AREA);
 
     WSEditorPage currentPage = editor.getCurrentPage();
     if (currentPage instanceof WSXMLTextEditorPage) {
@@ -114,7 +110,7 @@ public class Bridge {
           + "\"][parent::*:scenario[@label=\"" + scenarioName
           + "\" or *:label/text()=\"" + scenarioName
           + "\"]]";
-      
+
       if (logger.isDebugEnabled()) {
         logger.debug("Show test XPath: " + xpath);
       }
@@ -134,7 +130,7 @@ public class Bridge {
 
 
         } else {
-        	logger.warn("Unable to identify test");
+          logger.warn("Unable to identify test");
         }
       } catch (XPathException e) {
         e.printStackTrace();
@@ -149,26 +145,28 @@ public class Bridge {
    * Invoked from Javascript. Runs an XSpect scenario.
    * 
    * @param scenarioName The name of the scenario.
+   * @param scenarioLocation System id of the file that contains the scenario.
    */
-  public void runScenario(final String scenarioName) {
+  public void runScenario(final String scenarioName, final String scenarioLocation) {
     SwingUtilities.invokeLater(new Runnable() {
       @Override
       public void run() {
-        runScenarioAWT(scenarioName);
+        runScenarioAWT(scenarioName, scenarioLocation);
       }
     });
   }
 
-  private void runScenarioAWT(String testName) {
+  private void runScenarioAWT(String scenarioName, String scenarioLocation) {
 
-    WSEditor e = pluginWorkspace.getEditorAccess(xspec, PluginWorkspace.MAIN_EDITING_AREA);
-    if (e == null) {
-      // Just in case the file is no longer opened.
-      pluginWorkspace.open(xspec);
-      
-      e = pluginWorkspace.getEditorAccess(xspec, PluginWorkspace.MAIN_EDITING_AREA);
+    URL toOpen = xspec;
+    try {
+      toOpen = new URL(scenarioLocation);
+    } catch (MalformedURLException e1) {
+      e1.printStackTrace();
     }
     
+    WSEditor e = getEditorAccess(toOpen);
+
     final WSEditor editor = e;
 
     WSEditorPage currentPage = editor.getCurrentPage();
@@ -176,13 +174,14 @@ public class Bridge {
 
       // Step 1. Locate the scenario.
       final WSXMLTextEditorPage textpage = (WSXMLTextEditorPage) currentPage;
-      String xpath = "//*:scenario[@label=\"" + testName
-          + "\" or *:label=\"" + testName
+      String xpath = "//*:scenario[@label=\"" + scenarioName
+          + "\" or *:label=\"" + scenarioName
           + "\"]";
 
       if (logger.isDebugEnabled()) {
         logger.debug("Xpath " + xpath);
       }
+      
       try {
         WSXMLTextNodeRange[] ranges = textpage.findElementsByXPath(xpath);
         if (logger.isDebugEnabled()) {
@@ -233,8 +232,14 @@ public class Bridge {
           // we can modify as we see fit!
           editor.save();
 
+          WSEditor xspecToExecute = e;
+          if (!xspec.equals(toOpen)) {
+            xspecToExecute = getEditorAccess(xspec);
+          }
+          
           // Step 3. Run the scenario
           XSpecUtil.runScenario(
+              xspecToExecute,
               (StandalonePluginWorkspace) pluginWorkspace, 
               resultsPresenter,
               new TransformationFeedback() {
@@ -266,6 +271,8 @@ public class Bridge {
                   }
                 }
               });
+        } else {
+          logger.warn("Unable to indetify scenario");
         }
       } catch (XPathException ex) {
         ex.printStackTrace();
@@ -273,6 +280,17 @@ public class Bridge {
         ex.printStackTrace();
       }
     }
+  }
+
+  private WSEditor getEditorAccess(URL toOpen) {
+    WSEditor e = pluginWorkspace.getEditorAccess(toOpen, PluginWorkspace.MAIN_EDITING_AREA);
+    if (e == null) {
+      // Just in case the file is no longer opened.
+      pluginWorkspace.open(toOpen);
+
+      e = pluginWorkspace.getEditorAccess(toOpen, PluginWorkspace.MAIN_EDITING_AREA);
+    }
+    return e;
   }
 
   /**

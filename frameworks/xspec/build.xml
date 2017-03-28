@@ -92,6 +92,10 @@ where:
 
   <target name="xspec"
     description="Runs the XSpec unit tests in ${xspec.xml}">
+    
+    <!-- Oxygen Patch Start: Clean up before executing. -->
+    <delete dir="${xspec.dir}"/>
+    <!-- Oxygen Patch End:   Clean up before executing. -->
     <xslt in="${xspec.xml}" 
       out="${xspec.xsl}"
       style="${xspec.project.dir}/src/compiler/generate-xspec-tests.xsl"
