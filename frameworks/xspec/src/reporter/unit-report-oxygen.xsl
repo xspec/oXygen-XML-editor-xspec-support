@@ -61,7 +61,7 @@
             <span class="test-run" data-label="{xs:string(x:label/text())}" onclick="runScenario(getAttribute('data-label'))" >[Run]</span>
             
             <xsl:apply-templates select="x:test"/>
-            <xsl:apply-templates select="x:scenario" mode="nested"/>
+            <xsl:apply-templates select="x:scenario" />
         </div>
     </xsl:template>
 
@@ -94,9 +94,10 @@
                 <span class="test-status">[<xsl:value-of select="$status"/>]</span>
                 <span>&#160;</span>
                 <span class="test-show" onclick="showTest(this)" data-label="{xs:string(x:label/text())}">[Show]</span>
-                
-                <span>&#160;</span>
-                <span class="test-diff" onclick="showDiff(this.parentElement.parentElement)">[Diff]</span>
+                <xsl:if test="@successful='false'">
+                    <span>&#160;</span>
+                    <span class="test-diff" onclick="showDiff(this.parentElement.parentElement)">[Diff]</span>
+                </xsl:if>
 
             </p>
             <xsl:choose>

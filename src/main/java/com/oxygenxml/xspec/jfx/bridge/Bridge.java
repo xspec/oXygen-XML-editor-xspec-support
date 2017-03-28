@@ -133,6 +133,8 @@ public class Bridge {
           textpage.select(start, end);
 
 
+        } else {
+        	logger.warn("Unable to identify test");
         }
       } catch (XPathException e) {
         e.printStackTrace();

@@ -1,4 +1,24 @@
 
+.testsuite {
+    margin-top:10px;
+}
+
+.testsuite > .testsuite {
+    margin-left:10px;
+    margin-top:0px;
+    
+}
+
+.testcase {
+    margin-top: 5px;
+    margin-bottom: 5px;
+}
+
+div.testcase > p {
+    margin-top: 0px;
+    margin-bottom: 0px;
+}
+
 /* Not for presenting. Metadata. */
 .embeded.diff.data {
     display:none;
