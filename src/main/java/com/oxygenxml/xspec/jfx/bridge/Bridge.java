@@ -9,16 +9,17 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
-import javafx.scene.web.WebEngine;
-
 import javax.swing.JTextArea;
 import javax.swing.SwingUtilities;
 import javax.swing.text.BadLocationException;
 
-import netscape.javascript.JSObject;
-
 import org.apache.log4j.Logger;
 
+import com.oxygenxml.xspec.XSpecResultsView;
+import com.oxygenxml.xspec.XSpecUtil;
+
+import javafx.scene.web.WebEngine;
+import netscape.javascript.JSObject;
 import ro.sync.exml.workspace.api.PluginWorkspace;
 import ro.sync.exml.workspace.api.editor.WSEditor;
 import ro.sync.exml.workspace.api.editor.page.WSEditorPage;
@@ -28,9 +29,6 @@ import ro.sync.exml.workspace.api.editor.page.text.xml.WSXMLTextNodeRange;
 import ro.sync.exml.workspace.api.editor.page.text.xml.XPathException;
 import ro.sync.exml.workspace.api.editor.transformation.TransformationFeedback;
 import ro.sync.exml.workspace.api.standalone.StandalonePluginWorkspace;
-
-import com.oxygenxml.xspec.XSpecResultsPresenter;
-import com.oxygenxml.xspec.XSpecUtil;
 
 /**
  * A bridge between JavaScript and Java. JavaScript code will be able to invoke 
@@ -51,7 +49,7 @@ public class Bridge {
 
   private PluginWorkspace pluginWorkspace;
 
-  private XSpecResultsPresenter resultsPresenter;
+  private XSpecResultsView resultsPresenter;
 
   /**
    * Constructor.
@@ -60,13 +58,13 @@ public class Bridge {
    * 
    * @param context Form control editing context.
    */
-  private Bridge(PluginWorkspace pluginWorkspace, XSpecResultsPresenter resultsPresenter, URL xspec) {
+  private Bridge(PluginWorkspace pluginWorkspace, XSpecResultsView resultsPresenter, URL xspec) {
     this.pluginWorkspace = pluginWorkspace;
     this.resultsPresenter = resultsPresenter;
     this.xspec = xspec;
   }
 
-  public static Bridge install(WebEngine engine, XSpecResultsPresenter resultsPresenter, PluginWorkspace pluginWorkspace, URL xspec) {
+  public static Bridge install(WebEngine engine, XSpecResultsView resultsPresenter, PluginWorkspace pluginWorkspace, URL xspec) {
     JSObject window = (JSObject) engine.executeScript("window");
     Bridge value = new Bridge(pluginWorkspace, resultsPresenter, xspec);
     window.setMember("xspecBridge", value);

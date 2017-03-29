@@ -75,7 +75,7 @@ public class XSpecUtil {
    */
   public static void runScenario(
       StandalonePluginWorkspace pluginWorkspaceAccess, 
-      XSpecResultsPresenter resultsPresenter,
+      XSpecResultsView resultsPresenter,
       TransformationFeedback feedback) {
     
     runScenario(null, pluginWorkspaceAccess, resultsPresenter, feedback);
@@ -92,7 +92,7 @@ public class XSpecUtil {
   public static void runScenario(
       WSEditor wsEditor,
       final StandalonePluginWorkspace pluginWorkspaceAccess, 
-      final XSpecResultsPresenter resultsPresenter,
+      final XSpecResultsView resultsPresenter,
       final TransformationFeedback feedback) {
     
     if (wsEditor == null) {
@@ -145,7 +145,7 @@ public class XSpecUtil {
    * @return The XSpec editor to execute.
    */
   private static WSEditor getXSpecEditor(
-      final StandalonePluginWorkspace pluginWorkspaceAccess, XSpecResultsPresenter resultsPresenter) {
+      final StandalonePluginWorkspace pluginWorkspaceAccess, XSpecResultsView resultsPresenter) {
     WSEditor currentEditorAccess = pluginWorkspaceAccess.getCurrentEditorAccess(PluginWorkspace.MAIN_EDITING_AREA);
     
     boolean isXspecOn = false;

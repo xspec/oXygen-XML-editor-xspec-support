@@ -1,26 +1,32 @@
 package com.oxygenxml.xspec;
 
 import java.awt.BorderLayout;
+import java.awt.event.ActionEvent;
 import java.net.URL;
 
-import javafx.application.Platform;
-
+import javax.swing.AbstractAction;
+import javax.swing.Action;
+import javax.swing.ImageIcon;
+import javax.swing.JButton;
 import javax.swing.JPanel;
 
 import org.apache.log4j.Logger;
 
-import ro.sync.exml.workspace.api.standalone.StandalonePluginWorkspace;
-
 import com.oxygenxml.xspec.jfx.BrowserInteractor;
 import com.oxygenxml.xspec.jfx.SwingBrowserPanel;
 import com.oxygenxml.xspec.jfx.bridge.Bridge;
+
+import javafx.application.Platform;
+import javafx.scene.web.WebEngine;
+import ro.sync.exml.workspace.api.standalone.StandalonePluginWorkspace;
+import ro.sync.exml.workspace.api.standalone.ui.ToolbarToggleButton;
 
 /**
  * A view taht uses a JavaFX WebEngine to present the results of running an XSpec 
  * scenario.   
  * @author alex_jitianu
  */
-public class XSpecResultsPresenter extends JPanel {
+public class XSpecResultsView extends JPanel {
   /**
    * View ID.
    */
@@ -29,7 +35,15 @@ public class XSpecResultsPresenter extends JPanel {
   /**
    * Logger for logging.
    */
-  private static final Logger logger = Logger.getLogger(XSpecResultsPresenter.class.getName());
+  private static final Logger logger = Logger.getLogger(XSpecResultsView.class.getName());
+  /**
+   * A Javascript that will present just the failed tests.
+   */
+  protected static final String SHOW_ONLY_FAILED_TESTS = "showOnlyFailedTests();";
+  /**
+   * A Javascript that will present all the tests.
+   */
+  protected static final String SHOW_ALL_TESTS = "showAllTests();";
   
   static {
     Platform.setImplicitExit(false);
@@ -54,13 +68,17 @@ public class XSpecResultsPresenter extends JPanel {
    * Currently loaded XSpec.
    */
   private URL xspec;
+  /**
+   * Show just the tests that failed.
+   */
+  private JButton showFailuresOnly;
   
   /**
    * Constructor.
    * 
    * @param pluginWorkspace Oxygen workspace access.
    */
-  public XSpecResultsPresenter(final StandalonePluginWorkspace pluginWorkspace) {
+  public XSpecResultsView(final StandalonePluginWorkspace pluginWorkspace) {
     this.pluginWorkspace = pluginWorkspace;
     panel = new SwingBrowserPanel(new BrowserInteractor() {
       @Override
@@ -72,7 +90,9 @@ public class XSpecResultsPresenter extends JPanel {
           }
           // The XSpec results were loaded by the WebEngine.
           // Install the Javascript->Java bridge.
-          xspecBridge = Bridge.install(panel.getWebEngine(), XSpecResultsPresenter.this, pluginWorkspace, xspec);
+          xspecBridge = Bridge.install(panel.getWebEngine(), XSpecResultsView.this, pluginWorkspace, xspec);
+          
+          applyTestFilter();
         }
       }
       
@@ -86,7 +106,42 @@ public class XSpecResultsPresenter extends JPanel {
     panel.loadContent("");
     
     setLayout(new BorderLayout());
+    
+    JPanel toolbar = new JPanel(new BorderLayout());
+    
+    Action showFailuresAction = new AbstractAction() {
+      @Override
+      public void actionPerformed(ActionEvent arg0) {
+        applyTestFilter();
+      }
+    };
+    
+    ImageIcon ic = new ImageIcon(getClass().getClassLoader().getResource("failures.gif"));
+    showFailuresAction.putValue(Action.SMALL_ICON, ic);
+    showFailuresAction.putValue(Action.SHORT_DESCRIPTION, "Show only failures.");
+    showFailuresOnly = new ToolbarToggleButton(showFailuresAction);
+    toolbar.add(showFailuresOnly, BorderLayout.WEST);
+    add(toolbar, BorderLayout.NORTH);
+    
     add(panel, BorderLayout.CENTER);
+  }
+  
+  /**
+   * Applies the filtering criteria on the test results.
+   */
+  private void applyTestFilter() {
+    boolean selected = showFailuresOnly.isSelected();
+    if (selected) {
+      panel.executeScript(SHOW_ONLY_FAILED_TESTS);
+    } else {
+      panel.executeScript(SHOW_ALL_TESTS);
+    }
+  }
+  
+  public void setFilterTests(boolean filter) {
+    showFailuresOnly.setSelected(filter);
+    
+    applyTestFilter();
   }
   
   /**
@@ -128,5 +183,9 @@ public class XSpecResultsPresenter extends JPanel {
   
   public URL getXspec() {
     return xspec;
+  }
+  
+  public WebEngine getEngineForTests() {
+    return panel.getWebEngine();
   }
 }

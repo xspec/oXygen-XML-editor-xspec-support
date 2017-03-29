@@ -1,13 +1,11 @@
 package com.oxygenxml.xspec;
 
 import java.awt.event.ActionEvent;
-import java.io.File;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.JComponent;
 
-import ro.sync.exml.options.APIAccessibleOptionTags;
 import ro.sync.exml.plugin.workspace.WorkspaceAccessPluginExtension;
 import ro.sync.exml.workspace.api.standalone.StandalonePluginWorkspace;
 import ro.sync.exml.workspace.api.standalone.ToolbarComponentsCustomizer;
@@ -25,17 +23,17 @@ public class XSpecSupportPluginExtension implements WorkspaceAccessPluginExtensi
   /**
    * Results presenter.
    */
-  private XSpecResultsPresenter resultsPresenter;
+  private XSpecResultsView resultsPresenter;
 
   @Override
   public void applicationStarted(final StandalonePluginWorkspace pluginWorkspaceAccess) {
-    resultsPresenter = new XSpecResultsPresenter(pluginWorkspaceAccess);
+    resultsPresenter = new XSpecResultsView(pluginWorkspaceAccess);
     
     // Intercept the view creation.
     pluginWorkspaceAccess.addViewComponentCustomizer(new ViewComponentCustomizer() {
       @Override
       public void customizeView(ViewInfo viewInfo) {
-        if (viewInfo.getViewID().equals(XSpecResultsPresenter.RESULTS)) {
+        if (viewInfo.getViewID().equals(XSpecResultsView.RESULTS)) {
           viewInfo.setComponent(resultsPresenter);
           viewInfo.setTitle("XSpec Test Results");
         }

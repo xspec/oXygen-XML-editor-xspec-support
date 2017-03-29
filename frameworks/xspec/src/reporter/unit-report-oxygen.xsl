@@ -81,7 +81,7 @@
         <xsl:param name="prefix"/>
         
         <xsl:variable name="id" select="generate-id()"/>
-        <div class="testcase">
+        <div class="testcase" data-name="{xs:string(x:label/text())}">
             <xsl:variable name="status">
                 <xsl:choose>
                     <xsl:when test="@pending">skipped</xsl:when>
@@ -90,11 +90,11 @@
                 </xsl:choose>
             </xsl:variable>
             <p class="{$status}">
-                <span class="test-{$status}" onclick="toggleResult(this.parentElement.parentElement)"><xsl:value-of select="concat($prefix, x:label)"/></span>
+                <span class="test-{$status}" onclick="toggleResult(this)"><xsl:value-of select="concat($prefix, x:label)"/></span>
                 <span>&#160;</span>
                 <span class="test-status">[<xsl:value-of select="$status"/>]</span>
                 <span>&#160;</span>
-                <span class="test-show" onclick="showTest(this)" data-label="{xs:string(x:label/text())}">[Show]</span>
+                <span class="test-show" onclick="showTest(this)">[Show]</span>
                 <xsl:if test="@successful='false'">
                     <span>&#160;</span>
                     <span class="test-diff" onclick="showDiff(this.parentElement.parentElement)">[Diff]</span>
