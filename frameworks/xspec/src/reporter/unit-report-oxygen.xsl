@@ -56,11 +56,11 @@
             <xsl:attribute name="data-source" select="@source"/>
             <xsl:attribute name="data-tests" select="count(.//x:test)"/>
             <xsl:attribute name="data-failures" select="count(.//x:test[@successful='false'])"/>
-            
+            <p style="margin:0px;">
             <span><xsl:value-of select="x:label"/></span>
             <span>&#160;</span>
             <span class="test-run" onclick="runScenario(this)" >[Run]</span>
-            
+            </p>
             <xsl:apply-templates select="x:test"/>
             <xsl:apply-templates select="x:scenario" />
         </div>
