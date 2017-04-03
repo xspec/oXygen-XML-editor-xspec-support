@@ -33,7 +33,7 @@
         
     <xsl:output name="escaped" method="xml" omit-xml-declaration="yes" indent="yes"/>
     
-    <xsl:output  method="html" omit-xml-declaration="yes" indent="no"/>
+    <xsl:output  method="html" omit-xml-declaration="yes" indent="yes" />
     
     <xsl:import href="format-utils.xsl"/>
 
@@ -161,8 +161,7 @@
     <xsl:template name="embedDiff">
         <xsl:variable name="result" as="element(x:result)"
             select="if (x:result) then x:result else ../x:result" />
-        
-        <div class="embeded.diff.data" style="display:none;">
+        <pre class="embeded.diff.data" style="display:none;">
             <div class="embeded.diff.result" style="white-space:pre;">
                 <xsl:apply-templates select="$result/node()" mode="copy">
                     <xsl:with-param name="level" select="0"/>
@@ -173,8 +172,7 @@
                     <xsl:with-param name="level" select="0"/>
                 </xsl:apply-templates>                
             </div>
-        </div>
-        
+        </pre>
     </xsl:template>
     
     
