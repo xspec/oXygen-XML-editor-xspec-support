@@ -20,7 +20,8 @@ function toggleResult(element) {
             
             if (!isElementInViewport(failure)) {
             	// If the element is not visible, scroll a bit to bring it into view.
-            	window.scrollTo(0, rect.top + (rect.top - rect.bottom) / 2);
+            	var sc = rect.top + (rect.bottom - rect.top) / 2;
+            	window.scrollTo(0, sc);
             }
         } else {
             failure.style.display = "none";
