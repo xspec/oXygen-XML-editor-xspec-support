@@ -59,7 +59,7 @@
             <p style="margin:0px;">
             <span><xsl:value-of select="x:label"/></span>
             <span>&#160;</span>
-            <span class="test-run" onclick="runScenario(this)" >[Run]</span>
+            <a class="button" onclick="runScenario(this)" >Run</a>
             </p>
             <xsl:apply-templates select="x:test"/>
             <xsl:apply-templates select="x:scenario" />
@@ -92,12 +92,12 @@
             <p class="{$status}">
                 <span class="test-{$status}" onclick="toggleResult(this)"><xsl:value-of select="concat($prefix, x:label)"/></span>
                 <span>&#160;</span>
-                <span class="test-status">[<xsl:value-of select="$status"/>]</span>
-                <span>&#160;</span>
-                <span class="test-show" onclick="showTest(this)">[Show]</span>
+                <a class="button" onclick="showTest(this)">Show</a>
                 <xsl:if test="@successful='false'">
                     <span>&#160;</span>
-                    <span class="test-diff" onclick="showDiff(this.parentElement.parentElement)">[Diff]</span>
+                    <a class="button" onclick="toggleResult(this)">Q-Diff</a>
+                    <span>&#160;</span>
+                    <a class="button" onclick="showDiff(this)">Diff</a>
                 </xsl:if>
 
             </p>

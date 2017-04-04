@@ -1,4 +1,5 @@
 
+
 .testsuite {
     margin-top:10px;
 }
@@ -24,10 +25,7 @@ div.testcase > p {
     display:none;
 }
 
-.test-diff:hover,
-.test-failed:hover,
-.test-show:hover,
-.test-run:hover {
+.test-failed:hover {
     text-decoration:underline;
     cursor:pointer;
 }
@@ -51,6 +49,40 @@ p {
 	margin-left: 20px;
 }
 
+
+/* --------------------- */
+/*      BUTTONS          */
+/* --------------------- */
+
+a.button { 
+	text-decoration: none; 
+	margin: 0 1px; 
+}
+a.button {
+	display: inline-block;
+	color: #667;
+	background-color: #eee;
+	font-weight: normal;
+	font-size: 12px;
+	padding: 1px 2px;
+	border-radius: 5px;
+	border: 1px solid rgba(0,0,0,0.3);
+	border-bottom-width: 3px;
+}
+
+	a.button:hover {
+		background-color: #e3e3e3;
+		border-color: rgba(0,0,0,0.5);
+		cursor:pointer;
+	}
+	
+	a.button:active {
+		background-color: #CCC;
+		border-color: rgba(0,0,0,0.9);
+	}
+	
+/* --------------------- */
+/* --------------------- */
 
 img {
 	position: relative;

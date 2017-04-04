@@ -14,10 +14,36 @@ function toggleResult(element) {
     if (failure != null) {
         if (failure.style.display == "none") {
             failure.style.display = "block";
+            
+            
+            var rect = failure.getBoundingClientRect();
+            
+            if (!isElementInViewport(failure)) {
+            	// If the element is not visible, scroll a bit to bring it into view.
+            	window.scrollTo(0, rect.top + (rect.top - rect.bottom) / 2);
+            }
         } else {
             failure.style.display = "none";
         }
     }
+}
+
+/**
+ * Tests if the given element is visible inside the current viewport.
+ * 
+ * @param el Element to test.
+ * 
+ * @returns true if a part of the element is indeed visible.
+ */
+function isElementInViewport (el) {
+    var rect = el.getBoundingClientRect();
+
+    return (
+        rect.top >= 0 &&
+        rect.left >= 0 &&
+        rect.bottom <= (window.innerHeight || document.documentElement.clientHeight) && /*or $(window).height() */
+        rect.right <= (window.innerWidth || document.documentElement.clientWidth) /*or $(window).width() */
+    );
 }
 
 
@@ -48,7 +74,9 @@ function runScenario(currentNode) {
 }
 
 
-function showDiff(test) {
+function showDiff(currentNode) {
+	
+	var test = getAncestor(currentNode, "testcase");
     
     var diffData = null;
     for (var i = 0; i < test.childNodes.length; i++) {
