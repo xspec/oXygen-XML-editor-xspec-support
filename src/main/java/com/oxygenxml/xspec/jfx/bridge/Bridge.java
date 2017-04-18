@@ -342,8 +342,18 @@ public class Bridge {
 
         compareFiles.put(rightKey, f2);
       } 
+      
+      
+      final URL url1 = f1.toURI().toURL();
+      final URL url2 = f2.toURI().toURL();
+      
+      SwingUtilities.invokeLater(new Runnable() {
+        @Override
+        public void run() {
+          ((StandalonePluginWorkspace)pluginWorkspace).openDiffFilesApplication(url1, url2);
+        }
+      });
 
-      ((StandalonePluginWorkspace)pluginWorkspace).openDiffFilesApplication(f1.toURI().toURL(), f2.toURI().toURL());
 
     } catch (Exception e) {
       e.printStackTrace();
