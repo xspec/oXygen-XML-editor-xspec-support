@@ -245,28 +245,22 @@ public class Bridge {
                 public void transformationStopped() {}
                 @Override
                 public void transformationFinished(boolean success) {
-                  try {
-                    SwingUtilities.invokeAndWait(new Runnable() {
-                      @Override
-                      public void run() {
-                        // Step 4. Undo the change.
+                  SwingUtilities.invokeLater(new Runnable() {
+                    @Override
+                    public void run() {
+                      // Step 4. Undo the change.
 
-                        // TODO The transformation is performed on a thread. The user 
-                        // can touch the editor during this time. An UNDO now can't guarantee 
-                        // the fact that we will UNDO the @focus attribute set above.
-                        TextActionsProvider actionsProvider = textpage.getActionsProvider();
-                        Object object = actionsProvider.getTextActions().get("Edit/Edit_Undo");
-                        if (object != null) {
-                          actionsProvider.invokeAction(object);
-                          editor.save();
-                        }
+                      // TODO The transformation is performed on a thread. The user 
+                      // can touch the editor during this time. An UNDO now can't guarantee 
+                      // the fact that we will UNDO the @focus attribute set above.
+                      TextActionsProvider actionsProvider = textpage.getActionsProvider();
+                      Object object = actionsProvider.getTextActions().get("Edit/Edit_Undo");
+                      if (object != null) {
+                        actionsProvider.invokeAction(object);
+                        editor.save();
                       }
-                    });
-                  } catch (InvocationTargetException e) {
-                    logger.error(e, e);
-                  } catch (InterruptedException e) {
-                    logger.error(e, e);
-                  }
+                    }
+                  });
                 }
               });
         } else {
