@@ -17,7 +17,7 @@
  
  <extension type="WorkspaceAccess" class="com.oxygenxml.xspec.XSpecSupportPluginExtension"/>
  
- <view id="com.oxygenxml.xspec.results"/>
+ <view id="com.oxygenxml.xspec.results" initialSide="WEST" initialRow="1"/>
  
  <toolbar id="com.oxygenxml.xspec" initialSide="NORTH" initialRow="1"/>
  

@@ -158,6 +158,7 @@ public class XSpecUtil {
         @Override
         public void transformationStopped() {
           // Not sure if we should do something...
+          resultsPresenter.loadContent("");
         }
 
         @Override
@@ -170,6 +171,7 @@ public class XSpecUtil {
               e.printStackTrace();
             }
           } else {
+            resultsPresenter.loadContent("");
             logger.warn("Transformation ended with error");
           }
 
