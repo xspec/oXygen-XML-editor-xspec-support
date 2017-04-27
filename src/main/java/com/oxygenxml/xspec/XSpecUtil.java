@@ -7,8 +7,10 @@ import org.apache.log4j.Logger;
 
 import ro.sync.exml.workspace.api.PluginWorkspace;
 import ro.sync.exml.workspace.api.editor.WSEditor;
+import ro.sync.exml.workspace.api.editor.documenttype.DocumentTypeInformation;
 import ro.sync.exml.workspace.api.editor.transformation.TransformationFeedback;
 import ro.sync.exml.workspace.api.editor.transformation.TransformationScenarioNotFoundException;
+import ro.sync.exml.workspace.api.listeners.WSEditorListener;
 import ro.sync.exml.workspace.api.standalone.StandalonePluginWorkspace;
 import ro.sync.util.URLUtil;
 
@@ -31,13 +33,14 @@ public class XSpecUtil {
    * The output file.
    */
   private static final String SCENARIO_OUTPUT_FILE = "${cfdu}/${cfn}-report.html";
+  private static final String FILE_NAME_MARKER = "${MARKER}";
   private static final String PENDING = "<!DOCTYPE html>\n" + 
       "<html>\n" + 
       "<body>\n" + 
       "\n" + 
       "<p id=\"demo\"></p>\n" + 
       "\n" + 
-      "<b>Running<span class=\"pending\"></span></b>\n" + 
+      "Running <b>" + FILE_NAME_MARKER + " <span class=\"pending\"></span></b>\n" + 
       "\n" + 
       "<script>\n" + 
       "function change() {\n" + 
@@ -72,11 +75,13 @@ public class XSpecUtil {
    * @param pluginWorkspaceAccess Workspace access.
    * @param resultsPresenter XSpec results presenter.
    * @param feedback Receives notifications when the transformation has finished.
+   * 
+   * @throws OperationCanceledException Operation stopped by user. 
    */
   public static void runScenario(
       StandalonePluginWorkspace pluginWorkspaceAccess, 
       XSpecResultsView resultsPresenter,
-      TransformationFeedback feedback) {
+      TransformationFeedback feedback) throws OperationCanceledException {
     
     runScenario(null, pluginWorkspaceAccess, resultsPresenter, feedback);
   }
@@ -88,50 +93,95 @@ public class XSpecUtil {
    * @param pluginWorkspaceAccess Workspace access.
    * @param resultsPresenter XSpec results presenter.
    * @param feedback Receives notifications when the transformation has finished.
+   * 
+   * @throws OperationCanceledException Operation canceled. 
    */
   public static void runScenario(
       WSEditor wsEditor,
       final StandalonePluginWorkspace pluginWorkspaceAccess, 
       final XSpecResultsView resultsPresenter,
-      final TransformationFeedback feedback) {
+      final TransformationFeedback feedback) throws OperationCanceledException {
     
     if (wsEditor == null) {
       wsEditor = getXSpecEditor(pluginWorkspaceAccess, resultsPresenter);
     }
     
-    resultsPresenter.loadContent(PENDING);
-    
     if (wsEditor != null) {
       final URL editorLocation = wsEditor.getEditorLocation();
-      try {
-        wsEditor.runTransformationScenarios(new String[] {SCENARIO_NAME}, new TransformationFeedback() {
+      
+      resultsPresenter.loadContent(
+          PENDING.replace(FILE_NAME_MARKER, pluginWorkspaceAccess.getUtilAccess().getFileName(editorLocation.toString())));
+      
+      DocumentTypeInformation dti = wsEditor.getDocumentTypeInformation();
+      if (dti == null) {
+        // We need the document type association. If it's not present we wait for it.
+        final WSEditor fwsEditor = wsEditor;
+        // Is better to use a thread that polls the wsEditor.getDocumentTypeInformation for a few
+        // times with a small sleep. Because of threading issues we might miss a callback
+        // ro.sync.exml.workspace.api.listeners.WSEditorListener.documentTypeExtensionsReconfigured()
+        new Thread(new Runnable() {
           @Override
-          public void transformationStopped() {
-            // Not sure if we should do something...
-          }
-
-          @Override
-          public void transformationFinished(boolean success) {
-            if (success) {
-              String toOpen = pluginWorkspaceAccess.getUtilAccess().expandEditorVariables(SCENARIO_OUTPUT_FILE, editorLocation);
-              try {
-                resultsPresenter.load(editorLocation, new URL(toOpen));
-              } catch (MalformedURLException e) {
-                e.printStackTrace();
+          public void run() {
+            int counter = 0;
+            DocumentTypeInformation documentTypeInformation = fwsEditor.getDocumentTypeInformation();
+            try {
+              while (documentTypeInformation == null || counter < 4) {
+                Thread.sleep(200);
+                documentTypeInformation = fwsEditor.getDocumentTypeInformation();
+                counter ++;
               }
-            } else {
-              logger.warn("Transformation ended with error");
+            } catch (InterruptedException e) {
+              e.printStackTrace();
             }
-
-            if (feedback != null) {
-              feedback.transformationFinished(success);
+            
+            if (documentTypeInformation != null) {
+              executeScenario(pluginWorkspaceAccess, resultsPresenter, feedback,
+                  editorLocation, fwsEditor);
             }
           }
-        });
-      } catch (TransformationScenarioNotFoundException e1) {
-        logger.error(e1, e1);
-        pluginWorkspaceAccess.showErrorMessage("Required \"XSpec Report\" scenario not found. Please install the XSpec framework as well.");
+        }).start();
+      } else {
+        executeScenario(pluginWorkspaceAccess, resultsPresenter, feedback,
+            editorLocation, wsEditor);
       }
+    }
+  }
+  
+
+  private static void executeScenario(
+      final StandalonePluginWorkspace pluginWorkspaceAccess,
+      final XSpecResultsView resultsPresenter,
+      final TransformationFeedback feedback, final URL editorLocation,
+      final WSEditor fwsEditor) {
+    try {
+      fwsEditor.runTransformationScenarios(new String[] {SCENARIO_NAME}, new TransformationFeedback() {
+        @Override
+        public void transformationStopped() {
+          // Not sure if we should do something...
+        }
+
+        @Override
+        public void transformationFinished(boolean success) {
+          if (success) {
+            String toOpen = pluginWorkspaceAccess.getUtilAccess().expandEditorVariables(SCENARIO_OUTPUT_FILE, editorLocation);
+            try {
+              resultsPresenter.load(editorLocation, new URL(toOpen));
+            } catch (MalformedURLException e) {
+              e.printStackTrace();
+            }
+          } else {
+            logger.warn("Transformation ended with error");
+          }
+
+          if (feedback != null) {
+            feedback.transformationFinished(success);
+          }
+        }
+      });
+    } catch (TransformationScenarioNotFoundException e1) {
+      resultsPresenter.loadContent("");
+      logger.error(e1, e1);
+      pluginWorkspaceAccess.showErrorMessage("Required \"XSpec Report\" scenario not found. Please install the XSpec framework as well.");
     }
   }
 
@@ -143,9 +193,11 @@ public class XSpecUtil {
    * @param resultsPresenter The XSpec results presenter.
    * 
    * @return The XSpec editor to execute.
+   * 
+   * @throws OperationCanceledException The operation was canceled. 
    */
   private static WSEditor getXSpecEditor(
-      final StandalonePluginWorkspace pluginWorkspaceAccess, XSpecResultsView resultsPresenter) {
+      final StandalonePluginWorkspace pluginWorkspaceAccess, XSpecResultsView resultsPresenter) throws OperationCanceledException {
     WSEditor currentEditorAccess = pluginWorkspaceAccess.getCurrentEditorAccess(PluginWorkspace.MAIN_EDITING_AREA);
     
     boolean isXspecOn = false;
@@ -162,15 +214,25 @@ public class XSpecUtil {
     
     if (!isXspecOn) {
       URL xspecURL = resultsPresenter.getXspec();
+      if (xspecURL == null) {
+        // The current editor is not an XSpec. Ask for one.
+        xspecURL = pluginWorkspaceAccess.chooseURL("Open XSpec to execute", new String[] {"xspec", "*"}, "XSpec files");
+        if (xspecURL == null) {
+          throw new OperationCanceledException();
+        }
+      }
+      
       if (xspecURL != null) {
         WSEditor candidate = pluginWorkspaceAccess.getEditorAccess(xspecURL, PluginWorkspace.MAIN_EDITING_AREA);
         if (candidate == null) {
           pluginWorkspaceAccess.open(xspecURL);
           
           candidate = pluginWorkspaceAccess.getEditorAccess(xspecURL, PluginWorkspace.MAIN_EDITING_AREA);
+          
         }
         
         if (candidate != null) {
+          isXspecOn = true;
           currentEditorAccess = candidate;
         }
       }
@@ -179,4 +241,11 @@ public class XSpecUtil {
     return currentEditorAccess;
   }
 
+  /**
+   * Operation canceled. 
+   *
+   */
+  public static class OperationCanceledException extends Exception {
+    
+  }
 }

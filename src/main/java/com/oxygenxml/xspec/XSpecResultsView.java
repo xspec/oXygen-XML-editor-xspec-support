@@ -6,19 +6,24 @@ import java.net.URL;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
+import javax.swing.Box;
+import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JPanel;
 
 import org.apache.log4j.Logger;
 
+import com.oxygenxml.xspec.XSpecUtil.OperationCanceledException;
 import com.oxygenxml.xspec.jfx.BrowserInteractor;
 import com.oxygenxml.xspec.jfx.SwingBrowserPanel;
 import com.oxygenxml.xspec.jfx.bridge.Bridge;
 
 import javafx.application.Platform;
 import javafx.scene.web.WebEngine;
+import ro.sync.exml.workspace.api.editor.transformation.TransformationFeedback;
 import ro.sync.exml.workspace.api.standalone.StandalonePluginWorkspace;
+import ro.sync.exml.workspace.api.standalone.ui.ToolbarButton;
 import ro.sync.exml.workspace.api.standalone.ui.ToolbarToggleButton;
 
 /**
@@ -71,6 +76,11 @@ public class XSpecResultsView extends JPanel {
   /**
    * Show just the tests that failed.
    */
+  private JButton runButton;
+  
+  /**
+   * Show just the tests that failed.
+   */
   private JButton showFailuresOnly;
   
   /**
@@ -108,7 +118,38 @@ public class XSpecResultsView extends JPanel {
     setLayout(new BorderLayout());
     
     JPanel toolbar = new JPanel(new BorderLayout());
+    JPanel left = new JPanel();
     
+    // Run scenario
+    Action runAction = new AbstractAction() {
+      @Override
+      public void actionPerformed(ActionEvent arg0) {
+        runButton.setEnabled(false);
+        try {
+          XSpecUtil.runScenario(pluginWorkspace, XSpecResultsView.this, new TransformationFeedback() {
+            @Override
+            public void transformationStopped() {
+              runButton.setEnabled(true);
+            }
+            @Override
+            public void transformationFinished(boolean success) {
+              runButton.setEnabled(true);
+            }
+          });
+        } catch (OperationCanceledException e) {
+          // canceled by user.
+          runButton.setEnabled(true);
+        }
+      }
+    };
+    
+    ImageIcon runIcon = new ImageIcon(getClass().getClassLoader().getResource("run16.png"));
+    runAction.putValue(Action.SMALL_ICON, runIcon);
+    runAction.putValue(Action.SHORT_DESCRIPTION, "Run XSpec");
+    runButton = new ToolbarButton(runAction, false);
+    left.add(runButton);
+    
+    // Show failures.
     Action showFailuresAction = new AbstractAction() {
       @Override
       public void actionPerformed(ActionEvent arg0) {
@@ -118,9 +159,11 @@ public class XSpecResultsView extends JPanel {
     
     ImageIcon ic = new ImageIcon(getClass().getClassLoader().getResource("failures.gif"));
     showFailuresAction.putValue(Action.SMALL_ICON, ic);
-    showFailuresAction.putValue(Action.SHORT_DESCRIPTION, "Show only failures.");
+    showFailuresAction.putValue(Action.SHORT_DESCRIPTION, "Show only failures");
     showFailuresOnly = new ToolbarToggleButton(showFailuresAction);
-    toolbar.add(showFailuresOnly, BorderLayout.WEST);
+    left.add(showFailuresOnly);
+    
+    toolbar.add(left, BorderLayout.WEST);
     add(toolbar, BorderLayout.NORTH);
     
     add(panel, BorderLayout.CENTER);

@@ -6,6 +6,8 @@ import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.JComponent;
 
+import com.oxygenxml.xspec.XSpecUtil.OperationCanceledException;
+
 import ro.sync.exml.plugin.workspace.WorkspaceAccessPluginExtension;
 import ro.sync.exml.workspace.api.standalone.StandalonePluginWorkspace;
 import ro.sync.exml.workspace.api.standalone.ToolbarComponentsCustomizer;
@@ -48,7 +50,11 @@ public class XSpecSupportPluginExtension implements WorkspaceAccessPluginExtensi
           Action action = new AbstractAction("XSpec Run") {
             @Override
             public void actionPerformed(ActionEvent e) {
-              XSpecUtil.runScenario(pluginWorkspaceAccess, resultsPresenter, null);
+              try {
+                XSpecUtil.runScenario(pluginWorkspaceAccess, resultsPresenter, null);
+              } catch (OperationCanceledException e1) {
+                // Stopped by user.
+              }
             }
           };
           ToolbarButton b = new ToolbarButton(action, true);

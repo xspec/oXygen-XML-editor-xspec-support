@@ -17,6 +17,7 @@ import org.apache.log4j.Logger;
 
 import com.oxygenxml.xspec.XSpecResultsView;
 import com.oxygenxml.xspec.XSpecUtil;
+import com.oxygenxml.xspec.XSpecUtil.OperationCanceledException;
 
 import javafx.scene.web.WebEngine;
 import netscape.javascript.JSObject;
@@ -270,6 +271,8 @@ public class Bridge {
         ex.printStackTrace();
       } catch (BadLocationException ex) {
         ex.printStackTrace();
+      } catch (OperationCanceledException e1) {
+        // The user canceled the operation.
       }
     }
   }
