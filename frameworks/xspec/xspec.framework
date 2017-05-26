@@ -420,13 +420,13 @@
 										</antParameter>
 										<antParameter>
 											<field name="name">
-												<String>output.file.path</String>
+												<String>xspec.project.dir</String>
 											</field>
 											<field name="description">
-												<String>The location where the result will be copied.</String>
+												<String></String>
 											</field>
 											<field name="value">
-												<String>${cfd}/${cfn}-result.html</String>
+												<String>${frameworkDir}/</String>
 											</field>
 											<field name="defaultValue">
 												<null/>
@@ -443,13 +443,13 @@
 										</antParameter>
 										<antParameter>
 											<field name="name">
-												<String>xspec.project.dir</String>
+												<String>xspec.result.html</String>
 											</field>
 											<field name="description">
-												<String></String>
+												<String>The location where the result will be copied.</String>
 											</field>
 											<field name="value">
-												<String>${frameworkDir}/</String>
+												<String>${cfd}/${cfn}-result.html</String>
 											</field>
 											<field name="defaultValue">
 												<null/>
@@ -691,13 +691,13 @@
 										</antParameter>
 										<antParameter>
 											<field name="name">
-												<String>format.xspec.report</String>
+												<String>compile.xspec.xsl</String>
 											</field>
 											<field name="description">
 												<String></String>
 											</field>
 											<field name="value">
-												<String>${frameworkDir}/src/reporter/unit-report-oxygen.xsl</String>
+												<String>${frameworkDir}/oxygen-results-view/generate-xspec-tests-oxygen.xsl</String>
 											</field>
 											<field name="defaultValue">
 												<null/>
@@ -714,13 +714,13 @@
 										</antParameter>
 										<antParameter>
 											<field name="name">
-												<String>output.file.path</String>
+												<String>format.xspec.report</String>
 											</field>
 											<field name="description">
-												<String>The location where the result will be copied.</String>
+												<String></String>
 											</field>
 											<field name="value">
-												<String>${cfd}/${cfn}-report.html</String>
+												<String>${frameworkDir}/oxygen-results-view/unit-report-oxygen.xsl</String>
 											</field>
 											<field name="defaultValue">
 												<null/>
@@ -744,6 +744,29 @@
 											</field>
 											<field name="value">
 												<String>${frameworkDir}/</String>
+											</field>
+											<field name="defaultValue">
+												<null/>
+											</field>
+											<field name="type">
+												<Integer>5</Integer>
+											</field>
+											<field name="possibleValues">
+												<null/>
+											</field>
+											<field name="possibleValuesDescriptions">
+												<null/>
+											</field>
+										</antParameter>
+										<antParameter>
+											<field name="name">
+												<String>xspec.result.html</String>
+											</field>
+											<field name="description">
+												<String>The location where the result will be copied.</String>
+											</field>
+											<field name="value">
+												<String>${cfd}/${cfn}-report.html</String>
 											</field>
 											<field name="defaultValue">
 												<null/>
@@ -825,7 +848,7 @@
 									<String>${frameworkDir}/</String>
 								</field>
 								<field name="showConsoleAlways">
-									<Boolean>false</Boolean>
+									<Boolean>true</Boolean>
 								</field>
 								<field name="advancedOptionsMap">
 									<null/>
@@ -978,6 +1001,9 @@
 						<null/>
 					</field>
 					<field name="customAttributeValueEditor">
+						<null/>
+					</field>
+					<field name="textModeExternalObjectInsertionHandler">
 						<null/>
 					</field>
 				</documentTypeDescriptor>

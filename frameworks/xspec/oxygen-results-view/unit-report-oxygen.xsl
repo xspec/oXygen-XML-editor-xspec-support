@@ -1,20 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- =====================================================================
 
-  Usage:	java -cp "$CP" net.sf.saxon.Transform 
-		-o:"$JUNIT_RESULT" \
-	        -s:"$RESULT" \
-	        -xsl:"$XSPEC_HOME/src/reporter/junit-report.xsl"
-  Description:  XSLT to convert XSpec XML report to JUnit report                                       
-		Executed from bin/xspec.sh
-  Input:        XSpec XML report                             
-  Output:       JUnit report                                                         
-  Dependencies: It requires XSLT 3.0 for function fn:serialize() 
-  Authors:      Kal Ahmed, github.com/kal       
-		Sandro Cirulli, github.com/cirulls
-  License: 	MIT License (https://opensource.org/licenses/MIT)
-
-  ======================================================================== -->
 <xsl:stylesheet version="3.0"
                 xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
                 xmlns:xs="http://www.w3.org/2001/XMLSchema"
@@ -26,7 +11,7 @@
                 exclude-result-prefixes="x xs test pkg xhtml fn xsl">
     
     <xsl:param name="report-css-uri" select="
-        resolve-uri('test-unit-report.css')"/>
+        resolve-uri('test-report.css')"/>
     
     <xsl:param name="report-js-uri" select="
         resolve-uri('test-report.js')"/>
@@ -35,7 +20,21 @@
     
     <xsl:output  method="html" omit-xml-declaration="yes" indent="yes" />
     
-    <xsl:import href="format-utils.xsl"/>
+    
+    <xsl:import href="../src/reporter/format-utils.xsl"/>
+    
+    <!-- 
+      
+      Oxygen Patch START
+      
+      Exclude all prefixes.
+      
+      TODO Which prefixes to we actually need excluding????
+  
+  -->
+    <!-- Copied from format-utils.xsl -->
+    <xsl:output name="x:report" exclude-result-prefixes="#all" method="xml" indent="yes"/>
+    <!-- Oxygen Patch END -->
 
     <xsl:template match="x:report">
         <html>

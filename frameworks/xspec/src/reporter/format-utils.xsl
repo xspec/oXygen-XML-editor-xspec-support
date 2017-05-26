@@ -20,7 +20,7 @@
 
 <pkg:import-uri>http://www.jenitennison.com/xslt/xspec/format-utils.xsl</pkg:import-uri>
 
-<xsl:output name="x:report" exclude-result-prefixes="#all" method="xml" indent="yes"/>
+<xsl:output name="x:report" method="xml" indent="yes"/>
 
 <xsl:variable name="omit-namespaces" as="xs:string+"
   select="('http://www.w3.org/XML/1998/namespace',
