@@ -6,6 +6,8 @@ import java.util.UUID;
 
 import org.apache.log4j.Logger;
 
+import javafx.scene.web.WebEngine;
+import netscape.javascript.JSObject;
 import ro.sync.exml.workspace.api.PluginWorkspace;
 import ro.sync.exml.workspace.api.editor.WSEditor;
 import ro.sync.exml.workspace.api.editor.documenttype.DocumentTypeInformation;
@@ -256,6 +258,72 @@ public class XSpecUtil {
     String ID = "x" + UUID.nameUUIDFromBytes(scenarioName.getBytes()).toString();
     
     return ID;
+  }
+  
+  public static Object[] convertToArray(Object jsArray) throws Exception {
+    Object[] parameters = null;
+    if (jsArray != null) {
+      if (logger.isDebugEnabled()) {
+        logger.debug("Array received from JS");
+      }
+
+      JSObject jsObj = (JSObject) jsArray;
+
+      Object length = jsObj.eval("this.length");
+      if (logger.isDebugEnabled()) {
+        logger.debug("Array length: " + length);
+      }
+
+      if (length != null) {
+        int size = Integer.parseInt(length.toString());
+
+        parameters = new Object[size];
+
+        for (int i = 0; i < size; i++) {
+          Object slot = jsObj.getSlot(i);
+          if (logger.isDebugEnabled()) {
+            logger.debug("Slot: " + slot + " class: " + slot.getClass());
+          }
+          parameters[i] = slot;
+        }
+      }
+    } else {
+      logger.warn("The received parameter is not an array.");
+    }
+    
+    return parameters;
+  }
+  
+  /**
+   * Gets the template names of the failed scenarios from the report loaded by the given engine.
+   * For each scenario:
+   * <pre>
+   *  &lt;x:scenario label="No escaping">....&lt;/x:scenario>
+   * </pre>
+   * a template is generated in the compiled XSLT:
+   * <pre>
+   *  &lt;xsl:template name="x:x65e49470-1cdf-3d10-ad6d-79d35fbe3962">....&lt;/xsl:template>
+   * </pre>
+   * 
+   * @param webEngine Engine that loaded the HTML report.
+   * 
+   * @return The names of the templates that correspond to each failed scenario separated by a space:
+   * <pre>x65e49470-1cdf-3d10-ad6d-79d35fbe3962 x:x32fb71e3-69ad-3c05-809b-fec2848053ab</pre>
+   * @throws Exception
+   */
+  public static StringBuilder getFailedTemplateNames(WebEngine webEngine) throws Exception {
+    final StringBuilder b = new StringBuilder();
+    Object[] failed = XSpecUtil.convertToArray(webEngine.executeScript("getFailedScenarios()"));
+    if (failed != null && failed.length > 0) {
+      for (int i = 0; i < failed.length; i++) {
+        if (b.length() > 0) {
+          b.append(" ");
+        }
+
+        b.append(XSpecUtil.generateId(String.valueOf(failed[i])));
+      }
+    }
+    return b;
   }
 
 }

@@ -151,7 +151,7 @@
   	-->
   	
   	
-  
+  	<echo>Apply driver to execute the templates: ${xspec.template.name.entrypoint}</echo>
   	
   	<java classname="net.sf.saxon.Transform"
   	      fork="true">

@@ -140,3 +140,22 @@ function showAllTests() {
         tcs[i].style.display = "block";
     }
 }
+
+/* *
+ * Returns the names of the failed scenarios in an array. An empty array if none.
+ */
+function getFailedScenarios() {
+    var listOfObjects = [];
+    var scenarios = document.querySelectorAll(".testsuite");
+    for (var i = 0; i < scenarios.length; i++) {
+        var scenario = scenarios[i];
+        var failures = scenario.getAttribute('data-failures');
+        
+        if (failures != "0") {
+            var scenarioName = scenario.getAttribute('data-name');
+            listOfObjects.push(scenarioName);
+        }
+    }
+    
+    return listOfObjects;
+}

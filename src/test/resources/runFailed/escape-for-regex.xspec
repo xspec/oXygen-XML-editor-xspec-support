@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<x:description xmlns:x="http://www.jenitennison.com/xslt/xspec"
+               xmlns:functx="http://www.functx.com"
+               stylesheet="escape-for-regex.xsl">
+
+   <x:scenario label="No escaping bad">
+      <!-- call the function with the string 'Hello' -->
+      <x:call function="functx:escape-for-regex">
+         <x:param select="'Hello'"/>
+      </x:call>
+      <!-- check the result -->
+      <x:expect label="Must not be escaped at all" select="'Hellox'"/>
+   </x:scenario>
+   
+   <x:scenario label="No escaping">
+      <!-- call the function with the string 'Hello' -->
+      <x:call function="functx:escape-for-regex">
+         <x:param select="'Hello'"/>
+      </x:call>
+      <!-- check the result -->
+      <x:expect label="Must not be escaped at all" select="'Hello'"/>
+   </x:scenario>
+
+  
+   <x:scenario label="When processing a list of phrases">
+      <!-- apply template rules to this element -->
+      <x:context>
+         <phrases>
+            <phrase>Hello!</phrase>
+            <phrase>Goodbye!</phrase>
+            <phrase>(So long!)</phrase>
+         </phrases>
+      </x:context>
+      <x:expect label="Strings should be escaped and status attributes should be added. The 'status' attribute are not as expected, indicating a problem in the tested template.">
+         <phrases>
+            <phrase status="same">Hello!</phrase>
+            <phrase status="same">Goodbye!</phrase>
+            <phrase status="changed">\(So long!\)</phrase>
+            </phrases>
+      </x:expect>
+   </x:scenario>
+
+</x:description>

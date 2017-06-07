@@ -12,6 +12,7 @@ import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JPanel;
+import javax.swing.SwingUtilities;
 
 import org.apache.log4j.Logger;
 
@@ -179,27 +180,44 @@ public class XSpecResultsView extends JPanel {
       @Override
       public void actionPerformed(ActionEvent arg0) {
         enableButtons(false);
-        try {
-          // TODO Set in the resolver the name of the failed scenarios.
-          resolver.setTemplateNames("");
-          
-          XSpecUtil.runScenario(
-              pluginWorkspace, 
-              XSpecResultsView.this, 
-              new TransformationFeedback() {
-            @Override
-            public void transformationStopped() {
+        Platform.runLater(new Runnable() {
+          @Override
+          public void run() {
+            try {
+              final StringBuilder b = XSpecUtil.getFailedTemplateNames(panel.getWebEngine());
+              
+              if (b.length() > 0) {
+                SwingUtilities.invokeLater(new Runnable() {
+                  @Override
+                  public void run() {
+                    resolver.setTemplateNames(b.toString());
+                    try {
+                      XSpecUtil.runScenario(
+                          pluginWorkspace, 
+                          XSpecResultsView.this, 
+                          new TransformationFeedback() {
+                            @Override
+                            public void transformationStopped() {
+                              enableButtons(true);
+                            }
+                            @Override
+                            public void transformationFinished(boolean success) {
+                              enableButtons(true);
+                            }
+                          });
+                    } catch (OperationCanceledException e) {
+                      // canceled by user.
+                      enableButtons(true);
+                    }
+                  }
+                });
+              }
+            } catch (Exception e) {
+              e.printStackTrace();
               enableButtons(true);
             }
-            @Override
-            public void transformationFinished(boolean success) {
-              enableButtons(true);
-            }
-          });
-        } catch (OperationCanceledException e) {
-          // canceled by user.
-          enableButtons(true);
-        }
+          }
+        });
       }
     };
     
@@ -282,6 +300,9 @@ public class XSpecResultsView extends JPanel {
   private void enableButtons(boolean enable) {
     runButton.setEnabled(enable);
     runFailuresButton.setEnabled(enable);
+    if (enable) {
+      resolver.setTemplateNames("");
+    }
   }
 
   

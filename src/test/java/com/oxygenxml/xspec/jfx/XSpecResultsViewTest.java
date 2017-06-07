@@ -21,6 +21,7 @@ import org.mockito.Mockito;
 import org.w3c.dom.Node;
 
 import com.oxygenxml.xspec.XSpecResultsView;
+import com.oxygenxml.xspec.XSpecUtil;
 
 import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
@@ -134,6 +135,46 @@ public class XSpecResultsViewTest extends XSpecViewTestBase {
         "Test: Strings should be escaped and status attributes should be added. The 'status' attribute are not as expected, indicating a problem in the tested template., display: block\n" + 
         "", execute);
     
+  }
+
+
+  /**
+   * Tests the method that collects the names of the templates that correspond to the failed scenarios.
+   * 
+   * Issue https://github.com/xspec/oXygen-XML-editor-xspec-support/issues/17
+   * 
+   * @throws Exception If it fails.
+   */
+  public void testGetFailedTemplates() throws Exception {
+    
+    URL xspecURL = getClass().getClassLoader().getResource("runFailed/escape-for-regex.xspec");
+    URL resultsURL = getClass().getClassLoader().getResource("runFailed/escape-for-regex-report.html");
+    
+    initXSpec(xspecURL);
+    
+    presenter.load(xspecURL, resultsURL);
+    flushAWT();
+    waitForFX();
+    
+    final StringBuilder b = new StringBuilder(); 
+    final Exception[] ex = new Exception[1];
+    Platform.runLater(new Runnable() {
+      @Override
+      public void run() {
+        try {
+          StringBuilder failedTemplateNames = XSpecUtil.getFailedTemplateNames(presenter.getEngineForTests());
+          b.append(failedTemplateNames);
+        } catch (Exception e) {
+          ex[0] = e;
+        }
+      }
+    });
+    waitForFX();
+    
+    StringBuilder expected = new StringBuilder();
+    expected.append(XSpecUtil.generateId("No escaping bad")).append(" ")
+    .append(XSpecUtil.generateId("When processing a list of phrases"));
+    assertEquals(expected.toString(), b.toString());
   }
 
 }
