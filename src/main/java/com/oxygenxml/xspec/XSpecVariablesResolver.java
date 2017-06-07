@@ -46,11 +46,6 @@ public class XSpecVariablesResolver extends EditorVariablesResolver {
     
     expr = expr.replace(SKIP_COMPILE_VAR, String.valueOf(skipCompilation));
     
-    System.out.println("Replaced " + contentWithEditorVariables + " with " + expr);
-    if ("${pn}".equals(contentWithEditorVariables)) {
-      new Exception().printStackTrace(System.out);
-    }
-    
     return expr;
   }
 }
