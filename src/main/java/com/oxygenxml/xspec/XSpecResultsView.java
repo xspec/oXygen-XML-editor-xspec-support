@@ -211,6 +211,9 @@ public class XSpecResultsView extends JPanel {
                     }
                   }
                 });
+              } else {
+                pluginWorkspace.showInformationMessage("No failed messages!");
+                enableButtons(true);  
               }
             } catch (Exception e) {
               e.printStackTrace();
@@ -232,6 +235,8 @@ public class XSpecResultsView extends JPanel {
     add(toolbar, BorderLayout.NORTH);
     
     add(panel, BorderLayout.CENTER);
+    
+    enableButtons(true);
   }
   
   /**
@@ -299,7 +304,7 @@ public class XSpecResultsView extends JPanel {
   
   private void enableButtons(boolean enable) {
     runButton.setEnabled(enable);
-    runFailuresButton.setEnabled(enable);
+    runFailuresButton.setEnabled(enable && xspec != null);
     if (enable) {
       resolver.setTemplateNames("");
     }
