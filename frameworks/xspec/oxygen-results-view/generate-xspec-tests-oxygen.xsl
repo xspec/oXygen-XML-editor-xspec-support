@@ -5,11 +5,16 @@
   xmlns:xs="http://www.w3.org/2001/XMLSchema"
   xmlns="http://www.w3.org/1999/XSL/TransformAlias"
   xmlns:test="http://www.jenitennison.com/xslt/unit-test"
-  exclude-result-prefixes="#default test"
+  exclude-result-prefixes="#default test uuid local string"
   xmlns:x="http://www.jenitennison.com/xslt/xspec"
   xmlns:__x="http://www.w3.org/1999/XSL/TransformAliasAlias"
   xmlns:pkg="http://expath.org/ns/pkg"
-  xmlns:impl="urn:x-xspec:compile:xslt:impl">
+  xmlns:impl="urn:x-xspec:compile:xslt:impl"
+  
+  xmlns:uuid="java:java.util.UUID"
+  xmlns:local="http://oxygenxml.com/local"
+  xmlns:string="java:java.lang.String"
+  >
 
   <xsl:import href="../src/compiler/generate-xspec-tests.xsl"/>
 
@@ -36,6 +41,33 @@
       <xsl:copy-of select="@*"/>
       <xsl:apply-templates mode="x:gather-specs"/>
     </x:scenario>
+  </xsl:template>
+  
+  <xd:doc xmlns:xd="http://www.oxygenxml.com/ns/doc/xsl">
+    <xd:desc>
+      <xd:p>Overriden to control the ID generation.</xd:p>
+      <xd:p>This template is copied from <b>generate-common-tests.xsl</b></xd:p>
+    </xd:desc>
+    <xd:param name="xslt-version"></xd:param>
+  </xd:doc>
+  <xsl:template match="x:scenario" mode="x:generate-calls">
+    <xsl:param name="vars" select="()" tunnel="yes" as="element(var)*"/>
+    <xsl:call-template name="x:output-call">
+<!-- 
+      
+      Oxygen Patch START 
+      
+      Control the ID generation.
+-->
+      <xsl:with-param name="name" select="local:generate-id(.)"/>
+<!-- Oxygen Patch END -->
+      <xsl:with-param name="last" select="empty(following-sibling::x:scenario)"/>
+      <xsl:with-param name="params" as="element(param)*">
+        <xsl:for-each select="$vars">
+          <param name="{ @name }" select="${ @name }"/>
+        </xsl:for-each>
+      </xsl:with-param>
+    </xsl:call-template>
   </xsl:template>
   
 
@@ -100,7 +132,20 @@
         <xsl:text>": there are tests in this scenario but no call, or apply or context has been given</xsl:text>
       </xsl:message>
     </xsl:if>
-    <template name="x:{generate-id()}">
+    
+    <!-- 
+        
+        Oxygen Patch START 
+        
+        Use local:generate-id() to control the generated IDs.
+      
+      -->
+
+    
+    <template name="x:{local:generate-id(.)}">
+      
+      <!-- Oxygen Patch END -->
+      
       <xsl:for-each select="$params">
         <param name="{ @name }" required="yes"/>
       </xsl:for-each>
@@ -231,4 +276,31 @@
     <xsl:call-template name="x:compile-scenarios"/>
   </xsl:template>
   
+  
+ 
+  
+  
+  <!--
+       OXYGEN PATCH START
+       
+       This method generates the same ID based on the label of the scenario. It is good enough...chances are that
+       there are multiple scenarios with the same label....
+   -->
+  
+  <xsl:function name="local:generate-id" as="xs:string">
+    <xsl:param name="context"/>
+    <xsl:variable name="seed" select="if($context/@label) then $context/@label else $context/x:label/text()" as="xs:string"/>
+    
+    <!--<xsl:value-of select="concat('x', uuid:toString(uuid:nameUUIDFromBytes(string:getBytes($seed))))"/>-->
+    
+    <xsl:value-of
+      xmlns:ox="http://www.oxygenxml.com./xslt/xspec"
+      select="ox:generate-id($seed)"/>
+    
+  </xsl:function>
+  
+  <!--
+       OXYGEN PATCH END
+   -->
+ 
 </xsl:stylesheet>

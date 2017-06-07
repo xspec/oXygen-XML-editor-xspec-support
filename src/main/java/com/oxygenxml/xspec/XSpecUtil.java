@@ -2,6 +2,7 @@ package com.oxygenxml.xspec;
 
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.UUID;
 
 import org.apache.log4j.Logger;
 
@@ -28,7 +29,7 @@ public class XSpecUtil {
   /**
    * The name of the XSpec running scenario.
    */
-  private static final String SCENARIO_NAME = "XSpec Report";
+  public static final String SCENARIO_NAME = "XSpec Report";
   /**
    * The output file.
    */
@@ -250,4 +251,11 @@ public class XSpecUtil {
   public static class OperationCanceledException extends Exception {
     
   }
+  
+  public static String generateId(String scenarioName) {
+    String ID = "x" + UUID.nameUUIDFromBytes(scenarioName.getBytes()).toString();
+    
+    return ID;
+  }
+
 }

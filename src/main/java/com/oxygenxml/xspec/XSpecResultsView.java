@@ -3,6 +3,7 @@ package com.oxygenxml.xspec;
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.net.URL;
+import java.util.UUID;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
@@ -77,19 +78,27 @@ public class XSpecResultsView extends JPanel {
    * Show just the tests that failed.
    */
   private JButton runButton;
+  /**
+   * Run just the tests that failed.
+   */
+  private JButton runFailuresButton;
   
   /**
    * Show just the tests that failed.
    */
   private JButton showFailuresOnly;
+
+  private XSpecVariablesResolver resolver = new XSpecVariablesResolver();
   
   /**
    * Constructor.
    * 
    * @param pluginWorkspace Oxygen workspace access.
    */
-  public XSpecResultsView(final StandalonePluginWorkspace pluginWorkspace) {
+  public XSpecResultsView(
+      final StandalonePluginWorkspace pluginWorkspace) {
     this.pluginWorkspace = pluginWorkspace;
+    pluginWorkspace.getUtilAccess().addCustomEditorVariablesResolver(resolver);
     panel = new SwingBrowserPanel(new BrowserInteractor() {
       @Override
       public void pageLoaded() {
@@ -124,21 +133,23 @@ public class XSpecResultsView extends JPanel {
     Action runAction = new AbstractAction() {
       @Override
       public void actionPerformed(ActionEvent arg0) {
-        runButton.setEnabled(false);
+        // Run all scenarios.
+        resolver.setTemplateNames("");
+        enableButtons(false);
         try {
           XSpecUtil.runScenario(pluginWorkspace, XSpecResultsView.this, new TransformationFeedback() {
             @Override
             public void transformationStopped() {
-              runButton.setEnabled(true);
+              enableButtons(true);
             }
             @Override
             public void transformationFinished(boolean success) {
-              runButton.setEnabled(true);
+              enableButtons(true);
             }
           });
         } catch (OperationCanceledException e) {
           // canceled by user.
-          runButton.setEnabled(true);
+          enableButtons(true);
         }
       }
     };
@@ -162,6 +173,42 @@ public class XSpecResultsView extends JPanel {
     showFailuresAction.putValue(Action.SHORT_DESCRIPTION, "Show only failures");
     showFailuresOnly = new ToolbarToggleButton(showFailuresAction);
     left.add(showFailuresOnly);
+    
+    // Run scenario
+    Action runFailuresAction = new AbstractAction() {
+      @Override
+      public void actionPerformed(ActionEvent arg0) {
+        enableButtons(false);
+        try {
+          // TODO Set in the resolver the name of the failed scenarios.
+          resolver.setTemplateNames("");
+          
+          XSpecUtil.runScenario(
+              pluginWorkspace, 
+              XSpecResultsView.this, 
+              new TransformationFeedback() {
+            @Override
+            public void transformationStopped() {
+              enableButtons(true);
+            }
+            @Override
+            public void transformationFinished(boolean success) {
+              enableButtons(true);
+            }
+          });
+        } catch (OperationCanceledException e) {
+          // canceled by user.
+          enableButtons(true);
+        }
+      }
+    };
+    
+    ImageIcon runFailureIcon = new ImageIcon(getClass().getClassLoader().getResource("runFailures16.png"));
+    runFailuresAction.putValue(Action.SMALL_ICON, runFailureIcon);
+    runFailuresAction.putValue(Action.SHORT_DESCRIPTION, "Run Only Failures");
+    runFailuresButton = new ToolbarButton(runFailuresAction, false);
+    left.add(runFailuresButton);
+    
     
     toolbar.add(left, BorderLayout.WEST);
     add(toolbar, BorderLayout.NORTH);
@@ -231,4 +278,15 @@ public class XSpecResultsView extends JPanel {
   public WebEngine getEngineForTests() {
     return panel.getWebEngine();
   }
+  
+  private void enableButtons(boolean enable) {
+    runButton.setEnabled(enable);
+    runFailuresButton.setEnabled(enable);
+  }
+
+  
+  public XSpecVariablesResolver getResolver() {
+    return resolver;
+  }
+
 }

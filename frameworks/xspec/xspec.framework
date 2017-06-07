@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<serialized version="19.0" xml:space="preserve">
+<serialized version="19.1" xml:space="preserve">
 	<serializableOrderedMap>
 		<entry>
 			<String>document.types</String>
@@ -639,7 +639,7 @@
 									<String></String>
 								</field>
 								<field name="buildFilePath">
-									<String>build.xml</String>
+									<String>oxygen-results-view/build_report.xml</String>
 								</field>
 								<field name="ditaParams">
 									<list>
@@ -694,7 +694,7 @@
 												<String>compile.xspec.xsl</String>
 											</field>
 											<field name="description">
-												<String></String>
+												<String>The XSLT that processes the XSPEC file into XSLT.</String>
 											</field>
 											<field name="value">
 												<String>${frameworkDir}/oxygen-results-view/generate-xspec-tests-oxygen.xsl</String>
@@ -743,7 +743,7 @@
 												<String></String>
 											</field>
 											<field name="value">
-												<String>${frameworkDir}/</String>
+												<String>${frameworkDir}</String>
 											</field>
 											<field name="defaultValue">
 												<null/>
@@ -767,6 +767,29 @@
 											</field>
 											<field name="value">
 												<String>${cfd}/${cfn}-report.html</String>
+											</field>
+											<field name="defaultValue">
+												<null/>
+											</field>
+											<field name="type">
+												<Integer>5</Integer>
+											</field>
+											<field name="possibleValues">
+												<null/>
+											</field>
+											<field name="possibleValuesDescriptions">
+												<null/>
+											</field>
+										</antParameter>
+										<antParameter>
+											<field name="name">
+												<String>xspec.template.name.entrypoint</String>
+											</field>
+											<field name="description">
+												<String></String>
+											</field>
+											<field name="value">
+												<String>${xspec.template.name.entrypoint}</String>
 											</field>
 											<field name="defaultValue">
 												<null/>
@@ -848,7 +871,7 @@
 									<String>${frameworkDir}/</String>
 								</field>
 								<field name="showConsoleAlways">
-									<Boolean>true</Boolean>
+									<Boolean>false</Boolean>
 								</field>
 								<field name="advancedOptionsMap">
 									<null/>

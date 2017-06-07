@@ -2,14 +2,12 @@ package com.oxygenxml.xspec.jfx.bridge;
 
 import java.io.File;
 import java.io.FileOutputStream;
-import java.lang.reflect.InvocationTargetException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.swing.JTextArea;
 import javax.swing.SwingUtilities;
 import javax.swing.text.BadLocationException;
 
@@ -24,7 +22,6 @@ import netscape.javascript.JSObject;
 import ro.sync.exml.workspace.api.PluginWorkspace;
 import ro.sync.exml.workspace.api.editor.WSEditor;
 import ro.sync.exml.workspace.api.editor.page.WSEditorPage;
-import ro.sync.exml.workspace.api.editor.page.text.actions.TextActionsProvider;
 import ro.sync.exml.workspace.api.editor.page.text.xml.WSXMLTextEditorPage;
 import ro.sync.exml.workspace.api.editor.page.text.xml.WSXMLTextNodeRange;
 import ro.sync.exml.workspace.api.editor.page.text.xml.XPathException;
@@ -154,126 +151,27 @@ public class Bridge {
       }
     });
   }
-
+  
   private void runScenarioAWT(String scenarioName, String scenarioLocation) {
-
-    URL toOpen = xspec;
     try {
-      toOpen = new URL(scenarioLocation);
-    } catch (MalformedURLException e1) {
-      e1.printStackTrace();
-    }
-    
-    WSEditor e = getEditorAccess(toOpen);
-
-    final WSEditor editor = e;
-
-    WSEditorPage currentPage = editor.getCurrentPage();
-    if (currentPage instanceof WSXMLTextEditorPage) {
-
-      // Step 1. Locate the scenario.
-      final WSXMLTextEditorPage textpage = (WSXMLTextEditorPage) currentPage;
-      String xpath = "//*:scenario[@label=\"" + scenarioName
-          + "\" or *:label=\"" + scenarioName
-          + "\"]";
-
-      if (logger.isDebugEnabled()) {
-        logger.debug("Xpath " + xpath);
-      }
-      
-      try {
-        WSXMLTextNodeRange[] ranges = textpage.findElementsByXPath(xpath);
-        if (logger.isDebugEnabled()) {
-          logger.debug("ranges " + ranges);
-        }
-        if (ranges != null && ranges.length > 0) {
-          int start = textpage.getOffsetOfLineStart(ranges[0].getStartLine()) + ranges[0].getStartColumn();
-
-          // Step 2. Put a @focus on the scenario
-          textpage.setCaretPosition(start);
-
-          JTextArea textComponent = (JTextArea) textpage.getTextComponent();
-          textpage.setCaretPosition(start);
-          WSXMLTextNodeRange[] focusAttr = textpage.findElementsByXPath("@focus");
-          if (focusAttr != null && focusAttr.length > 0) {
-            // TODO The presence of the @focus will run the scenario. But we should identify and remove all
-            // others @focus.
-
-            //            int startAttr = textpage.getOffsetOfLineStart(focusAttr[0].getStartLine()) + focusAttr[0].getStartColumn() - 1;
-            //            int endAttr = textpage.getOffsetOfLineStart(focusAttr[0].getEndLine()) + focusAttr[0].getEndColumn() - 1;
-            //            textComponent.replaceRange("focus=\"true\"", startAttr, endAttr);
-
-          } else {
-            // Look for a place where to put @focus
-            String text = textComponent.getText(start, Math.min(20, textComponent.getDocument().getLength() - start));
-            if (logger.isDebugEnabled()) {
-              logger.debug("Read: " + text);
-            }
-
-            // We've read something like: <x:scenario labe="... 
-            // or something like: <x:scenario>
-            int position = 0;
-            char ch = 0;
-            while (position < text.length() && ch != ' ' && ch != '>') {
-              ch = text.charAt(position);
-              position ++;
-            };
-
-            if (position < text.length()) {
-              // we have an insert location.
-              textComponent.insert(" focus=\"true\"", start + position - 1);
-            }
-          }
-
-          // Save the change. We will start an ANT transformation so we need the 
-          // file to be saved.
-          // TODO Perhaps it would be best to run a temporary copy, one that
-          // we can modify as we see fit!
-          editor.save();
-
-          WSEditor xspecToExecute = e;
-          if (!xspec.equals(toOpen)) {
-            xspecToExecute = getEditorAccess(xspec);
-          }
-          
-          // Step 3. Run the scenario
-          XSpecUtil.runScenario(
-              xspecToExecute,
-              (StandalonePluginWorkspace) pluginWorkspace, 
-              resultsPresenter,
-              new TransformationFeedback() {
-                @Override
-                public void transformationStopped() {}
-                @Override
-                public void transformationFinished(boolean success) {
-                  SwingUtilities.invokeLater(new Runnable() {
-                    @Override
-                    public void run() {
-                      // Step 4. Undo the change.
-
-                      // TODO The transformation is performed on a thread. The user 
-                      // can touch the editor during this time. An UNDO now can't guarantee 
-                      // the fact that we will UNDO the @focus attribute set above.
-                      TextActionsProvider actionsProvider = textpage.getActionsProvider();
-                      Object object = actionsProvider.getTextActions().get("Edit/Edit_Undo");
-                      if (object != null) {
-                        actionsProvider.invokeAction(object);
-                        editor.save();
-                      }
-                    }
-                  });
-                }
-              });
-        } else {
-          logger.warn("Unable to indetify scenario");
-        }
-      } catch (XPathException ex) {
-        ex.printStackTrace();
-      } catch (BadLocationException ex) {
-        ex.printStackTrace();
-      } catch (OperationCanceledException e1) {
-        // The user canceled the operation.
-      }
+        WSEditor xspecToExecute = getEditorAccess(xspec);
+        
+        // We only need to execute this scenario.
+        resultsPresenter.getResolver().setTemplateNames(XSpecUtil.generateId(scenarioName));
+        
+        // Step 3. Run the scenario
+        XSpecUtil.runScenario(
+            xspecToExecute,
+            (StandalonePluginWorkspace) pluginWorkspace, 
+            resultsPresenter,
+            new TransformationFeedback() {
+              @Override
+              public void transformationStopped() {}
+              @Override
+              public void transformationFinished(boolean success) {}
+            });
+    } catch (OperationCanceledException e1) {
+      // The user canceled the operation.
     }
   }
 

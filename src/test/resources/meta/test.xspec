@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<x:description xmlns:x="http://www.jenitennison.com/xslt/xspec"
+    xmlns:functx="http://www.functx.com"
+    stylesheet="escape-for-regex.xsl"> 
+<x:import href="escape-for-regex.xspec"/>
+    
+    <x:scenario label="When processing a list of phrases">
+        <!-- apply template rules to this element -->
+        <x:context>
+            <phrases>
+                <phrase>Hello!</phrase>
+                <phrase>Goodbye!</phrase>
+                <phrase>(So long!)</phrase>
+            </phrases>
+        </x:context>
+        <!-- check the result -->
+        <x:expect label="All phrase elements should remain"
+            test="count(phrases/phrase) = 3"/>
+        <x:expect label="Strings should be escaped and status attributes should be added. The 'status' attribute are not as expected, indicating a problem in the tested template.">
+            <phrases>
+                <phrase status="same">Hello!</phrase>
+                <phrase status="same">Goodbye!</phrase>
+                <phrase status="changed">\(So long!\)</phrase>
+            </phrases>
+        </x:expect>
+    </x:scenario>
+</x:description>

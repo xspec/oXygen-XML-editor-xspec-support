@@ -30,17 +30,14 @@ import javafx.concurrent.Worker.State;
 import javafx.scene.web.WebEngine;
 import junit.extensions.jfcunit.JFCTestCase;
 import ro.sync.exml.workspace.api.standalone.StandalonePluginWorkspace;
+import ro.sync.exml.workspace.api.util.UtilAccess;
 
 /**
  * Some test cases for the JavaFx renderer.
  *  
  * @author alex_jitianu
  */
-public class XSpecResultsViewTest extends JFCTestCase {
-  /**
-   * The plugin workspace used by the XSpec view.
-   */
-  private StandalonePluginWorkspace pluginWorkspace;
+public class XSpecResultsViewTest extends XSpecViewTestBase {
   /**
    * XSpec view.
    */
@@ -54,8 +51,6 @@ public class XSpecResultsViewTest extends JFCTestCase {
   protected void setUp() throws Exception {
     super.setUp();
     
-    pluginWorkspace = Mockito.mock(StandalonePluginWorkspace.class);
-    
     presenter = new XSpecResultsView(pluginWorkspace);
     
     frame = new JFrame("Test frame");
@@ -68,6 +63,7 @@ public class XSpecResultsViewTest extends JFCTestCase {
     
     flushAWT();
   }
+
   
   @Override
   protected void tearDown() throws Exception {
@@ -88,13 +84,15 @@ public class XSpecResultsViewTest extends JFCTestCase {
     URL xspecURL = getClass().getClassLoader().getResource("escape-for-regex.xspec");
     URL resultsURL = getClass().getClassLoader().getResource("escape-for-regex-result.html");
     
+    initXSpec(xspecURL);
+    
     presenter.load(xspecURL, resultsURL);
     flushAWT();
     waitForFX();
     
-    loadUtilitiesLibrary();
+    loadUtilitiesLibrary(presenter.getEngineForTests());
     
-    String execute = execute("logScenarios()");
+    String execute = execute(presenter.getEngineForTests(), "logScenarios()");
     assertEquals(
         "Scenario: No escaping, display: block\n" + 
         "Scenario: Test simple patterns, display: block\n" + 
@@ -103,7 +101,7 @@ public class XSpecResultsViewTest extends JFCTestCase {
         "Scenario: When processing a list of phrases, display: block\n" + 
         "", execute);
     
-    execute = execute("logTests()");
+    execute = execute(presenter.getEngineForTests(), "logTests()");
     assertEquals(
         "Test: Must not be escaped at all, display: block\n" + 
         "Test: escape them., display: block\n" + 
@@ -116,7 +114,7 @@ public class XSpecResultsViewTest extends JFCTestCase {
     // Present just the tests that have failed.
     presenter.setFilterTests(true);
     
-    execute = execute("logScenarios()");
+    execute = execute(presenter.getEngineForTests(), "logScenarios()");
     
     assertEquals(
         "Scenario: No escaping, display: none\n" + 
@@ -126,7 +124,7 @@ public class XSpecResultsViewTest extends JFCTestCase {
         "Scenario: When processing a list of phrases, display: block\n" + 
         "", execute);
     
-    execute = execute("logTests()");
+    execute = execute(presenter.getEngineForTests(), "logTests()");
     assertEquals(
         "Test: Must not be escaped at all, display: none\n" + 
         "Test: escape them., display: none\n" + 
@@ -137,156 +135,5 @@ public class XSpecResultsViewTest extends JFCTestCase {
         "", execute);
     
   }
-  
-  private String execute(final String script) throws InterruptedException {
-    final WebEngine webEngine = presenter.getEngineForTests();
-    final String[] toReturn = new String[1];
-    
-    final Semaphore s = new Semaphore(0);
-    Platform.runLater(new Runnable() {
-      @Override
-      public void run() {
-        try {
-          toReturn[0] = webEngine.executeScript(script).toString();
-        } catch (Exception e) {
-          e.printStackTrace();
-        }
-        // It means that all other events scheduled on the FX thread are done.
-        s.release();
-      }
-    });
-    s.acquire();
-    
-    return toReturn[0];
-  }
-  
-  /**
-   * Loads a utilities Javascript library into the XSpec view.
-   * 
-   * @throws InterruptedException If it fails.
-   */
-  private void loadUtilitiesLibrary() throws InterruptedException {
-    final URL utilitiesJS = getClass().getClassLoader().getResource("utilities.js");
-    
-    final WebEngine webEngine = presenter.getEngineForTests();
-    
-    invokeAndWaitOnFX(new Runnable() {
-      @Override
-      public void run() {
-        try {
-          webEngine.executeScript(read(utilitiesJS).toString());
-        } catch (Exception e) {
-          e.printStackTrace();
-        }
-      }
-    });
-  }
 
-  /**
-   * Waits until the FX thread has consumed all scheduled events.
-   * 
-   * @throws InterruptedException
-   */
-  private void waitForFX() throws InterruptedException {
-    // Invoke and wait to ensure all other events are executed.
-    invokeAndWaitOnFX(new Runnable() {
-      @Override
-      public void run() {}
-    });
-  }
-  
-  /**
-   * Executes the given runnable on the FX thread and waits untilthe code was executed.
-   * 
-   * @param r Code to execute.
-   * 
-   * @throws InterruptedException If it fails.
-   */
-  private void invokeAndWaitOnFX(final Runnable r) throws InterruptedException {
-    final Semaphore s = new Semaphore(0);
-    Platform.runLater(new Runnable() {
-      @Override
-      public void run() {
-        r.run();
-        
-        s.release();
-      }
-    });
-    
-    s.acquire();
-  }
-  
-  /**
-   * Waits until the Web engine has successfully loaded the page.
-   * 
-   * @param engine Web engine.
-   * @throws InterruptedException
-   */
-  private void waitForEngine(final WebEngine engine) throws InterruptedException {
-    final Semaphore s = new Semaphore(0);
-    // Make the test on the FX thread, the same thread on which the state is updated.
-    Platform.runLater(new Runnable() {
-      @Override
-      public void run() {
-        // It means that all other events scheduled on the FX thread are done.
-        if (engine.getLoadWorker().getState() == Worker.State.SUCCEEDED) {
-          // Already loaded. Release the semaphore.
-          s.release();
-        } else {
-          // Not yet loaded. Wait and release the semaphore when the state changes.
-          engine.getLoadWorker().stateProperty().addListener(
-              new ChangeListener<State>() {
-                @Override public void changed(ObservableValue ov, State oldState, State newState) {
-                  if (newState == Worker.State.SUCCEEDED) {
-                    s.release();
-                  }
-                }
-              });
-        }
-      }
-    });
-    s.acquire();
-  }
-  
-  public static String getInnerHTML(Node node) throws TransformerConfigurationException, TransformerException {
-      StringWriter sw = new StringWriter();
-      Result result = new StreamResult(sw);
-      TransformerFactory factory = new net.sf.saxon.TransformerFactoryImpl();
-      Transformer proc = factory.newTransformer();
-      proc.setOutputProperty(OutputKeys.METHOD, "html");
-      for (int i = 0; i < node.getChildNodes().getLength(); i++)
-      {
-          proc.transform(new DOMSource(node.getChildNodes().item(i)), result);
-      }
-      return sw.toString();
-  }
-  
-  /**
-   * Reads the content of a file.
-   * 
-   * @param url File to read.
-   * 
-   * @return The content of the file.
-   * 
-   * @throws Exception If it fails.
-   */
-  private StringBuilder read(URL url) throws Exception {
-    StringBuilder b = new StringBuilder();
-
-    BufferedReader r = new BufferedReader(new InputStreamReader(url.openStream(), "UTF-8"));
-    try {
-      String l = null;
-      while ((l = r.readLine()) != null) {
-        if (b.length() > 0) {
-          b.append("\n");
-        }
-        
-        b.append(l);
-      }
-    } finally {
-      r.close();
-    }
-
-    return b;
-  }
 }

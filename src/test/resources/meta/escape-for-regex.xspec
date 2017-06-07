@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<x:description xmlns:x="http://www.jenitennison.com/xslt/xspec"
+               xmlns:functx="http://www.functx.com"
+               stylesheet="escape-for-regex.xsl">
+
+   <x:scenario label="No escaping">
+      <!-- call the function with the string 'Hello' -->
+      <x:call function="functx:escape-for-regex">
+         <x:param select="'Hello'"/>
+      </x:call>
+      <!-- check the result -->
+      <x:expect label="Must not be escaped at all" select="'Hello'"/>
+   </x:scenario>
+
+</x:description>
