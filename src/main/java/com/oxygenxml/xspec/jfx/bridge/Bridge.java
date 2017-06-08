@@ -157,7 +157,7 @@ public class Bridge {
         WSEditor xspecToExecute = getEditorAccess(xspec);
         
         // We only need to execute this scenario.
-        resultsPresenter.getResolver().setTemplateNames(XSpecUtil.generateId(scenarioName));
+        resultsPresenter.getVariableResolver().setTemplateNames(XSpecUtil.generateId(scenarioName));
         
         // Step 3. Run the scenario
         XSpecUtil.runScenario(

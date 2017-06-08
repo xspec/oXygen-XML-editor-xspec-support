@@ -254,12 +254,28 @@ public class XSpecUtil {
     
   }
   
-  public static String generateId(String scenarioName) {
-    String ID = "x" + UUID.nameUUIDFromBytes(scenarioName.getBytes()).toString();
+  /**
+   * Generates an unique ID based on the given seed.
+   * 
+   * @param seed The seed.
+   * 
+   * @return A unique ID.
+   */
+  public static String generateId(String seed) {
+    String ID = "x" + UUID.nameUUIDFromBytes(seed.getBytes()).toString();
     
     return ID;
   }
   
+  /**
+   * Converts a JavaScript array to a Java array.
+   * 
+   * @param jsArray A JS array.
+   * 
+   * @return The Java array.
+   * 
+   * @throws Exception The conversion failed.
+   */
   public static Object[] convertToArray(Object jsArray) throws Exception {
     Object[] parameters = null;
     if (jsArray != null) {

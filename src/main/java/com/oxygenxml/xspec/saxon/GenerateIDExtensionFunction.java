@@ -11,6 +11,9 @@ import net.sf.saxon.trans.XPathException;
 import net.sf.saxon.type.BuiltInAtomicType;
 import net.sf.saxon.value.StringValue;
 
+/**
+ * Saxon extension function to generate an unique ID. 
+ */
 public class GenerateIDExtensionFunction extends net.sf.saxon.lib.ExtensionFunctionDefinition {
   private static final String NS = "http://www.oxygenxml.com./xslt/xspec";
   private static final String NAME = "generate-id";

@@ -310,9 +310,10 @@ public class XSpecResultsView extends JPanel {
     }
   }
 
-  
-  public XSpecVariablesResolver getResolver() {
+  /**
+   * @return Special variables resolver.
+   */
+  public XSpecVariablesResolver getVariableResolver() {
     return resolver;
   }
-
 }

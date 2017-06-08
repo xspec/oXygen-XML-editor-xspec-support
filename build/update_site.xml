@@ -1,6 +1,59 @@
 <xt:extensions xmlns:xt="http://www.oxygenxml.com/ns/extension"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:schemaLocation="http://www.oxygenxml.com/ns/extension http://www.oxygenxml.com/ns/extension/extensions.xsd">
+
+<xt:extension xmlns:xt="http://www.oxygenxml.com/ns/extension"
+        id="com.oxygenxml.xspec.XSpecSupportPlugin">
+        <xt:location href="xspec.support-0-7-plugin.zip"/>
+        <xt:version>0.0.7</xt:version>
+        <xt:oxy_version>18.0+</xt:oxy_version>
+        <xt:type>plugin</xt:type>
+        <xt:author>Alex Jitianu</xt:author>
+        <xt:name>XSpec Helper view</xt:name>
+        <xt:description><html xmlns="http://www.w3.org/1999/xhtml">
+            <head>
+                <title>XSpec Helper view</title>
+            </head>
+            <body>
+                <div>
+                    <p style="color:red">This plugin also requires the <b>XSpec Framework</b>. Please install them both.</p>
+                    <p><b>What's New:</b> The posibility to rerun just the failed scenarios.</p>
+                    <p>A proof of concept plugin that contributes a view that presents the results of an XSpec 
+                        transformation. After instalation, to use it, open an XSpec file and invoke the <b>XSpec Run</b>
+                        action from the toolbar.</p>
+                    
+                </div>
+            </body>
+        </html>
+        </xt:description>
+        <xt:license></xt:license>
+    </xt:extension>
+    
+    <xt:extension xmlns:xt="http://www.oxygenxml.com/ns/extension"
+        id="com.oxygenxml.xspec.XSpecSupportFramework">
+        <xt:location href="xspec_0_7.zip"/>
+        <xt:version>0.0.7</xt:version>
+        <xt:oxy_version>18.0+</xt:oxy_version>
+        <xt:type>framework</xt:type>
+        <xt:author>Alex Jitianu</xt:author>
+        <xt:name>XSpec Framework (required by the XSpec Helper view plugin)</xt:name>
+        <xt:description><html xmlns="http://www.w3.org/1999/xhtml">
+            <head>
+                <title>XSpec Helper view</title>
+            </head>
+            <body>
+                <div>
+                    <p style="color:red">This framework is required by the <b>XSpec Helper view</b> plugin. Please install them both.</p>
+                    <p>A customized version of the oXygen's built-in XSpec framework. It contributes a transformation scenario
+                        named "XSpec Report" that generates an HTML report that will be loaded by the <b>XSpec Helper view</b></p>
+                </div>
+            </body>
+        </html>
+        </xt:description>
+        <xt:license></xt:license>
+    </xt:extension>
+
+
     <xt:extension xmlns:xt="http://www.oxygenxml.com/ns/extension"
         id="com.oxygenxml.xspec.XSpecSupportPlugin">
         <xt:location href="xspec.support-1.0-SNAPSHOT-plugin.zip"/>
