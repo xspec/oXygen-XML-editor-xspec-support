@@ -413,6 +413,16 @@
   <text><xsl:value-of select="." /></text>
 </xsl:template>  
   
+<xsl:template match="node()" mode="test:create-xslt-generator">
+  <xsl:copy>
+    <xsl:apply-templates select="@* | node()" mode="#current"/>
+  </xsl:copy>
+</xsl:template>  
+
+<xsl:template match="@*" mode="test:create-xslt-generator">
+  <xsl:attribute name="{name()}" namespace="{namespace-uri()}"
+    select="replace(replace(., '\{', '{{'), '\}', '}}')" />
+</xsl:template>  
 
 <!-- *** x:compile *** -->
 <!-- Helper code for the tests -->
