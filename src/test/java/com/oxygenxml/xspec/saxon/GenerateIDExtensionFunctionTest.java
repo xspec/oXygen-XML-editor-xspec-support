@@ -38,7 +38,7 @@ public class GenerateIDExtensionFunctionTest extends TestCase {
    */
   public void testNesting() throws Exception {
     URL xspecURL = getClass().getClassLoader().getResource("#20/math.xspec");
-    URL xslURL = new File("frameworks\\xspec\\oxygen-results-view\\generate-xspec-tests-oxygen.xsl").toURI().toURL();
+    URL xslURL = new File("frameworks/xspec/oxygen-results-view/generate-xspec-tests-oxygen.xsl").toURI().toURL();
     File xspecFile = URLUtil.getCanonicalFileFromFileUrl(xspecURL);
     
     File compiledXSLFile = new File(xspecFile.getParentFile(), "math-compiled.xsl");
