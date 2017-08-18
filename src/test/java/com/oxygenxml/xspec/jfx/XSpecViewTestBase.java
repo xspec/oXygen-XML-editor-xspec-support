@@ -274,7 +274,7 @@ public class XSpecViewTestBase extends JFCTestCase {
     StringBuilder cl = new StringBuilder();
     File saxon = URLUtil.getCanonicalFileFromFileUrl(getClass().getClassLoader().getResource("cmd/saxon9ee.jar"));
     cl.append("-lib \"").append(saxon.getAbsolutePath()).append("\" ");
-    File extSaxon = new File("frameworks\\xspec\\oxygen-results-view\\saxon-extension.jar");
+    File extSaxon = new File("frameworks/xspec/oxygen-results-view/saxon-extension.jar");
     cl.append("-lib \"").append(extSaxon.getAbsolutePath()).append("\" ");
     File xerces = URLUtil.getCanonicalFileFromFileUrl(getClass().getClassLoader().getResource("cmd/xercesImpl.jar"));
     cl.append("-lib \"").append(xerces.getAbsolutePath()).append("\" ");
@@ -287,7 +287,7 @@ public class XSpecViewTestBase extends JFCTestCase {
     File reportXSL = new File("frameworks/xspec/oxygen-results-view/unit-report-oxygen.xsl");
     File xspecProjectDir = new File("frameworks/xspec/");
     
-    File buildFile = new File("frameworks\\xspec\\oxygen-results-view\\build_report.xml");
+    File buildFile = new File("frameworks/xspec/oxygen-results-view/build_report.xml");
     
 //    System.out.println("CLASSPATH: " + cl);
 //    System.out.println("ANT: " + antlauncherJar);
@@ -317,7 +317,7 @@ public class XSpecViewTestBase extends JFCTestCase {
         // From tests we Run Saxon in HE mode so we need a config file that creates a HE configuration. 
         + "\"-Dxspec.saxon.config=" + URLUtil.getCanonicalFileFromFileUrl(saxonConfig).getAbsolutePath() + "\"";
     
-//    System.out.println(cmd);
+    System.out.println(cmd);
     
     final Process p = Runtime.getRuntime().exec(cmd);
 
