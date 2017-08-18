@@ -149,8 +149,8 @@ public class XSpecResultsViewTest extends XSpecViewTestBase {
     waitForFX();
     
     StringBuilder expected = new StringBuilder();
-    expected.append(XSpecUtil.generateId("No escaping bad")).append(" ")
-    .append(XSpecUtil.generateId("When processing a list of phrases"));
+    expected.append(XSpecUtil.generateId(" / No escaping bad(0)")).append(" ")
+    .append(XSpecUtil.generateId(" / When processing a list of phrases(2)"));
     assertEquals(expected.toString(), b.toString());
   }
 

@@ -4,6 +4,7 @@ import java.awt.event.ActionEvent;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
+import javax.swing.ImageIcon;
 import javax.swing.JComponent;
 
 import com.oxygenxml.xspec.XSpecUtil.OperationCanceledException;
@@ -38,6 +39,8 @@ public class XSpecSupportPluginExtension implements WorkspaceAccessPluginExtensi
         if (viewInfo.getViewID().equals(XSpecResultsView.RESULTS)) {
           viewInfo.setComponent(resultsPresenter);
           viewInfo.setTitle("XSpec Test Results");
+          ImageIcon ic = new ImageIcon(getClass().getClassLoader().getResource("failures.gif"));
+          viewInfo.setIcon(ic);
         }
       }
     });

@@ -8,7 +8,6 @@
                 xmlns:pkg="http://expath.org/ns/pkg"
                 xmlns:xhtml="http://www.w3.org/1999/xhtml"
                 xmlns:fn="http://www.w3.org/2005/xpath-functions"
-                xmlns:local="http://oxygenxml.com/local"
                 exclude-result-prefixes="x xs test pkg xhtml fn xsl">
     
     <xsl:param name="report-css-uri" select="
@@ -23,18 +22,6 @@
     
     
     <xsl:import href="../src/reporter/format-utils.xsl"/>
-    
-    <!-- 
-      
-      Oxygen Patch START
-      
-      Exclude all prefixes.
-      
-      TODO Which prefixes to we actually need excluding????
-  
-    -->
-    <xsl:include href="id-generation.xsl"/>
-    <!-- Oxygen Patch END -->
     
     
     <!-- 
@@ -97,7 +84,6 @@
         
         <xsl:variable name="id" select="generate-id()"/>
         <div class="testcase" data-name="{xs:string(x:label/text())}">
-            <xsl:attribute name="template-id" select="@template-id"/>
             <xsl:variable name="status">
                 <xsl:choose>
                     <xsl:when test="@pending">skipped</xsl:when>
