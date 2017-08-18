@@ -6,7 +6,6 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.StringWriter;
 import java.net.URL;
-import java.net.URLClassLoader;
 import java.util.concurrent.Semaphore;
 
 import javax.xml.transform.OutputKeys;
@@ -32,8 +31,6 @@ import javafx.scene.web.WebEngine;
 import junit.extensions.jfcunit.JFCTestCase;
 import ro.sync.exml.workspace.api.editor.WSEditor;
 import ro.sync.exml.workspace.api.editor.documenttype.DocumentTypeInformation;
-import ro.sync.exml.workspace.api.editor.transformation.TransformationFeedback;
-import ro.sync.exml.workspace.api.editor.transformation.TransformationScenarioNotFoundException;
 import ro.sync.exml.workspace.api.standalone.StandalonePluginWorkspace;
 import ro.sync.exml.workspace.api.util.UtilAccess;
 import ro.sync.util.URLUtil;

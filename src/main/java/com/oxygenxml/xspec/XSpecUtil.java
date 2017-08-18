@@ -13,7 +13,6 @@ import ro.sync.exml.workspace.api.editor.WSEditor;
 import ro.sync.exml.workspace.api.editor.documenttype.DocumentTypeInformation;
 import ro.sync.exml.workspace.api.editor.transformation.TransformationFeedback;
 import ro.sync.exml.workspace.api.editor.transformation.TransformationScenarioNotFoundException;
-import ro.sync.exml.workspace.api.listeners.WSEditorListener;
 import ro.sync.exml.workspace.api.standalone.StandalonePluginWorkspace;
 import ro.sync.util.URLUtil;
 
@@ -336,7 +335,7 @@ public class XSpecUtil {
           b.append(" ");
         }
 
-        b.append(XSpecUtil.generateId(String.valueOf(failed[i])));
+        b.append(String.valueOf(failed[i]));
       }
     }
     return b;

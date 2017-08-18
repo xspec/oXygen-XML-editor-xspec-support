@@ -68,7 +68,7 @@ function runScenario(currentNode) {
     
     var scenario = getAncestor(currentNode, "testsuite");
     
-    var scenarioName = scenario.getAttribute('data-name');
+    var scenarioName = scenario.getAttribute('template-id');
     var scenarioLocation = scenario.getAttribute('data-source');
     
     xspecBridge.runScenario(scenarioName, scenarioLocation);
@@ -152,8 +152,20 @@ function getFailedScenarios() {
         var failures = scenario.getAttribute('data-failures');
         
         if (failures != "0") {
-            var scenarioName = scenario.getAttribute('data-name');
-            listOfObjects.push(scenarioName);
+        	// Check if this has any asserts in it. Otherwise is just a grouping scenario.
+        	
+            var hasAssert = false;
+             for (var j = 0; j < scenario.childNodes.length; j++) {
+            	 if (scenario.childNodes[j].className == "testcase") {
+                    	hasAssert = true;
+                    	break;
+                    }
+             }
+        	
+            if (hasAssert) {
+                var scenarioName = scenario.getAttribute('template-id');
+                listOfObjects.push(scenarioName);
+            }
         }
     }
     

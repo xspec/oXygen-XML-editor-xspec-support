@@ -17,6 +17,8 @@
   >
 
   <xsl:import href="../src/compiler/generate-xspec-tests.xsl"/>
+  
+  <xsl:include href="id-generation.xsl"/>
 
   
   
@@ -168,9 +170,11 @@
         Oxygen Patch START 
         
         Keep the location of the scenario for backmapping. 
+
+        Keep the template ID so we can run just this scenario later on.
       
       -->
-      <x:scenario  source="{@source}">
+      <x:scenario  source="{@source}" template-id="{local:generate-id(.)}">
       <!-- Oxygen Patch END -->
         <xsl:if test="$pending-p">
           <xsl:attribute name="pending" select="$pending" />
@@ -278,29 +282,6 @@
   
   
  
-  
-  
-  <!--
-       OXYGEN PATCH START
-       
-       This method generates the same ID based on the label of the scenario. It is good enough...chances are that
-       there are multiple scenarios with the same label....
-   -->
-  
-  <xsl:function name="local:generate-id" as="xs:string">
-    <xsl:param name="context"/>
-    <xsl:variable name="seed" select="if($context/@label) then $context/@label else $context/x:label/text()" as="xs:string"/>
-    
-    <!--<xsl:value-of select="concat('x', uuid:toString(uuid:nameUUIDFromBytes(string:getBytes($seed))))"/>-->
-    
-    <xsl:value-of
-      xmlns:ox="http://www.oxygenxml.com./xslt/xspec"
-      select="ox:generate-id($seed)"/>
-    
-  </xsl:function>
-  
-  <!--
-       OXYGEN PATCH END
-   -->
+ 
  
 </xsl:stylesheet>

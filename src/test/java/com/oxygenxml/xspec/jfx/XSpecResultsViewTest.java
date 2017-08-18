@@ -1,37 +1,14 @@
 package com.oxygenxml.xspec.jfx;
 
 import java.awt.BorderLayout;
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
-import java.io.StringWriter;
 import java.net.URL;
-import java.util.concurrent.Semaphore;
 
 import javax.swing.JFrame;
-import javax.xml.transform.OutputKeys;
-import javax.xml.transform.Result;
-import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerConfigurationException;
-import javax.xml.transform.TransformerException;
-import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.dom.DOMSource;
-import javax.xml.transform.stream.StreamResult;
-
-import org.mockito.Mockito;
-import org.w3c.dom.Node;
 
 import com.oxygenxml.xspec.XSpecResultsView;
 import com.oxygenxml.xspec.XSpecUtil;
 
 import javafx.application.Platform;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
-import javafx.concurrent.Worker;
-import javafx.concurrent.Worker.State;
-import javafx.scene.web.WebEngine;
-import junit.extensions.jfcunit.JFCTestCase;
-import ro.sync.exml.workspace.api.standalone.StandalonePluginWorkspace;
-import ro.sync.exml.workspace.api.util.UtilAccess;
 
 /**
  * Some test cases for the JavaFx renderer.

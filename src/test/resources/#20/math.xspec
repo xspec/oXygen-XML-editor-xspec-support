@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<x:description xmlns:x="http://www.jenitennison.com/xslt/xspec" xmlns:math="math"
+    stylesheet="math.xsl">
+    
+    <x:scenario label="Math first group">
+        <x:scenario label="Test sum">
+            <x:call function="math:sum">
+                <x:param name="p1" select="1"/>
+                <x:param name="p2" select="2"/>
+            </x:call>
+            <x:expect label="Expected">3</x:expect>
+        </x:scenario>
+    </x:scenario>
+
+
+    <x:scenario label="Math second group">
+        <x:scenario label="Test sum">
+            <x:call function="math:sum">
+                <x:param name="p1" select="2"/>
+                <x:param name="p2" select="2"/>
+            </x:call>
+            <x:expect label="Expected">4</x:expect>
+        </x:scenario>
+    </x:scenario>
+    
+    
+</x:description>

@@ -8,6 +8,7 @@
                 xmlns:pkg="http://expath.org/ns/pkg"
                 xmlns:xhtml="http://www.w3.org/1999/xhtml"
                 xmlns:fn="http://www.w3.org/2005/xpath-functions"
+                xmlns:local="http://oxygenxml.com/local"
                 exclude-result-prefixes="x xs test pkg xhtml fn xsl">
     
     <xsl:param name="report-css-uri" select="
@@ -31,7 +32,21 @@
       
       TODO Which prefixes to we actually need excluding????
   
+    -->
+    <xsl:include href="id-generation.xsl"/>
+    <!-- Oxygen Patch END -->
+    
+    
+    <!-- 
+      
+      Oxygen Patch START
+      
+      Exclude all prefixes.
+      
+      TODO Which prefixes to we actually need excluding????
+  
   -->
+    
     <!-- Copied from format-utils.xsl -->
     <xsl:output name="x:report" exclude-result-prefixes="#all" method="xml" indent="yes"/>
     <!-- Oxygen Patch END -->
@@ -52,6 +67,7 @@
     <xsl:template match="x:scenario">
         <div class="testsuite">
             <xsl:attribute name="data-name" select="x:label"/>
+            <xsl:attribute name="template-id" select="@template-id"/>
             <xsl:attribute name="data-source" select="@source"/>
             <xsl:attribute name="data-tests" select="count(.//x:test)"/>
             <xsl:attribute name="data-failures" select="count(.//x:test[@successful='false'])"/>
@@ -81,6 +97,7 @@
         
         <xsl:variable name="id" select="generate-id()"/>
         <div class="testcase" data-name="{xs:string(x:label/text())}">
+            <xsl:attribute name="template-id" select="@template-id"/>
             <xsl:variable name="status">
                 <xsl:choose>
                     <xsl:when test="@pending">skipped</xsl:when>

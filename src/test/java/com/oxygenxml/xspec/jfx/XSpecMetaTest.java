@@ -347,7 +347,10 @@ public class XSpecMetaTest extends XSpecViewTestBase {
     File xspecFile = URLUtil.getCanonicalFileFromFileUrl(xspecURL);
     File outputFile = new File(xspecFile.getParentFile(), "driverTest-report.html");
     
-    String entryPoints = XSpecUtil.generateId("Test no.1") + " " + XSpecUtil.generateId("Test no.2");
+//    / Math first group(0) / Test sum(0)
+    String firstID = XSpecUtil.generateId(" / Test no.1(0)");
+    String secondID = XSpecUtil.generateId(" / Test no.2(1)");
+    String entryPoints = firstID + " " + secondID;
     executeANT(xspecFile, outputFile, entryPoints);
     
     File xmlFormatOutput = new File(xspecFile.getParentFile(), "xspec/driverTest-result.xml");
@@ -400,8 +403,8 @@ public class XSpecMetaTest extends XSpecViewTestBase {
         "      <xsl:result-document format=\"x:report\">\n" + 
         "         <x:report>\n" + 
         // 
-        "            <xsl:call-template name=\"x:x902ab200-b398-338b-90b5-a19708ce37d1\"/>\n" + 
-        "            <xsl:call-template name=\"x:xa0a2d95c-2b63-3229-b5ad-8a166aabd06a\"/>\n" + 
+        "            <xsl:call-template name=\"x:" + firstID + "\"/>\n" + 
+        "            <xsl:call-template name=\"x:" + secondID + "\"/>\n" + 
         "         </x:report>\n" + 
         "      </xsl:result-document>\n" + 
         "   </xsl:template>\n" + 
