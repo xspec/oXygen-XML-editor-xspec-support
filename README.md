@@ -19,13 +19,6 @@ Alternative installation method
 2. download the framework [ZIP package](https://github.com/AlexJitianu/oXygen-XML-editor-xspec-support/raw/master/build/xspec.zip) and unzip it inside `{OxygenInstallDir}/frameworks`
 
 
-Known issues
-----
-The plugin relies on a special framework. This might pose a problem is you are using project 
-files and the preferences page "Locations" is set to "Project". In this cases please load a 
-new project or switch the previously mentioned page to "Global". I'll think of a better 
-solution for the future.
-
 How to use it
 -----------
 
