@@ -1,12 +1,7 @@
 package com.oxygenxml.xspec.jfx.bridge;
 
-import java.io.File;
-import java.io.FileOutputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
 
 import javax.swing.SwingUtilities;
 import javax.swing.text.BadLocationException;
@@ -16,6 +11,7 @@ import org.apache.log4j.Logger;
 import com.oxygenxml.xspec.XSpecResultsView;
 import com.oxygenxml.xspec.XSpecUtil;
 import com.oxygenxml.xspec.XSpecUtil.OperationCanceledException;
+import com.oxygenxml.xspec.protocol.DiffFragmentRepository;
 
 import javafx.scene.web.WebEngine;
 import netscape.javascript.JSObject;
@@ -41,22 +37,28 @@ public class Bridge {
   private static final Logger logger = Logger.getLogger(Bridge.class.getName());
 
   /**
-   * Form control editing context.
+   * The executed XSpec file.
    */
   private URL xspec;
 
   private PluginWorkspace pluginWorkspace;
-
+  
+  /**
+   * TODO Extract an interface to pass to the bridge.
+   */
   private XSpecResultsView resultsPresenter;
 
   /**
    * Constructor.
-   * @param pluginWorkspace 
-   * @param resultsPresenter2 
    * 
-   * @param context Form control editing context.
+   * @param pluginWorkspace 
+   * @param resultsPresenter 
+   * @param xspec The executed XSpec file.
    */
-  private Bridge(PluginWorkspace pluginWorkspace, XSpecResultsView resultsPresenter, URL xspec) {
+  private Bridge(
+      PluginWorkspace pluginWorkspace, 
+      XSpecResultsView resultsPresenter, 
+      URL xspec) {
     this.pluginWorkspace = pluginWorkspace;
     this.resultsPresenter = resultsPresenter;
     this.xspec = xspec;
@@ -187,11 +189,6 @@ public class Bridge {
   }
 
   /**
-   * Temporary files created for the Diff Files.
-   */
-  private Map<Integer, File> compareFiles = new HashMap<Integer, File>(); 
-
-  /**
    * Shows the Oxygen Diff files with the given content.
    *  
    * @param left Left side content.
@@ -207,51 +204,28 @@ public class Bridge {
       logger.debug("Left content " + left);
       logger.debug("Right content " + right);
     }
-
-    int leftKey = left.hashCode();
-    int rightKey = right.hashCode();
-
-    File f1 = compareFiles.get(leftKey);
-    File f2 = compareFiles.get(rightKey);
+    
+    
 
     try {
-      if (f1 == null) {
-        f1 = File.createTempFile("result_", ".xml");
-        FileOutputStream fos = new FileOutputStream(f1);
-        try {
-          fos.write(((String)left).getBytes("UTF-8"));
-        } finally {
-          fos.close();
-        }
-        compareFiles.put(leftKey, f1);
+      DiffFragmentRepository instance = DiffFragmentRepository.getInstance();
+      
+      final URL url1 = instance.cache(left, "RESULT");
+      final URL url2 = instance.cache(right, "EXPECTED");
+
+      if (logger.isDebugEnabled()) {
+        logger.debug("Left URL " + url1);
+        logger.debug("Right URL " + url2);
       }
 
-      if (f2 == null) {
-        f2 = File.createTempFile("expected_", ".xml");
-        FileOutputStream fos2 = new FileOutputStream(f2);
-        try {
-          fos2.write(((String)right).getBytes("UTF-8"));
-        } finally {
-          fos2.close();
-        }
-
-        compareFiles.put(rightKey, f2);
-      } 
-      
-      
-      final URL url1 = f1.toURI().toURL();
-      final URL url2 = f2.toURI().toURL();
-      
       SwingUtilities.invokeLater(new Runnable() {
         @Override
         public void run() {
           ((StandalonePluginWorkspace)pluginWorkspace).openDiffFilesApplication(url1, url2);
         }
       });
-
-
     } catch (Exception e) {
-      e.printStackTrace();
+      logger.error(e, e);
     }
   }
 
@@ -259,11 +233,6 @@ public class Bridge {
    * The bridge will not be used anymore. Dispose any resources kept internally.
    */
   public void dispose() {
-    Collection<File> values = compareFiles.values();
-    for (File file : values) {
-      file.delete();
-    }
-
-    compareFiles.clear();
+    DiffFragmentRepository.getInstance().dispose();
   }
 }

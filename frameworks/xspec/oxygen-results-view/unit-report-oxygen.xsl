@@ -165,11 +165,14 @@
             select="if (x:result) then x:result else ../x:result" />
         <pre class="embeded.diff.data" style="display:none;">
             <div class="embeded.diff.result" style="white-space:pre;">
+                <!-- The value can also appear in teh @select attribute. -->
+                <xsl:value-of select="$result/@select"/>
                 <xsl:apply-templates select="$result/node()" mode="copy">
                     <xsl:with-param name="level" select="0"/>
                 </xsl:apply-templates>
             </div>
             <div class="embeded.diff.expected" style="white-space:pre;">
+                <xsl:value-of select="x:expect/@select"/>
                 <xsl:apply-templates select="x:expect/node()" mode="copy">
                     <xsl:with-param name="level" select="0"/>
                 </xsl:apply-templates>                

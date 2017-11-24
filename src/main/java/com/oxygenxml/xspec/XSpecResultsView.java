@@ -3,12 +3,9 @@ package com.oxygenxml.xspec;
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.net.URL;
-import java.util.UUID;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
-import javax.swing.Box;
-import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JPanel;

@@ -13,9 +13,12 @@
  <runtime>
   <library name="lib/${project.build.finalName}.jar" scope="global"/>
   <library name="lib/" scope="global"/>
+  <library name="target/classes" />
  </runtime>
  
  <extension type="WorkspaceAccess" class="com.oxygenxml.xspec.XSpecSupportPluginExtension"/>
+ <extension type="URLHandler" 
+  class="com.oxygenxml.xspec.protocol.DiffURLHandlerExtension"/>
  
  <view id="com.oxygenxml.xspec.results" initialSide="WEST" initialRow="1"/>
  
