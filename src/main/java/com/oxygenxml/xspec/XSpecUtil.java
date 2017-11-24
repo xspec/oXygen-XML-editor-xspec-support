@@ -101,7 +101,7 @@ public class XSpecUtil {
   public static void runScenario(
       WSEditor wsEditor,
       final StandalonePluginWorkspace pluginWorkspaceAccess, 
-      final XSpecResultsView resultsPresenter,
+      final XSpecResultPresenter resultsPresenter,
       final TransformationFeedback feedback) throws OperationCanceledException {
     
     if (wsEditor == null) {
@@ -152,7 +152,7 @@ public class XSpecUtil {
 
   private static void executeScenario(
       final StandalonePluginWorkspace pluginWorkspaceAccess,
-      final XSpecResultsView resultsPresenter,
+      final XSpecResultPresenter resultsPresenter,
       final TransformationFeedback feedback, final URL editorLocation,
       final WSEditor fwsEditor) {
     try {
@@ -201,7 +201,8 @@ public class XSpecUtil {
    * @throws OperationCanceledException The operation was canceled. 
    */
   private static WSEditor getXSpecEditor(
-      final StandalonePluginWorkspace pluginWorkspaceAccess, XSpecResultsView resultsPresenter) throws OperationCanceledException {
+      final StandalonePluginWorkspace pluginWorkspaceAccess, 
+      XSpecResultPresenter resultsPresenter) throws OperationCanceledException {
     WSEditor currentEditorAccess = pluginWorkspaceAccess.getCurrentEditorAccess(PluginWorkspace.MAIN_EDITING_AREA);
     
     boolean isXspecOn = false;

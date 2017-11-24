@@ -30,7 +30,7 @@ import ro.sync.exml.workspace.api.standalone.ui.ToolbarToggleButton;
  * scenario.   
  * @author alex_jitianu
  */
-public class XSpecResultsView extends JPanel {
+public class XSpecResultsView extends JPanel implements XSpecResultPresenter {
   /**
    * View ID.
    */
@@ -107,7 +107,12 @@ public class XSpecResultsView extends JPanel {
           }
           // The XSpec results were loaded by the WebEngine.
           // Install the Javascript->Java bridge.
-          xspecBridge = Bridge.install(panel.getWebEngine(), XSpecResultsView.this, pluginWorkspace, xspec);
+          xspecBridge = Bridge.install(
+              panel.getWebEngine(), 
+              XSpecResultsView.this,
+              getVariableResolver(),
+              pluginWorkspace, 
+              xspec);
           
           applyTestFilter();
         }

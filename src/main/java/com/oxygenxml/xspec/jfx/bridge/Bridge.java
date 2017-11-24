@@ -8,9 +8,10 @@ import javax.swing.text.BadLocationException;
 
 import org.apache.log4j.Logger;
 
-import com.oxygenxml.xspec.XSpecResultsView;
+import com.oxygenxml.xspec.XSpecResultPresenter;
 import com.oxygenxml.xspec.XSpecUtil;
 import com.oxygenxml.xspec.XSpecUtil.OperationCanceledException;
+import com.oxygenxml.xspec.XSpecVariablesResolver;
 import com.oxygenxml.xspec.protocol.DiffFragmentRepository;
 
 import javafx.scene.web.WebEngine;
@@ -40,33 +41,62 @@ public class Bridge {
    * The executed XSpec file.
    */
   private URL xspec;
-
+  /**
+   * Interface to Oxygen's workspace.
+   */
   private PluginWorkspace pluginWorkspace;
   
   /**
-   * TODO Extract an interface to pass to the bridge.
+   * Extract an interface to pass to the bridge.
    */
-  private XSpecResultsView resultsPresenter;
+  private XSpecResultPresenter resultsPresenter;
+  /**
+   * Contributes a number of special XSpec variables.
+   */
+  private XSpecVariablesResolver variablesResolver;
 
   /**
    * Constructor.
    * 
    * @param pluginWorkspace 
    * @param resultsPresenter 
+   * @param variablesResolver 
    * @param xspec The executed XSpec file.
    */
   private Bridge(
       PluginWorkspace pluginWorkspace, 
-      XSpecResultsView resultsPresenter, 
+      XSpecResultPresenter resultsPresenter, 
+      XSpecVariablesResolver variablesResolver, 
       URL xspec) {
     this.pluginWorkspace = pluginWorkspace;
     this.resultsPresenter = resultsPresenter;
+    this.variablesResolver = variablesResolver;
     this.xspec = xspec;
   }
 
-  public static Bridge install(WebEngine engine, XSpecResultsView resultsPresenter, PluginWorkspace pluginWorkspace, URL xspec) {
+  /**
+   * Installs in the Web Engine the bridge between Javascript and the Java environment.
+   * Javascript code will be able to call Java methods.
+   * 
+   * @param engine Web Engine.
+   * @param resultsPresenter Presents the HTML resulted from an XSpec execution.
+   * @param variablesResolver Resolves special XSpec variables, like which template to execute.
+   * @param pluginWorkspace Oxygen workspace.
+   * @param xspec The XSpec for which we present the results.
+   * @return
+   */
+  public static Bridge install(
+      WebEngine engine, 
+      XSpecResultPresenter resultsPresenter,
+      XSpecVariablesResolver variablesResolver,
+      PluginWorkspace pluginWorkspace, 
+      URL xspec) {
     JSObject window = (JSObject) engine.executeScript("window");
-    Bridge value = new Bridge(pluginWorkspace, resultsPresenter, xspec);
+    Bridge value = new Bridge(
+        pluginWorkspace, 
+        resultsPresenter,
+        variablesResolver,
+        xspec);
     window.setMember("xspecBridge", value);
 
     return value;
@@ -159,7 +189,7 @@ public class Bridge {
         WSEditor xspecToExecute = getEditorAccess(xspec);
         
         // We only need to execute this scenario.
-        resultsPresenter.getVariableResolver().setTemplateNames(scenarioName);
+        variablesResolver.setTemplateNames(scenarioName);
         
         // Step 3. Run the scenario
         XSpecUtil.runScenario(
