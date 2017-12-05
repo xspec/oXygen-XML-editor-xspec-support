@@ -235,13 +235,15 @@ public class Bridge {
       logger.debug("Right content " + right);
     }
     
-    
-
     try {
       DiffFragmentRepository instance = DiffFragmentRepository.getInstance();
       
-      final URL url1 = instance.cache(left, "RESULT");
-      final URL url2 = instance.cache(right, "EXPECTED");
+      final URL url1 = instance.cache(
+          left, 
+          "RESULT");
+      final URL url2 = instance.cache(
+          right, 
+          "EXPECTED");
 
       if (logger.isDebugEnabled()) {
         logger.debug("Left URL " + url1);

@@ -163,19 +163,37 @@
     <xsl:template name="embedDiff">
         <xsl:variable name="result" as="element(x:result)"
             select="if (x:result) then x:result else ../x:result" />
+        
+        
+        <xsl:variable name="params">
+            <output:serialization-parameters 
+            xmlns:output="http://www.w3.org/2010/xslt-xquery-serialization">
+            <output:omit-xml-declaration value="yes"/>
+        </output:serialization-parameters>            
+        </xsl:variable> 
+        
         <pre class="embeded.diff.data" style="display:none;">
             <div class="embeded.diff.result" style="white-space:pre;">
                 <!-- The value can also appear in teh @select attribute. -->
-                <xsl:value-of select="$result/@select"/>
-                <xsl:apply-templates select="$result/node()" mode="copy">
-                    <xsl:with-param name="level" select="0"/>
-                </xsl:apply-templates>
+                <xsl:variable name="tmp">
+                    <xsl:value-of select="$result/@select"/>
+                    <xsl:apply-templates select="$result/node()" mode="copy">
+                        <xsl:with-param name="level" select="0"/>
+                    </xsl:apply-templates>
+                </xsl:variable>
+
+                <xsl:value-of select="serialize($tmp, $params/*:serialization-parameters)" />
             </div>
+            
             <div class="embeded.diff.expected" style="white-space:pre;">
-                <xsl:value-of select="x:expect/@select"/>
-                <xsl:apply-templates select="x:expect/node()" mode="copy">
-                    <xsl:with-param name="level" select="0"/>
-                </xsl:apply-templates>                
+                <xsl:variable name="tmp">
+                    <xsl:value-of select="x:expect/@select"/>
+                    <xsl:apply-templates select="x:expect/node()" mode="copy">
+                        <xsl:with-param name="level" select="0"/>
+                    </xsl:apply-templates>   
+                </xsl:variable>
+
+            <xsl:value-of select="serialize($tmp, $params/*:serialization-parameters)" />                
             </div>
         </pre>
     </xsl:template>

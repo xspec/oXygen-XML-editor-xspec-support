@@ -214,6 +214,7 @@ public class XSpecUtil {
         isXspecOn = false;
       } else {
         // TODO Perhaps a detection of the namespace of the root element (XPath).
+        // Maybe look at the DT name? If it contains xspec? currentEditorAccess.getDocumentTypeInformation().getName()
       }
     }
     

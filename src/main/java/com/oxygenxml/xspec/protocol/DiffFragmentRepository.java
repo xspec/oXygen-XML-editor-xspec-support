@@ -11,6 +11,7 @@ import java.util.Map;
 import org.apache.log4j.Logger;
 
 import ro.sync.exml.editor.ContentTypes;
+import ro.sync.exml.workspace.api.PluginWorkspaceProvider;
 
 /**
  * A repository for the XML fragments that can be accessed through the DIFF protocol.
@@ -70,33 +71,45 @@ public class DiffFragmentRepository {
     BufferedReader r = new BufferedReader(new StringReader(trim));
     String line = null;
     int lineCounter = 0;
-    int startTagCounter = 0;
+    int tagCharCounter = 0;
     boolean isXML = false;
     try {
       while ((line = r.readLine()) != null) {
-        lineCounter ++;
-        
-        int indexOf = line.indexOf("<");
-        while (indexOf != -1) {
-          startTagCounter ++;
-          indexOf = line.indexOf("<", indexOf + 1);
+        if (line.length() > 0) {
+          lineCounter ++;
+
+          int indexOf = line.indexOf("<");
+          while (indexOf != -1) {
+            tagCharCounter ++;
+            indexOf = line.indexOf("<", indexOf + 1);
+          }
+          
+          indexOf = line.indexOf(">");
+          while (indexOf != -1) {
+            tagCharCounter ++;
+            indexOf = line.indexOf(">", indexOf + 1);
+          }
         }
       }
+      
+      if (logger.isDebugEnabled()) {
+        logger.debug("lineCounter " + lineCounter);
+        logger.debug("startTagCounter " + tagCharCounter);
+        logger.debug("trim.length() " + trim.length());
+      }
+      
       
       if (lineCounter < 2) {
         // If the XML is inline consider a 'well studied' ratio.
-        int aproxLines = trim.length() / 50; 
-        if (aproxLines != 0) {
-          if (startTagCounter >= aproxLines && aproxLines > 5) {
-            isXML = true;
-          }
+        int aproxLines = Math.max(trim.length() / 50, 1); 
+        if (tagCharCounter / aproxLines >=2) {
+          isXML = true;
         }
       } else {
-        if (startTagCounter >= lineCounter - 1 && lineCounter >= 3) {
+        if (tagCharCounter >= lineCounter - 1) {
           isXML = true;
         }
       }
-      
       
     } catch (IOException e) {
       logger.error(e, e);
@@ -147,6 +160,11 @@ public class DiffFragmentRepository {
   public URL cache(String fragment, String host) throws MalformedURLException {
     int key = fragment.hashCode();
     if (!contains(key)) {
+//      fragment = fragment.replace("&lt;", "<");
+      fragment = PluginWorkspaceProvider.getPluginWorkspace().getXMLUtilAccess().unescapeAttributeValue(fragment);
+      
+      logger.info("Fragment " + fragment);
+      
       put(key, fragment);
     }
     

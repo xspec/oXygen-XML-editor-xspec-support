@@ -224,17 +224,17 @@ public class XSpecMetaTest extends XSpecViewTestBase {
         "            </div>"
         // DATA for the Oxygen DIFF.
         + "<pre class=\"embeded.diff.data\" style=\"display:none;\"><div class=\"embeded.diff.result\" style=\"white-space:pre;\">\n" + 
-        "<phrases>\n" + 
-        "   <phrase status=\"changed\">Hello!</phrase>\n" + 
-        "   <phrase status=\"changed\">Goodbye!</phrase>\n" + 
-        "   <phrase status=\"same\">\\(So long!\\)</phrase>\n" + 
-        "</phrases>\n" + 
+        "&lt;phrases&gt;\n" + 
+        "   &lt;phrase status=\"changed\"&gt;Hello!&lt;/phrase&gt;\n" + 
+        "   &lt;phrase status=\"changed\"&gt;Goodbye!&lt;/phrase&gt;\n" + 
+        "   &lt;phrase status=\"same\"&gt;\\(So long!\\)&lt;/phrase&gt;\n" + 
+        "&lt;/phrases&gt;\n" + 
         "</div><div class=\"embeded.diff.expected\" style=\"white-space:pre;\">\n" + 
-        "<phrases>\n" + 
-        "   <phrase status=\"same\">Hello!</phrase>\n" + 
-        "   <phrase status=\"same\">Goodbye!</phrase>\n" + 
-        "   <phrase status=\"changed\">\\(So long!\\)</phrase>\n" + 
-        "</phrases>\n" + 
+        "&lt;phrases&gt;\n" + 
+        "   &lt;phrase status=\"same\"&gt;Hello!&lt;/phrase&gt;\n" + 
+        "   &lt;phrase status=\"same\"&gt;Goodbye!&lt;/phrase&gt;\n" + 
+        "   &lt;phrase status=\"changed\"&gt;\\(So long!\\)&lt;/phrase&gt;\n" + 
+        "&lt;/phrases&gt;\n" + 
         "</div></pre></div>\n" + 
         "      </div>\n" + 
         "      <div class=\"testsuite\" data-name=\"No escaping\" template-id=\"xdf4d3bc9-c326-3719-8163-46ff873a00b8\" data-source=\"file:/C:/Users/alex_jitianu/Documents/Git-workspace/oXygen-XML-editor-xspec-plugin/target/test-classes/meta/escape-for-regex.xspec\" data-tests=\"1\" data-failures=\"0\">\n" + 
