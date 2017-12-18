@@ -133,7 +133,7 @@ public class XSpecUtil {
                 counter ++;
               }
             } catch (InterruptedException e) {
-              e.printStackTrace();
+              logger.error(e, e);
             }
             
             if (documentTypeInformation != null) {
@@ -170,7 +170,7 @@ public class XSpecUtil {
             try {
               resultsPresenter.load(editorLocation, new URL(toOpen));
             } catch (MalformedURLException e) {
-              e.printStackTrace();
+              logger.error(e, e);
             }
           } else {
             resultsPresenter.loadContent("");
@@ -247,14 +247,6 @@ public class XSpecUtil {
     return currentEditorAccess;
   }
 
-  /**
-   * Operation canceled. 
-   *
-   */
-  public static class OperationCanceledException extends Exception {
-    
-  }
-  
   /**
    * Generates an unique ID based on the given seed.
    * 

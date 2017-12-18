@@ -237,7 +237,9 @@ public class XSpecMetaTest extends XSpecViewTestBase {
         "&lt;/phrases&gt;\n" + 
         "</div></pre></div>\n" + 
         "      </div>\n" + 
-        "      <div class=\"testsuite\" data-name=\"No escaping\" template-id=\"xdf4d3bc9-c326-3719-8163-46ff873a00b8\" data-source=\"file:/C:/Users/alex_jitianu/Documents/Git-workspace/oXygen-XML-editor-xspec-plugin/target/test-classes/meta/escape-for-regex.xspec\" data-tests=\"1\" data-failures=\"0\">\n" + 
+        "      <div class=\"testsuite\" data-name=\"No escaping\" template-id=\"xdf4d3bc9-c326-3719-8163-46ff873a00b8\" data-source=\""
+        + importedXSpecURL.toString()
+        + "\" data-tests=\"1\" data-failures=\"0\">\n" + 
         "         <p style=\"margin:0px;\"><span>No escaping</span><span>&nbsp;</span><a class=\"button\" onclick=\"runScenario(this)\">Run</a></p>\n" + 
         "         <div class=\"testcase\" data-name=\"Must not be escaped at all\">\n" + 
         "            <p class=\"passed\"><span class=\"test-passed\" onclick=\"toggleResult(this)\">Must not be escaped at all</span><span>&nbsp;</span><a class=\"button\" onclick=\"showTest(this)\">Show</a></p>\n" + 

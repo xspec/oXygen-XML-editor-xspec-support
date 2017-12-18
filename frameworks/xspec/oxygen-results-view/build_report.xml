@@ -152,6 +152,7 @@
   	
   	
   	<echo>Apply driver to execute the templates: ${xspec.template.name.entrypoint}</echo>
+    <makeurl file="${xspec.xsl}" property="xspec.xsl.uri"/>
   	
   	<java classname="net.sf.saxon.Transform"
   	      fork="true">
@@ -170,7 +171,7 @@
   	      <arg value="-xsl:${compile.xspec.xsl.driver}" />
   		
   		<arg value="xspec.template.name.entrypoint=${xspec.template.name.entrypoint}" />
-  		<arg value="compiled-stylesheet-uri=file:/${xspec.xsl}" />
+  		<arg value="compiled-stylesheet-uri=${xspec.xsl.uri}" />
   	    	
   	      <arg value="-config:${xspec.saxon.config}" />
   	    </java>

@@ -12,6 +12,7 @@ import org.apache.log4j.Logger;
 
 import ro.sync.exml.editor.ContentTypes;
 import ro.sync.exml.workspace.api.PluginWorkspaceProvider;
+import ro.sync.util.URLUtil;
 
 /**
  * A repository for the XML fragments that can be accessed through the DIFF protocol.
@@ -23,6 +24,11 @@ public class DiffFragmentRepository {
    * Logger for logging.
    */
   private static final Logger logger = Logger.getLogger(DiffFragmentRepository.class.getName());
+  
+  /**
+   * Protocol name.
+   */
+  public static final String DIFF_PROTOCOL = "diff";
   
   /**
    * Singleton instance.
@@ -119,17 +125,6 @@ public class DiffFragmentRepository {
   }
   
   /**
-   * Gets the fragment associated with the given key.
-   * 
-   * @param key The key that identifies a fragment.
-   * 
-   * @return The fragment or null if the key is not mapped to any fragment.
-   */
-  public DiffFragment get(int key) {
-    return cache.get(key);
-  }
-  
-  /**
    * Checks of the fragment is present in the cache.
    * 
    * @param key The key that identifies a fragment.
@@ -160,14 +155,62 @@ public class DiffFragmentRepository {
   public URL cache(String fragment, String host) throws MalformedURLException {
     int key = fragment.hashCode();
     if (!contains(key)) {
-//      fragment = fragment.replace("&lt;", "<");
-      fragment = PluginWorkspaceProvider.getPluginWorkspace().getXMLUtilAccess().unescapeAttributeValue(fragment);
-      
-      logger.info("Fragment " + fragment);
       
       put(key, fragment);
     }
     
-    return DiffURLStreamHandler.build(key, host);
+    return build(DIFF_PROTOCOL, key, host);
+  }
+  
+  /**
+   * Gets the fragment identified by this URL.
+   * 
+   * @param u The URL.
+   * 
+   * @return The fragment or <code>null</code>.
+   */
+  public String getFragment(URL u) {
+    String fragment = null;
+    
+    String fileName = URLUtil.extractFileName(u);
+    String extension = URLUtil.getExtension(fileName);
+
+    String idAsString = fileName.substring(0, fileName.length() - extension.length() - 1);
+
+    try {
+      int key = Integer.parseInt(idAsString);
+
+      DiffFragment diffFragment = cache.get(key);
+      if (diffFragment != null) {
+        fragment = diffFragment.getContent();
+      }
+
+    } catch (Throwable t) {
+      logger.error(t, t);
+    }
+    
+    return fragment;
+  }
+  
+  /**
+   * Builds an URL to identify a fragment with teh given key.
+   * 
+   * @param key The key.
+   * @param host Something to put as host name.
+   * 
+   * @return The URL form.
+   * 
+   * @throws MalformedURLException Problems building the URL.
+   */
+  public URL build(String protocol, int key, String host) throws MalformedURLException {
+    DiffFragment diffFragment = cache.get(key);
+    StringBuilder b = new StringBuilder(protocol);
+    b.append(":/").append(host).append("/").append(key).append(".");
+    if (diffFragment.getContentType().equals(ContentTypes.XML_CONTENT_TYPE)) {
+      b.append("xml");
+    } else {
+      b.append("txt");
+    }
+    return new URL(b.toString());
   }
 }

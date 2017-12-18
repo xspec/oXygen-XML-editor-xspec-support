@@ -13,7 +13,6 @@ import javax.swing.SwingUtilities;
 
 import org.apache.log4j.Logger;
 
-import com.oxygenxml.xspec.XSpecUtil.OperationCanceledException;
 import com.oxygenxml.xspec.jfx.BrowserInteractor;
 import com.oxygenxml.xspec.jfx.SwingBrowserPanel;
 import com.oxygenxml.xspec.jfx.bridge.Bridge;
@@ -218,7 +217,7 @@ public class XSpecResultsView extends JPanel implements XSpecResultPresenter {
                 enableButtons(true);  
               }
             } catch (Exception e) {
-              e.printStackTrace();
+              logger.error(e, e);
               enableButtons(true);
             }
           }

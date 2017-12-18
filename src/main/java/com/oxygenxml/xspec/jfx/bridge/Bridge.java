@@ -8,15 +8,16 @@ import javax.swing.text.BadLocationException;
 
 import org.apache.log4j.Logger;
 
+import com.oxygenxml.xspec.OperationCanceledException;
 import com.oxygenxml.xspec.XSpecResultPresenter;
 import com.oxygenxml.xspec.XSpecUtil;
-import com.oxygenxml.xspec.XSpecUtil.OperationCanceledException;
 import com.oxygenxml.xspec.XSpecVariablesResolver;
 import com.oxygenxml.xspec.protocol.DiffFragmentRepository;
 
 import javafx.scene.web.WebEngine;
 import netscape.javascript.JSObject;
 import ro.sync.exml.workspace.api.PluginWorkspace;
+import ro.sync.exml.workspace.api.PluginWorkspaceProvider;
 import ro.sync.exml.workspace.api.editor.WSEditor;
 import ro.sync.exml.workspace.api.editor.page.WSEditorPage;
 import ro.sync.exml.workspace.api.editor.page.text.xml.WSXMLTextEditorPage;
@@ -24,6 +25,7 @@ import ro.sync.exml.workspace.api.editor.page.text.xml.WSXMLTextNodeRange;
 import ro.sync.exml.workspace.api.editor.page.text.xml.XPathException;
 import ro.sync.exml.workspace.api.editor.transformation.TransformationFeedback;
 import ro.sync.exml.workspace.api.standalone.StandalonePluginWorkspace;
+import ro.sync.exml.workspace.api.util.XMLUtilAccess;
 
 /**
  * A bridge between JavaScript and Java. JavaScript code will be able to invoke 
@@ -161,9 +163,9 @@ public class Bridge {
           logger.warn("Unable to identify test");
         }
       } catch (XPathException e) {
-        e.printStackTrace();
+        logger.error(e, e);
       } catch (BadLocationException e) {
-        e.printStackTrace();
+        logger.error(e, e);
       }
 
     }
@@ -238,11 +240,15 @@ public class Bridge {
     try {
       DiffFragmentRepository instance = DiffFragmentRepository.getInstance();
       
+      
+      XMLUtilAccess xmlUtilAccess = PluginWorkspaceProvider.getPluginWorkspace().getXMLUtilAccess();
+      String lu = xmlUtilAccess.unescapeAttributeValue(left);
+      String lr = xmlUtilAccess.unescapeAttributeValue(right);
       final URL url1 = instance.cache(
-          left, 
+          lu, 
           "RESULT");
       final URL url2 = instance.cache(
-          right, 
+          lr, 
           "EXPECTED");
 
       if (logger.isDebugEnabled()) {
