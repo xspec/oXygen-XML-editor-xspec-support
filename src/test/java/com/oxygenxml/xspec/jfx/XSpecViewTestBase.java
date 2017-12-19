@@ -278,13 +278,13 @@ public class XSpecViewTestBase extends JFCTestCase {
     // Build the classpath needed by the build_report.xml script.
     StringBuilder cl = new StringBuilder();
     File saxon = URLUtil.getCanonicalFileFromFileUrl(getClass().getClassLoader().getResource("cmd/saxon9ee.jar"));
-    cl.append("-lib \"").append(saxon.getAbsolutePath()).append("\" ");
+    cl.append("-lib ").append(saxon.getAbsolutePath()).append(" ");
     File extSaxon = new File("frameworks/xspec/oxygen-results-view/saxon-extension.jar");
-    cl.append("-lib \"").append(extSaxon.getAbsolutePath()).append("\" ");
+    cl.append("-lib ").append(extSaxon.getAbsolutePath()).append(" ");
     File xerces = URLUtil.getCanonicalFileFromFileUrl(getClass().getClassLoader().getResource("cmd/xercesImpl.jar"));
-    cl.append("-lib \"").append(xerces.getAbsolutePath()).append("\" ");
+    cl.append("-lib ").append(xerces.getAbsolutePath()).append(" ");
     File resolver = URLUtil.getCanonicalFileFromFileUrl(getClass().getClassLoader().getResource("cmd/resolver.jar"));
-    cl.append("-lib \"").append(resolver.getAbsolutePath()).append("\" ");
+    cl.append("-lib ").append(resolver.getAbsolutePath()).append(" ");
     
 
     File compilerXSL = new File("frameworks/xspec/oxygen-results-view/generate-xspec-tests-oxygen.xsl");
@@ -299,28 +299,28 @@ public class XSpecViewTestBase extends JFCTestCase {
     
     String cmd = 
         "java -Xmx256m "
-        + "-classpath \"" + antlauncherJar.toString() + "\" "
+        + "-classpath " + antlauncherJar.toString() + " "
         + "org.apache.tools.ant.launch.Launcher "
         // Classpath
         + cl.toString()
         // Build file.
-        + "-f \"" + buildFile.getAbsolutePath() + "\" "
-        + "\"-Dclean.output.dir=false\" "
+        + "-f " + buildFile.getAbsolutePath() + " "
+        + "-Dclean.output.dir=false "
         // Compile XSL.
-        + "\"-Dcompile.xspec.xsl=" + compilerXSL.getAbsolutePath() + "\" "
+        + "-Dcompile.xspec.xsl=" + compilerXSL.getAbsolutePath() + " "
         // Driver XSL that is applied over the the compiled XSL.
-        + "\"-Dcompile.xspec.xsl.driver=" + compilerXSLDriver.getAbsolutePath() + "\" "
+        + "-Dcompile.xspec.xsl.driver=" + compilerXSLDriver.getAbsolutePath() + " "
         // Report formatter.
-        + "\"-Dformat.xspec.report=" + reportXSL.getAbsolutePath() + "\" "
+        + "-Dformat.xspec.report=" + reportXSL.getAbsolutePath() + " "
         // XSpec project dir.
-        + "\"-Dxspec.project.dir=" + xspecProjectDir.getAbsolutePath() + "\" "
+        + "-Dxspec.project.dir=" + xspecProjectDir.getAbsolutePath() + " "
         // Output file name.
-        + "\"-Dxspec.result.html=" + outputFile.getAbsolutePath() + "\" "
-        + "\"-Dxspec.template.name.entrypoint=" + entryPoints+ "\" "
+        + "-Dxspec.result.html=" + outputFile.getAbsolutePath() + " "
+        + "-Dxspec.template.name.entrypoint=\"" + entryPoints+ "\" "
         // XSpec to process.
-        + "\"-Dxspec.xml=" + xspecFile.getAbsolutePath() +  "\" "
+        + "-Dxspec.xml=" + xspecFile.getAbsolutePath() +  " "
         // From tests we Run Saxon in HE mode so we need a config file that creates a HE configuration. 
-        + "\"-Dxspec.saxon.config=" + URLUtil.getCanonicalFileFromFileUrl(saxonConfig).getAbsolutePath() + "\"";
+        + "-Dxspec.saxon.config=" + URLUtil.getCanonicalFileFromFileUrl(saxonConfig).getAbsolutePath() + "";
     
     System.out.println(cmd);
     
