@@ -268,8 +268,12 @@ public class XSpecViewTestBase extends JFCTestCase {
     File ant = URLUtil.getCanonicalFileFromFileUrl(getClass().getClassLoader().getResource("cmd/apache-ant-1.10.1/lib/ant.jar"));
 
     StringBuilder antlauncherJar = new StringBuilder();
-    antlauncherJar.append("\"").append(antL.getAbsolutePath()).append("\"").append(";")
-    .append("\"").append(ant.getAbsolutePath()).append("\"");
+    String separator = ":";
+    String osName = System.getProperty("os.name");
+    if (osName.toUpperCase().startsWith("WIN")) {
+      separator = ";";
+    }
+    antlauncherJar.append(antL.getAbsolutePath()).append(separator).append(ant.getAbsolutePath());
     
     // Build the classpath needed by the build_report.xml script.
     StringBuilder cl = new StringBuilder();
@@ -295,7 +299,7 @@ public class XSpecViewTestBase extends JFCTestCase {
     
     String cmd = 
         "java -Xmx256m "
-        + "-classpath " + antlauncherJar.toString() + " "
+        + "-classpath \"" + antlauncherJar.toString() + "\" "
         + "org.apache.tools.ant.launch.Launcher "
         // Classpath
         + cl.toString()
