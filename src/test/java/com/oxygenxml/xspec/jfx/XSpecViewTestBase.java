@@ -6,6 +6,8 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.StringWriter;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.Semaphore;
 
 import javax.xml.transform.OutputKeys;
@@ -260,21 +262,24 @@ public class XSpecViewTestBase extends JFCTestCase {
     executeANT(xspecFile, outputFile, "");
   }
   
-  protected void executeANT(File xspecFile, File outputFile, String entryPoints) throws IOException, InterruptedException {
+  protected void executeANT(File xspecFile, File outputFile, String entryPoints)
+      throws IOException, InterruptedException {
     URL saxonConfig = getClass().getClassLoader().getResource("config/saxon-config.xml");
-    
+
     // Build the classpath needed to launch ANT.
     File antL = URLUtil.getCanonicalFileFromFileUrl(getClass().getClassLoader().getResource("cmd/apache-ant-1.10.1/lib/ant-launcher.jar"));
     File ant = URLUtil.getCanonicalFileFromFileUrl(getClass().getClassLoader().getResource("cmd/apache-ant-1.10.1/lib/ant.jar"));
 
-    StringBuilder antlauncherJar = new StringBuilder();
     String separator = ":";
     String osName = System.getProperty("os.name");
     if (osName.toUpperCase().startsWith("WIN")) {
       separator = ";";
     }
-    antlauncherJar.append(antL.getAbsolutePath()).append(separator).append(ant.getAbsolutePath());
     
+    StringBuilder antlauncherJar = new StringBuilder();
+    antlauncherJar.append(antL.getAbsolutePath()).append(separator)
+    .append(ant.getAbsolutePath());
+
     // Build the classpath needed by the build_report.xml script.
     StringBuilder cl = new StringBuilder();
     File saxon = URLUtil.getCanonicalFileFromFileUrl(getClass().getClassLoader().getResource("cmd/saxon9ee.jar"));
@@ -285,76 +290,91 @@ public class XSpecViewTestBase extends JFCTestCase {
     cl.append("-lib ").append(xerces.getAbsolutePath()).append(" ");
     File resolver = URLUtil.getCanonicalFileFromFileUrl(getClass().getClassLoader().getResource("cmd/resolver.jar"));
     cl.append("-lib ").append(resolver.getAbsolutePath()).append(" ");
-    
+
 
     File compilerXSL = new File("frameworks/xspec/oxygen-results-view/generate-xspec-tests-oxygen.xsl");
     File compilerXSLDriver = new File("frameworks/xspec/oxygen-results-view/compile-driver.xsl");
     File reportXSL = new File("frameworks/xspec/oxygen-results-view/unit-report-oxygen.xsl");
     File xspecProjectDir = new File("frameworks/xspec/");
-    
+
     File buildFile = new File("frameworks/xspec/oxygen-results-view/build_report.xml");
-    
-//    System.out.println("CLASSPATH: " + cl);
-//    System.out.println("ANT: " + antlauncherJar);
-    
-    String cmd = 
-        "java -Xmx256m "
-        + "-classpath " + antlauncherJar.toString() + " "
-        + "org.apache.tools.ant.launch.Launcher "
-        // Classpath
-        + cl.toString()
-        // Build file.
-        + "-f " + buildFile.getAbsolutePath() + " "
-        + "-Dclean.output.dir=false "
-        // Compile XSL.
-        + "-Dcompile.xspec.xsl=" + compilerXSL.getAbsolutePath() + " "
-        // Driver XSL that is applied over the the compiled XSL.
-        + "-Dcompile.xspec.xsl.driver=" + compilerXSLDriver.getAbsolutePath() + " "
-        // Report formatter.
-        + "-Dformat.xspec.report=" + reportXSL.getAbsolutePath() + " "
-        // XSpec project dir.
-        + "-Dxspec.project.dir=" + xspecProjectDir.getAbsolutePath() + " "
-        // Output file name.
-        + "-Dxspec.result.html=" + outputFile.getAbsolutePath() + " "
-        + "-Dxspec.template.name.entrypoint=\"" + entryPoints+ "\" "
-        // XSpec to process.
-        + "-Dxspec.xml=" + xspecFile.getAbsolutePath() +  " "
-        // From tests we Run Saxon in HE mode so we need a config file that creates a HE configuration. 
-        + "-Dxspec.saxon.config=" + URLUtil.getCanonicalFileFromFileUrl(saxonConfig).getAbsolutePath() + "";
-    
-    System.out.println(cmd);
-    
-    final Process p = Runtime.getRuntime().exec(cmd);
 
-    new Thread(new Runnable() {
-        public void run() {
-         BufferedReader input = new BufferedReader(new InputStreamReader(p.getInputStream()));
-         String line = null; 
+    //    System.out.println("CLASSPATH: " + cl);
+    //    System.out.println("ANT: " + antlauncherJar);
 
-         try {
-            while ((line = input.readLine()) != null)
-                System.out.println(line);
-         } catch (IOException e) {
-                e.printStackTrace();
-         }
-        }
-    }).start();
-    
+    List<String> lines = new ArrayList<String>();
+
+    lines.add("java");
+    lines.add("-Xmx256m");
+    lines.add("-classpath");
+    lines.add(antlauncherJar.toString());
+    lines.add("org.apache.tools.ant.launch.Launcher");
+
+    // Classpath
+    String[] split = cl.toString().split(" ");
+    for (int i = 0; i < split.length; i++) {
+      lines.add(split[i]);
+    }
+
+    lines.add("-f");
+    // Build file.
+    lines.add(buildFile.getAbsolutePath());
+    lines.add("-Dclean.output.dir=false");
+
+    // Compile XSL.
+    lines.add("-Dcompile.xspec.xsl=" + compilerXSL.getAbsolutePath() );
+    // Driver XSL that is applied over the the compiled XSL.
+    lines.add("-Dcompile.xspec.xsl.driver=" + compilerXSLDriver.getAbsolutePath() );
+    // Report formatter.
+    lines.add("-Dformat.xspec.report=" + reportXSL.getAbsolutePath() );
+    // XSpec project dir.
+    lines.add("-Dxspec.project.dir=" + xspecProjectDir.getAbsolutePath() );
+    // Output file name.
+    lines.add("-Dxspec.result.html=" + outputFile.getAbsolutePath() );
+    lines.add("-Dxspec.template.name.entrypoint=" + entryPoints);
+    // XSpec to process.
+    lines.add("-Dxspec.xml=" + xspecFile.getAbsolutePath() );
+    // From tests we Run Saxon in HE mode so we need a config file that creates a HE configuration. 
+    lines.add("-Dxspec.saxon.config=" + URLUtil.getCanonicalFileFromFileUrl(saxonConfig).getAbsolutePath());
+
+
+    System.out.println("-----LINES----");
+    for (String p : lines) {
+      System.out.println(p);
+    }
+    System.out.println("-----------");
+
+    final Process p = Runtime.getRuntime().exec(lines.toArray(new String[0]));
+
     new Thread(new Runnable() {
       public void run() {
-       BufferedReader input = new BufferedReader(new InputStreamReader(p.getErrorStream()));
-       String line = null; 
+        BufferedReader input = new BufferedReader(new InputStreamReader(p.getInputStream()));
+        String line = null; 
 
-       try {
+        try {
           while ((line = input.readLine()) != null)
-              System.out.println("error: " + line);
-       } catch (IOException e) {
-              e.printStackTrace();
-       }
+            System.out.println(line);
+        } catch (IOException e) {
+          e.printStackTrace();
+        }
       }
-  }).start();
+    }).start();
+
+    new Thread(new Runnable() {
+      public void run() {
+        BufferedReader input = new BufferedReader(new InputStreamReader(p.getErrorStream()));
+        String line = null; 
+
+        try {
+          while ((line = input.readLine()) != null)
+            System.out.println("error: " + line);
+        } catch (IOException e) {
+          e.printStackTrace();
+        }
+      }
+    }).start();
 
     p.waitFor();
-  
+
   }
 }
