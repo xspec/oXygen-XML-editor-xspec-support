@@ -1,3 +1,4 @@
+echo "Prepare to deploy add-on"
 
 REPONAME=`basename $PWD`
 PARENTDIR=`dirname $PWD`
@@ -5,9 +6,14 @@ USERNAME=`basename $PARENTDIR`
 
 mkdir deploy
 cd deploy
+
+echo "Initialize repository"
+
 git init
 git config user.name "AlexJitianu";
 git config user.email "alex_jitianu@oxygenxml.com";
+
+echo "Link with https://$GH_TOKEN@github.com/$USERNAME/$REPONAME.git"
 
 git remote add upstream "https://$GH_TOKEN@github.com/$USERNAME/$REPONAME.git"
 git fetch upstream
