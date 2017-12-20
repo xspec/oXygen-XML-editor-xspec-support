@@ -76,6 +76,11 @@ public class XSpecResultsViewTest extends XSpecViewTestBase {
     String content = read(resultsURL).toString();
     content = content.replace("CSS_MARKER", css.toString());
     content = content.replace("JS_MARKER", js.toString());
+    
+    System.out.println("------");
+    System.out.println(content);
+    System.out.println("------");
+    
     FileOutputStream fs = new FileOutputStream(f);
     fs.write(content.getBytes("UTF-8"));
     fs.close();
