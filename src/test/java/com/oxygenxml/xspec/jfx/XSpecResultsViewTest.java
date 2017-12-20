@@ -32,6 +32,8 @@ public class XSpecResultsViewTest extends XSpecViewTestBase {
   
   @Override
   protected void setUp() throws Exception {
+    System.setProperty("prism.order", "sw");
+    
     super.setUp();
     
     presenter = new XSpecResultsView(pluginWorkspace);
@@ -105,9 +107,11 @@ public class XSpecResultsViewTest extends XSpecViewTestBase {
         "Test: Strings should be escaped and status attributes should be added. The 'status' attribute are not as expected, indicating a problem in the tested template., display: block\n" + 
         "", execute);
     
+    
     // Present just the tests that have failed.
     presenter.setFilterTests(true);
-    
+    flushAWT();
+    waitForFX();    
     execute = execute(presenter.getEngineForTests(), "logScenarios()");
     
     assertEquals(
