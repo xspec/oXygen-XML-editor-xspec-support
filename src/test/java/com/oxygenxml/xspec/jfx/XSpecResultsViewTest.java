@@ -1,6 +1,8 @@
 package com.oxygenxml.xspec.jfx;
 
 import java.awt.BorderLayout;
+import java.io.File;
+import java.io.InputStream;
 import java.net.URL;
 
 import javax.swing.JFrame;
@@ -8,7 +10,10 @@ import javax.swing.JFrame;
 import com.oxygenxml.xspec.XSpecResultsView;
 import com.oxygenxml.xspec.XSpecUtil;
 
+import de.schlichtherle.io.FileInputStream;
+import de.schlichtherle.io.FileOutputStream;
 import javafx.application.Platform;
+import ro.sync.util.URLUtil;
 
 /**
  * Some test cases for the JavaFx renderer.
@@ -59,8 +64,19 @@ public class XSpecResultsViewTest extends XSpecViewTestBase {
    */
   public void testFiltering() throws Exception {
     
+    URL css = new File("frameworks/xspec/oxygen-results-view/test-report.css").toURI().toURL();
+    URL js = new File("frameworks/xspec/oxygen-results-view/test-report.js").toURI().toURL();
+    
     URL xspecURL = getClass().getClassLoader().getResource("escape-for-regex.xspec");
-    URL resultsURL = getClass().getClassLoader().getResource("escape-for-regex-result.html");
+    URL resultsURL = getClass().getClassLoader().getResource("escape-for-regex-report.html");
+    
+    File f = new File(resultsURL.getPath());
+    String content = read(resultsURL).toString();
+    content = content.replace("CSS_MARKER", css.toString());
+    content = content.replace("JS_MARKER", js.toString());
+    FileOutputStream fs = new FileOutputStream(f);
+    fs.write(content.getBytes("UTF-8"));
+    fs.close();
     
     initXSpec(xspecURL);
     
@@ -126,6 +142,17 @@ public class XSpecResultsViewTest extends XSpecViewTestBase {
     
     URL xspecURL = getClass().getClassLoader().getResource("runFailed/escape-for-regex.xspec");
     URL resultsURL = getClass().getClassLoader().getResource("runFailed/escape-for-regex-report.html");
+    
+    URL css = new File("frameworks/xspec/oxygen-results-view/test-report.css").toURI().toURL();
+    URL js = new File("frameworks/xspec/oxygen-results-view/test-report.js").toURI().toURL();
+    
+    File f = new File(resultsURL.getPath());
+    String content = read(resultsURL).toString();
+    content = content.replace("CSS_MARKER", css.toString());
+    content = content.replace("JS_MARKER", js.toString());
+    FileOutputStream fs = new FileOutputStream(f);
+    fs.write(content.getBytes("UTF-8"));
+    fs.close();
     
     initXSpec(xspecURL);
     
