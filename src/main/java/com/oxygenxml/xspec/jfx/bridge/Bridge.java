@@ -1,8 +1,10 @@
 package com.oxygenxml.xspec.jfx.bridge;
 
+import java.awt.Rectangle;
 import java.net.MalformedURLException;
 import java.net.URL;
 
+import javax.swing.JTextArea;
 import javax.swing.SwingUtilities;
 import javax.swing.text.BadLocationException;
 
@@ -154,9 +156,19 @@ public class Bridge {
           }
 
           int start = textpage.getOffsetOfLineStart(ranges[0].getStartLine()) + ranges[0].getStartColumn() - 1;
-          int end = textpage.getOffsetOfLineEnd(ranges[0].getStartLine()) - 1;
+          int end = textpage.getOffsetOfLineStart(ranges[0].getEndLine()) + ranges[0].getEndColumn() - 1;
 
-          textpage.select(start, end);
+          textpage.select(end, start);
+          
+          JTextArea textComponent = (JTextArea) textpage.getTextComponent();
+          Rectangle rStart = textComponent.modelToView(start);
+          Rectangle rEnd = textComponent.modelToView(end);
+          textComponent.scrollRectToVisible(
+              new Rectangle(
+                  rStart.x, 
+                  rStart.y, 
+                  Math.abs(rEnd.x - rStart.x), 
+                  Math.max(Math.abs(rEnd.y - rStart.y) + rEnd.height, 3 * rEnd.height)));
 
 
         } else {
