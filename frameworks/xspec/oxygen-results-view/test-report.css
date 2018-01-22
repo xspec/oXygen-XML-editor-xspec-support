@@ -1,4 +1,6 @@
-
+.button {
+    -webkit-user-select: none;
+}
 
 .testsuite {
     margin-top:10px;
