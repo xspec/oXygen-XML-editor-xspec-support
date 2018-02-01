@@ -166,7 +166,7 @@ public class XSpecResultsView extends JPanel implements XSpecResultPresenter {
       }
     };
     
-    ImageIcon runIcon = new ImageIcon(getClass().getClassLoader().getResource("run16.png"));
+    final ImageIcon runIcon = new ImageIcon(getClass().getClassLoader().getResource("run16.png"));
     runAction.putValue(Action.SMALL_ICON, runIcon);
     runAction.putValue(Action.SHORT_DESCRIPTION, "Run XSpec");
     runButton = new ToolbarButton(runAction, false);
