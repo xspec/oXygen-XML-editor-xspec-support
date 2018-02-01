@@ -9,6 +9,7 @@ import javax.swing.Action;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JPanel;
+import javax.swing.JPopupMenu;
 import javax.swing.SwingUtilities;
 
 import org.apache.log4j.Logger;
@@ -19,10 +20,19 @@ import com.oxygenxml.xspec.jfx.bridge.Bridge;
 
 import javafx.application.Platform;
 import javafx.scene.web.WebEngine;
+import ro.sync.exml.editor.EditorPageConstants;
+import ro.sync.exml.workspace.api.PluginWorkspace;
+import ro.sync.exml.workspace.api.editor.WSEditor;
+import ro.sync.exml.workspace.api.editor.page.text.TextPopupMenuCustomizer;
+import ro.sync.exml.workspace.api.editor.page.text.WSTextEditorPage;
+import ro.sync.exml.workspace.api.editor.page.text.xml.WSXMLTextEditorPage;
+import ro.sync.exml.workspace.api.editor.page.text.xml.XPathException;
 import ro.sync.exml.workspace.api.editor.transformation.TransformationFeedback;
+import ro.sync.exml.workspace.api.listeners.WSEditorChangeListener;
 import ro.sync.exml.workspace.api.standalone.StandalonePluginWorkspace;
 import ro.sync.exml.workspace.api.standalone.ui.ToolbarButton;
 import ro.sync.exml.workspace.api.standalone.ui.ToolbarToggleButton;
+import ro.sync.util.URLUtil;
 
 /**
  * A view taht uses a JavaFX WebEngine to present the results of running an XSpec 
@@ -238,6 +248,33 @@ public class XSpecResultsView extends JPanel implements XSpecResultPresenter {
     add(panel, BorderLayout.CENTER);
     
     enableButtons(true);
+    
+    // Contextual menu.
+    pluginWorkspace.addEditorChangeListener(new WSEditorChangeListener() {
+      @Override
+      public void editorOpened(URL editorLocation) {
+        WSEditor editorAccess = pluginWorkspace.getEditorAccess(editorLocation, PluginWorkspace.MAIN_EDITING_AREA);
+        if ("xspec".equals(URLUtil.getExtension(URLUtil.extractFileName(editorLocation.toString()))) &&
+            EditorPageConstants.PAGE_TEXT.equals(editorAccess.getCurrentPageID())) {
+          WSXMLTextEditorPage textPage = ((WSXMLTextEditorPage) editorAccess.getCurrentPage());
+          
+          textPage.addPopUpMenuCustomizer(new TextPopupMenuCustomizer() {
+            @Override
+            public void customizePopUpMenu(Object popUp, WSTextEditorPage textPage) {
+              JPopupMenu jPopup = (JPopupMenu) popUp;
+              
+              AbstractAction runCurrentAction = createRunScenarioAction(pluginWorkspace, editorAccess, textPage);
+              
+              runCurrentAction.putValue(Action.SMALL_ICON, runIcon);
+              
+              runCurrentAction.putValue(Action.NAME, "Run scenario");
+              
+              jPopup.add(runCurrentAction);
+            }
+          });
+        }
+      }
+    }, PluginWorkspace.MAIN_EDITING_AREA);
   }
   
   /**
@@ -316,5 +353,70 @@ public class XSpecResultsView extends JPanel implements XSpecResultPresenter {
    */
   public XSpecVariablesResolver getVariableResolver() {
     return resolver;
+  }
+  
+  /**
+   * Creates an action that executes the scenario at caret position.
+   * 
+   * @param pluginWorkspace Plugin workspace.
+   * @param editorAccess Editor acccess.
+   * @param textPage Text page.
+   * 
+   * @return An action that executes the scenario at caret position.
+   */
+  private AbstractAction createRunScenarioAction(
+      final StandalonePluginWorkspace pluginWorkspace,
+      WSEditor editorAccess, 
+      WSTextEditorPage textPage) {
+    return new AbstractAction() {
+      @Override
+      public void actionPerformed(ActionEvent e) {
+        String scenarioName = "";
+        String xpath = "string-join(\n" + 
+            "for $s in  ancestor-or-self::*:scenario\n" + 
+            "return  \n" + 
+            "    concat(\n" + 
+            "            if ($s/@label) then $s/@label else $s/*:label,  '(',\n" + 
+            "            count($s/preceding-sibling::x:scenario), ')')\n" + 
+            "       , ' / ' )\n" + 
+            "      ";
+        try {
+          Object[] evaluateXPath = ((WSXMLTextEditorPage) textPage).evaluateXPath(xpath);
+          if (evaluateXPath != null && String.valueOf(evaluateXPath[0]).length() > 0) {
+            if (logger.isDebugEnabled()) {
+              logger.debug("Xpath result:" + evaluateXPath[0]);
+            }
+            scenarioName = String.valueOf(evaluateXPath[0]);
+            scenarioName = XSpecUtil.generateId(scenarioName);
+          }
+        } catch (XPathException ex) {
+          logger.error(ex, ex);
+        }
+        
+        if (logger.isDebugEnabled()) {
+          logger.debug("scenarioName  |" + scenarioName + "|");
+        }
+        
+        // We only need to execute this scenario.
+        resolver.setTemplateNames(scenarioName);
+        
+        XSpecResultPresenter resultsPresenter = XSpecResultsView.this;
+        // Step 3. Run the scenario
+        try {
+          XSpecUtil.runScenario(
+              editorAccess,
+              (StandalonePluginWorkspace) pluginWorkspace, 
+              resultsPresenter,
+              new TransformationFeedback() {
+                @Override
+                public void transformationStopped() {}
+                @Override
+                public void transformationFinished(boolean success) {}
+              });
+        } catch (OperationCanceledException ex) {
+          logger.error(ex, ex);
+        }
+      }
+    };
   }
 }

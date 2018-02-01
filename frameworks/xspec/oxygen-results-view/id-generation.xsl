@@ -55,7 +55,7 @@
         </xsl:variable>
         
         
-        <xsl:value-of select="concat($ancestorLabel, ' / ', $l)"/>
+        <xsl:value-of select="if (string-length($ancestorLabel) > 0) then concat($ancestorLabel, ' / ', $l) else $l"/>
         
     </xsl:function>
     

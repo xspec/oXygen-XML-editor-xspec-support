@@ -29,6 +29,8 @@ public class XSpecMetaTest extends XSpecViewTestBase {
     
     executeANT(xspecFile, outputFile);
     
+    String firstID = XSpecUtil.generateId("No escaping(0)");
+    
     File xmlFormatOutput = new File(xspecFile.getParentFile(), "xspec/escape-for-regex-result.xml");
     assertEquals("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n\n" + 
         "<x:report xmlns:xsl=\"http://www.w3.org/1999/XSL/Transform\"\n" + 
@@ -41,7 +43,7 @@ public class XSpecMetaTest extends XSpecViewTestBase {
         // The source attribute is present.
         // To ensure back mapping we need to remember in which file a scenario was defined.
         "   <x:scenario source=\"" + xspecURL.toString() + "\"\n" + 
-            "               template-id=\"x98729d4e-69c1-3033-bf4b-b060a2d27b46\">\n" + 
+            "               template-id=\"" + firstID + "\">\n" + 
         "      <x:label>No escaping</x:label>\n" + 
         "      <x:call function=\"functx:escape-for-regex\">\n" + 
         "         <x:param select=\"'Hello'\"/>\n" + 
@@ -71,7 +73,7 @@ public class XSpecMetaTest extends XSpecViewTestBase {
         + "\"><script type=\"text/javascript\" src=\""
         + js.toURI().toURL().toString() + "\"></script></head>\n" + 
         "   <body>\n" + 
-        "      <div class=\"testsuite\" data-name=\"No escaping\" template-id=\"x98729d4e-69c1-3033-bf4b-b060a2d27b46\" "
+        "      <div class=\"testsuite\" data-name=\"No escaping\" template-id=\"" + firstID + "\" "
         
         + "data-source=\"" + xspecURL.toString() + "\" "
         + "data-tests=\"1\" "
@@ -103,6 +105,10 @@ public class XSpecMetaTest extends XSpecViewTestBase {
     
     executeANT(xspecFile, outputFile);
     
+    String firstID = XSpecUtil.generateId("When processing a list of phrases(0)");
+    String secondID = XSpecUtil.generateId("No escaping(1)");
+    
+    
     assertEquals("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n\n" + 
         "<x:report xmlns:xsl=\"http://www.w3.org/1999/XSL/Transform\"\n" + 
         "          xmlns:xs=\"http://www.w3.org/2001/XMLSchema\"\n" + 
@@ -112,7 +118,7 @@ public class XSpecMetaTest extends XSpecViewTestBase {
         "          stylesheet=\"" + xslURL.toString() + "\"\n" + 
         "          date=\"XXX\">\n" + 
         "   <x:scenario source=\"" + xspecFile.toURI().toURL().toString() + "\"\n" + 
-            "               template-id=\"xcf3714bf-337b-3d28-9db1-cce1e8d7a11d\">\n" + 
+            "               template-id=\"" + firstID + "\">\n" + 
         "      <x:label>When processing a list of phrases</x:label>\n" + 
         "      <x:context>\n" + 
         "         <phrases>\n" + 
@@ -146,7 +152,7 @@ public class XSpecMetaTest extends XSpecViewTestBase {
         // The source attribute is present.
         // To ensure back mapping we need to remember in which file a scenario was defined.
         "   <x:scenario source=\"" + importedXSpecURL.toString() + "\"\n" + 
-            "               template-id=\"xdf4d3bc9-c326-3719-8163-46ff873a00b8\">\n" + 
+            "               template-id=\"" + secondID + "\">\n" + 
         "      <x:label>No escaping</x:label>\n" + 
         "      <x:call function=\"functx:escape-for-regex\">\n" + 
         "         <x:param select=\"'Hello'\"/>\n" + 
@@ -177,7 +183,7 @@ public class XSpecMetaTest extends XSpecViewTestBase {
         "   <body>\n" + 
         "      <div class=\"testsuite\" "
         // Scenario name
-        + "data-name=\"When processing a list of phrases\" template-id=\"xcf3714bf-337b-3d28-9db1-cce1e8d7a11d\" "
+        + "data-name=\"When processing a list of phrases\" template-id=\"" + firstID + "\" "
         // Scenario source
         + "data-source=\"" + xspecFile.toURI().toURL().toString() + "\" data-tests=\"2\" data-failures=\"1\">\n" + 
         "         <p style=\"margin:0px;\"><span>When processing a list of phrases</span><span>&nbsp;</span><a class=\"button\" onclick=\"runScenario(this)\">Run</a></p>\n" +
@@ -237,7 +243,7 @@ public class XSpecMetaTest extends XSpecViewTestBase {
         "&lt;/phrases&gt;\n" + 
         "</div></pre></div>\n" + 
         "      </div>\n" + 
-        "      <div class=\"testsuite\" data-name=\"No escaping\" template-id=\"xdf4d3bc9-c326-3719-8163-46ff873a00b8\" data-source=\""
+        "      <div class=\"testsuite\" data-name=\"No escaping\" template-id=\"" + secondID +  "\" data-source=\""
         + importedXSpecURL.toString()
         + "\" data-tests=\"1\" data-failures=\"0\">\n" + 
         "         <p style=\"margin:0px;\"><span>No escaping</span><span>&nbsp;</span><a class=\"button\" onclick=\"runScenario(this)\">Run</a></p>\n" + 
@@ -264,6 +270,9 @@ public class XSpecMetaTest extends XSpecViewTestBase {
     
     File xmlFormatOutput = new File(xspecFile.getParentFile(), "xspec/driverTest-result.xml");
     
+    String firstID = XSpecUtil.generateId("Test no.1(0)");
+    String secondID = XSpecUtil.generateId("Test no.2(1)");
+    
     assertEquals("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" + 
         "\n" + 
         "<x:report xmlns:xsl=\"http://www.w3.org/1999/XSL/Transform\"\n" + 
@@ -274,7 +283,7 @@ public class XSpecMetaTest extends XSpecViewTestBase {
         "          stylesheet=\"" + xslURL.toString() + "\"\n" + 
         "          date=\"XXX\">\n" + 
         "   <x:scenario source=\"" + xspecURL.toString() + "\"\n" + 
-            "               template-id=\"xd756eeb0-86de-39c7-b405-7d53298b0633\">\n" + 
+            "               template-id=\"" + firstID + "\">\n" + 
         "      <x:label>Test no.1</x:label>\n" + 
         "      <x:call function=\"functx:escape-for-regex\">\n" + 
         "         <x:param select=\"'Hello'\"/>\n" + 
@@ -286,7 +295,7 @@ public class XSpecMetaTest extends XSpecViewTestBase {
         "      </x:test>\n" + 
         "   </x:scenario>\n" + 
         "   <x:scenario source=\"" + xspecURL.toString() + "\"\n" + 
-            "               template-id=\"x42dcc336-c523-3a81-8407-c1cf465dac0f\">\n" + 
+            "               template-id=\"" + secondID + "\">\n" + 
         "      <x:label>Test no.2</x:label>\n" + 
         "      <x:call function=\"functx:escape-for-regex\">\n" + 
         "         <x:param select=\"'(Hello)'\"/>\n" + 
@@ -313,14 +322,14 @@ public class XSpecMetaTest extends XSpecViewTestBase {
         "      <link rel=\"stylesheet\" type=\"text/css\" href=\"" + css.toURI().toURL().toString() + "\"><script type=\"text/javascript\" src=\"" + js.toURI().toURL().toString()
             + "\"></script></head>\n" + 
         "   <body>\n" + 
-        "      <div class=\"testsuite\" data-name=\"Test no.1\" template-id=\"xd756eeb0-86de-39c7-b405-7d53298b0633\" data-source=\"" + xspecURL.toString()
+        "      <div class=\"testsuite\" data-name=\"Test no.1\" template-id=\"" + firstID + "\" data-source=\"" + xspecURL.toString()
         + "\" data-tests=\"1\" data-failures=\"0\">\n" + 
         "         <p style=\"margin:0px;\"><span>Test no.1</span><span>&nbsp;</span><a class=\"button\" onclick=\"runScenario(this)\">Run</a></p>\n" + 
         "         <div class=\"testcase\" data-name=\"Must not be escaped at all\">\n" + 
         "            <p class=\"passed\"><span class=\"test-passed\" onclick=\"toggleResult(this)\">Must not be escaped at all</span><span>&nbsp;</span><a class=\"button\" onclick=\"showTest(this)\">Show</a></p>\n" + 
         "         </div>\n" + 
         "      </div>\n" + 
-        "      <div class=\"testsuite\" data-name=\"Test no.2\" template-id=\"x42dcc336-c523-3a81-8407-c1cf465dac0f\" data-source=\"" + xspecURL.toString()
+        "      <div class=\"testsuite\" data-name=\"Test no.2\" template-id=\"" + secondID + "\" data-source=\"" + xspecURL.toString()
         + "\" data-tests=\"1\" data-failures=\"0\">\n" + 
         "         <p style=\"margin:0px;\"><span>Test no.2</span><span>&nbsp;</span><a class=\"button\" onclick=\"runScenario(this)\">Run</a></p>\n" + 
         "         <div class=\"testcase\" data-name=\"Must not be escaped at all\">\n" + 
@@ -355,8 +364,8 @@ public class XSpecMetaTest extends XSpecViewTestBase {
     File outputFile = new File(xspecFile.getParentFile(), "driverTest-report.html");
     
 //    / Math first group(0) / Test sum(0)
-    String firstID = XSpecUtil.generateId(" / Test no.1(0)");
-    String secondID = XSpecUtil.generateId(" / Test no.2(1)");
+    String firstID = XSpecUtil.generateId("Test no.1(0)");
+    String secondID = XSpecUtil.generateId("Test no.2(1)");
     String entryPoints = firstID + " " + secondID;
     executeANT(xspecFile, outputFile, entryPoints);
     
@@ -369,7 +378,7 @@ public class XSpecMetaTest extends XSpecViewTestBase {
         "   <x:scenario xmlns:test=\"http://www.jenitennison.com/xslt/unit-test\"\n" + 
         "               xmlns:functx=\"http://www.functx.com\"\n" + 
         "               source=\"" + xspecURL.toString() + "\"\n" + 
-            "               template-id=\"xd756eeb0-86de-39c7-b405-7d53298b0633\">\n" + 
+            "               template-id=\"" + firstID + "\">\n" + 
         "      <x:label>Test no.1</x:label>\n" + 
         "      <x:call function=\"functx:escape-for-regex\">\n" + 
         "         <x:param select=\"'Hello'\"/>\n" + 
@@ -383,7 +392,7 @@ public class XSpecMetaTest extends XSpecViewTestBase {
         "   <x:scenario xmlns:test=\"http://www.jenitennison.com/xslt/unit-test\"\n" + 
         "               xmlns:functx=\"http://www.functx.com\"\n" + 
         "               source=\"" + xspecURL.toString() + "\"\n" + 
-            "               template-id=\"x42dcc336-c523-3a81-8407-c1cf465dac0f\">\n" + 
+            "               template-id=\"" + secondID + "\">\n" + 
         "      <x:label>Test no.2</x:label>\n" + 
         "      <x:call function=\"functx:escape-for-regex\">\n" + 
         "         <x:param select=\"'(Hello)'\"/>\n" + 
