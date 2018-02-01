@@ -253,7 +253,7 @@ public class XSpecResultsView extends JPanel implements XSpecResultPresenter {
     pluginWorkspace.addEditorChangeListener(new WSEditorChangeListener() {
       @Override
       public void editorOpened(URL editorLocation) {
-        WSEditor editorAccess = pluginWorkspace.getEditorAccess(editorLocation, PluginWorkspace.MAIN_EDITING_AREA);
+        final WSEditor editorAccess = pluginWorkspace.getEditorAccess(editorLocation, PluginWorkspace.MAIN_EDITING_AREA);
         if ("xspec".equals(URLUtil.getExtension(URLUtil.extractFileName(editorLocation.toString()))) &&
             EditorPageConstants.PAGE_TEXT.equals(editorAccess.getCurrentPageID())) {
           WSXMLTextEditorPage textPage = ((WSXMLTextEditorPage) editorAccess.getCurrentPage());
@@ -366,8 +366,8 @@ public class XSpecResultsView extends JPanel implements XSpecResultPresenter {
    */
   private AbstractAction createRunScenarioAction(
       final StandalonePluginWorkspace pluginWorkspace,
-      WSEditor editorAccess, 
-      WSTextEditorPage textPage) {
+      final WSEditor editorAccess, 
+      final WSTextEditorPage textPage) {
     return new AbstractAction() {
       @Override
       public void actionPerformed(ActionEvent e) {
