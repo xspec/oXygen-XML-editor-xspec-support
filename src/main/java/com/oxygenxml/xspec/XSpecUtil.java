@@ -121,25 +121,23 @@ public class XSpecUtil {
         // Is better to use a thread that polls the wsEditor.getDocumentTypeInformation for a few
         // times with a small sleep. Because of threading issues we might miss a callback
         // ro.sync.exml.workspace.api.listeners.WSEditorListener.documentTypeExtensionsReconfigured()
-        new Thread(new Runnable() {
-          @Override
-          public void run() {
-            int counter = 0;
-            DocumentTypeInformation documentTypeInformation = fwsEditor.getDocumentTypeInformation();
-            try {
-              while (documentTypeInformation == null || counter < 4) {
-                Thread.sleep(200);
-                documentTypeInformation = fwsEditor.getDocumentTypeInformation();
-                counter ++;
-              }
-            } catch (InterruptedException e) {
-              logger.error(e, e);
+        new Thread(() -> {
+          int counter = 0;
+          DocumentTypeInformation documentTypeInformation = fwsEditor.getDocumentTypeInformation();
+          try {
+            while (documentTypeInformation == null || counter < 4) {
+              Thread.sleep(200);
+              documentTypeInformation = fwsEditor.getDocumentTypeInformation();
+              counter ++;
             }
-            
-            if (documentTypeInformation != null) {
-              executeScenario(pluginWorkspaceAccess, resultsPresenter, feedback,
-                  editorLocation, fwsEditor);
-            }
+          } catch (InterruptedException e) {
+            logger.error(e, e);
+            Thread.currentThread().interrupt();
+          }
+          
+          if (documentTypeInformation != null) {
+            executeScenario(pluginWorkspaceAccess, resultsPresenter, feedback,
+                editorLocation, fwsEditor);
           }
         }).start();
       } else {
@@ -228,19 +226,16 @@ public class XSpecUtil {
         }
       }
       
-      if (xspecURL != null) {
-        WSEditor candidate = pluginWorkspaceAccess.getEditorAccess(xspecURL, PluginWorkspace.MAIN_EDITING_AREA);
-        if (candidate == null) {
-          pluginWorkspaceAccess.open(xspecURL);
-          
-          candidate = pluginWorkspaceAccess.getEditorAccess(xspecURL, PluginWorkspace.MAIN_EDITING_AREA);
-          
-        }
+      WSEditor candidate = pluginWorkspaceAccess.getEditorAccess(xspecURL, PluginWorkspace.MAIN_EDITING_AREA);
+      if (candidate == null) {
+        pluginWorkspaceAccess.open(xspecURL);
         
-        if (candidate != null) {
-          isXspecOn = true;
-          currentEditorAccess = candidate;
-        }
+        candidate = pluginWorkspaceAccess.getEditorAccess(xspecURL, PluginWorkspace.MAIN_EDITING_AREA);
+        
+      }
+      
+      if (candidate != null) {
+        currentEditorAccess = candidate;
       }
     }
     
@@ -255,9 +250,7 @@ public class XSpecUtil {
    * @return A unique ID.
    */
   public static String generateId(String seed) {
-    String ID = "x" + UUID.nameUUIDFromBytes(seed.getBytes()).toString();
-    
-    return ID;
+    return "x" + UUID.nameUUIDFromBytes(seed.getBytes()).toString();
   }
   
   /**

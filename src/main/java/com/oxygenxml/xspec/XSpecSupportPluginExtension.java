@@ -4,8 +4,10 @@ import java.awt.event.ActionEvent;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
-import javax.swing.ImageIcon;
+import javax.swing.Icon;
 import javax.swing.JComponent;
+
+import com.oxygenxml.xspec.ui.Icons;
 
 import ro.sync.exml.plugin.workspace.WorkspaceAccessPluginExtension;
 import ro.sync.exml.workspace.api.standalone.StandalonePluginWorkspace;
@@ -37,7 +39,7 @@ public class XSpecSupportPluginExtension implements WorkspaceAccessPluginExtensi
         if (viewInfo.getViewID().equals(XSpecResultsView.RESULTS)) {
           viewInfo.setComponent(resultsPresenter);
           viewInfo.setTitle("XSpec Test Results");
-          ImageIcon ic = new ImageIcon(getClass().getClassLoader().getResource("failures.gif"));
+          Icon ic = Icons.loadIcon(Icons.XSPEC_VIEW);
           viewInfo.setIcon(ic);
         }
       }
@@ -48,17 +50,16 @@ public class XSpecSupportPluginExtension implements WorkspaceAccessPluginExtensi
       @Override
       public void customizeToolbar(ToolbarInfo toolbarInfo) {
         if (toolbarInfo.getToolbarID().equals("com.oxygenxml.xspec")) {
+          toolbarInfo.setTitle("XSpec");
           Action action = new AbstractAction("XSpec Run") {
             @Override
             public void actionPerformed(ActionEvent e) {
-              try {
-                XSpecUtil.runScenario(pluginWorkspaceAccess, resultsPresenter, null);
-              } catch (OperationCanceledException e1) {
-                // Stopped by user.
-              }
+              resultsPresenter.runXSpec();
             }
           };
-          ToolbarButton b = new ToolbarButton(action, true);
+          ToolbarButton b = new ToolbarButton(action, false);
+          b.setToolTipText("Run XSpec test scenarios");
+          b.setIcon(Icons.loadIcon(Icons.RUN_TESTS));
           
           toolbarInfo.setComponents(new JComponent[] {b});
         }

@@ -6,7 +6,7 @@ import java.net.URL;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
-import javax.swing.ImageIcon;
+import javax.swing.Icon;
 import javax.swing.JButton;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
@@ -17,6 +17,7 @@ import org.apache.log4j.Logger;
 import com.oxygenxml.xspec.jfx.BrowserInteractor;
 import com.oxygenxml.xspec.jfx.SwingBrowserPanel;
 import com.oxygenxml.xspec.jfx.bridge.Bridge;
+import com.oxygenxml.xspec.ui.Icons;
 
 import javafx.application.Platform;
 import javafx.scene.web.WebEngine;
@@ -81,14 +82,6 @@ public class XSpecResultsView extends JPanel implements XSpecResultPresenter {
    * Currently loaded XSpec.
    */
   private URL xspec;
-  /**
-   * Show just the tests that failed.
-   */
-  private JButton runButton;
-  /**
-   * Run just the tests that failed.
-   */
-  private JButton runFailuresButton;
   
   /**
    * Show just the tests that failed.
@@ -96,6 +89,14 @@ public class XSpecResultsView extends JPanel implements XSpecResultPresenter {
   private JButton showFailuresOnly;
 
   private XSpecVariablesResolver resolver = new XSpecVariablesResolver();
+  /**
+   * The action that runs the transformation.
+   */
+  private AbstractAction runAction;
+  /**
+   * Action to run just the failures.
+   */
+  private AbstractAction runFailuresAction;
   
   /**
    * Constructor.
@@ -142,23 +143,14 @@ public class XSpecResultsView extends JPanel implements XSpecResultPresenter {
     JPanel left = new JPanel();
     
     // Run scenario
-    Action runAction = new AbstractAction() {
+    runAction = new AbstractAction() {
       @Override
       public void actionPerformed(ActionEvent arg0) {
         // Run all scenarios.
         resolver.setTemplateNames("");
         enableButtons(false);
         try {
-          XSpecUtil.runScenario(pluginWorkspace, XSpecResultsView.this, new TransformationFeedback() {
-            @Override
-            public void transformationStopped() {
-              enableButtons(true);
-            }
-            @Override
-            public void transformationFinished(boolean success) {
-              enableButtons(true);
-            }
-          });
+          XSpecUtil.runScenario(pluginWorkspace, XSpecResultsView.this, createTransformationFeedback());
         } catch (OperationCanceledException e) {
           // canceled by user.
           enableButtons(true);
@@ -166,10 +158,10 @@ public class XSpecResultsView extends JPanel implements XSpecResultPresenter {
       }
     };
     
-    final ImageIcon runIcon = new ImageIcon(getClass().getClassLoader().getResource("run16.png"));
+    final Icon runIcon = Icons.loadIcon(Icons.RUN_TESTS);
     runAction.putValue(Action.SMALL_ICON, runIcon);
     runAction.putValue(Action.SHORT_DESCRIPTION, "Run XSpec");
-    runButton = new ToolbarButton(runAction, false);
+    ToolbarButton runButton = new ToolbarButton(runAction, false);
     left.add(runButton);
     
     // Show failures.
@@ -180,14 +172,14 @@ public class XSpecResultsView extends JPanel implements XSpecResultPresenter {
       }
     };
     
-    ImageIcon ic = new ImageIcon(getClass().getClassLoader().getResource("failures.gif"));
+    Icon ic = Icons.loadIcon(Icons.SHOW_ONLY_FAILED_TESTS);
     showFailuresAction.putValue(Action.SMALL_ICON, ic);
     showFailuresAction.putValue(Action.SHORT_DESCRIPTION, "Show only failures");
     showFailuresOnly = new ToolbarToggleButton(showFailuresAction);
     left.add(showFailuresOnly);
     
     // Run scenario
-    Action runFailuresAction = new AbstractAction() {
+    runFailuresAction = new AbstractAction() {
       @Override
       public void actionPerformed(ActionEvent arg0) {
         enableButtons(false);
@@ -206,16 +198,7 @@ public class XSpecResultsView extends JPanel implements XSpecResultPresenter {
                       XSpecUtil.runScenario(
                           pluginWorkspace, 
                           XSpecResultsView.this, 
-                          new TransformationFeedback() {
-                            @Override
-                            public void transformationStopped() {
-                              enableButtons(true);
-                            }
-                            @Override
-                            public void transformationFinished(boolean success) {
-                              enableButtons(true);
-                            }
-                          });
+                          createTransformationFeedback());
                     } catch (OperationCanceledException e) {
                       // canceled by user.
                       enableButtons(true);
@@ -235,10 +218,10 @@ public class XSpecResultsView extends JPanel implements XSpecResultPresenter {
       }
     };
     
-    ImageIcon runFailureIcon = new ImageIcon(getClass().getClassLoader().getResource("runFailures16.png"));
+    Icon runFailureIcon = Icons.loadIcon(Icons.RUN_FAILED_TESTS);
     runFailuresAction.putValue(Action.SMALL_ICON, runFailureIcon);
     runFailuresAction.putValue(Action.SHORT_DESCRIPTION, "Run Only Failures");
-    runFailuresButton = new ToolbarButton(runFailuresAction, false);
+    ToolbarButton runFailuresButton = new ToolbarButton(runFailuresAction, false);
     left.add(runFailuresButton);
     
     
@@ -267,7 +250,7 @@ public class XSpecResultsView extends JPanel implements XSpecResultPresenter {
               
               runCurrentAction.putValue(Action.SMALL_ICON, runIcon);
               
-              runCurrentAction.putValue(Action.NAME, "Run scenario");
+              runCurrentAction.putValue(Action.NAME, "Run test scenario(s)");
               
               jPopup.add(runCurrentAction);
             }
@@ -341,8 +324,8 @@ public class XSpecResultsView extends JPanel implements XSpecResultPresenter {
   }
   
   private void enableButtons(boolean enable) {
-    runButton.setEnabled(enable);
-    runFailuresButton.setEnabled(enable && xspec != null);
+    runAction.setEnabled(enable);
+    runFailuresAction.setEnabled(enable && xspec != null);
     if (enable) {
       resolver.setTemplateNames("");
     }
@@ -418,5 +401,28 @@ public class XSpecResultsView extends JPanel implements XSpecResultPresenter {
         }
       }
     };
+  }
+  
+  /**
+   * @return An implementation that will enable the buttons when the transformation is finished.
+   */
+  private TransformationFeedback createTransformationFeedback() {
+    return new TransformationFeedback() {
+      @Override
+      public void transformationStopped() {
+        enableButtons(true);
+      }
+      @Override
+      public void transformationFinished(boolean success) {
+        enableButtons(true);
+      }
+    };
+  }
+  
+  /**
+   * Detects and executes an XSpec file.
+   */
+  public void runXSpec() {
+    runAction.actionPerformed(null);
   }
 }

@@ -235,18 +235,18 @@ public class Bridge {
   /**
    * Shows the Oxygen Diff files with the given content.
    *  
-   * @param left Left side content.
-   * @param right Right side content.
+   * @param actual Left side content.
+   * @param expected Right side content.
    */
-  public void showDiff(String left, String right) {
+  public void showDiff(String actual, String expected) {
     if (logger.isDebugEnabled()) {
       logger.debug("Show diff");
 
-      logger.debug("Left "  + left.getClass());
-      logger.debug("Right "  + right.getClass());
+      logger.debug("Left "  + actual.getClass());
+      logger.debug("Right "  + expected.getClass());
 
-      logger.debug("Left content " + left);
-      logger.debug("Right content " + right);
+      logger.debug("Left content " + actual);
+      logger.debug("Right content " + expected);
     }
     
     try {
@@ -254,24 +254,24 @@ public class Bridge {
       
       
       XMLUtilAccess xmlUtilAccess = PluginWorkspaceProvider.getPluginWorkspace().getXMLUtilAccess();
-      String lu = xmlUtilAccess.unescapeAttributeValue(left);
-      String lr = xmlUtilAccess.unescapeAttributeValue(right);
-      final URL url1 = instance.cache(
+      String lu = xmlUtilAccess.unescapeAttributeValue(actual);
+      String lr = xmlUtilAccess.unescapeAttributeValue(expected);
+      final URL actualURL = instance.cache(
           lu, 
-          "RESULT");
-      final URL url2 = instance.cache(
+          "ACTUAL");
+      final URL expectedURL = instance.cache(
           lr, 
           "EXPECTED");
 
       if (logger.isDebugEnabled()) {
-        logger.debug("Left URL " + url1);
-        logger.debug("Right URL " + url2);
+        logger.debug("Left URL " + actualURL);
+        logger.debug("Right URL " + expectedURL);
       }
 
       SwingUtilities.invokeLater(new Runnable() {
         @Override
         public void run() {
-          ((StandalonePluginWorkspace)pluginWorkspace).openDiffFilesApplication(url1, url2);
+          ((StandalonePluginWorkspace)pluginWorkspace).openDiffFilesApplication(actualURL, expectedURL);
         }
       });
     } catch (Exception e) {
