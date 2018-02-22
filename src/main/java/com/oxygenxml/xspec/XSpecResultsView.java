@@ -326,6 +326,7 @@ public class XSpecResultsView extends JPanel implements XSpecResultPresenter {
   private void enableButtons(boolean enable) {
     runAction.setEnabled(enable);
     runFailuresAction.setEnabled(enable && xspec != null);
+    showFailuresOnly.setEnabled(enable && xspec != null);
     if (enable) {
       resolver.setTemplateNames("");
     }
