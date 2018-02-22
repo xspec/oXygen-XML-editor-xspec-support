@@ -10,6 +10,7 @@ import javax.swing.Icon;
 import javax.swing.JButton;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
+import javax.swing.JToolBar;
 import javax.swing.SwingUtilities;
 
 import org.apache.log4j.Logger;
@@ -139,8 +140,8 @@ public class XSpecResultsView extends JPanel implements XSpecResultPresenter {
     
     setLayout(new BorderLayout());
     
-    JPanel toolbar = new JPanel(new BorderLayout());
-    JPanel left = new JPanel();
+    JToolBar toolbar = new JToolBar();
+    toolbar.setFloatable(false);
     
     // Run scenario
     runAction = new AbstractAction() {
@@ -161,8 +162,6 @@ public class XSpecResultsView extends JPanel implements XSpecResultPresenter {
     final Icon runIcon = Icons.loadIcon(Icons.RUN_TESTS);
     runAction.putValue(Action.SMALL_ICON, runIcon);
     runAction.putValue(Action.SHORT_DESCRIPTION, "Run XSpec");
-    ToolbarButton runButton = new ToolbarButton(runAction, false);
-    left.add(runButton);
     
     // Show failures.
     Action showFailuresAction = new AbstractAction() {
@@ -175,8 +174,6 @@ public class XSpecResultsView extends JPanel implements XSpecResultPresenter {
     Icon ic = Icons.loadIcon(Icons.SHOW_ONLY_FAILED_TESTS);
     showFailuresAction.putValue(Action.SMALL_ICON, ic);
     showFailuresAction.putValue(Action.SHORT_DESCRIPTION, "Show only failures");
-    showFailuresOnly = new ToolbarToggleButton(showFailuresAction);
-    left.add(showFailuresOnly);
     
     // Run scenario
     runFailuresAction = new AbstractAction() {
@@ -221,11 +218,16 @@ public class XSpecResultsView extends JPanel implements XSpecResultPresenter {
     Icon runFailureIcon = Icons.loadIcon(Icons.RUN_FAILED_TESTS);
     runFailuresAction.putValue(Action.SMALL_ICON, runFailureIcon);
     runFailuresAction.putValue(Action.SHORT_DESCRIPTION, "Run Only Failures");
+
     ToolbarButton runFailuresButton = new ToolbarButton(runFailuresAction, false);
-    left.add(runFailuresButton);
+    showFailuresOnly = new ToolbarToggleButton(showFailuresAction);
+    ToolbarButton runButton = new ToolbarButton(runAction, false);
     
+    toolbar.add(runButton);
+    toolbar.add(runFailuresButton);
+    toolbar.addSeparator();
+    toolbar.add(showFailuresOnly);
     
-    toolbar.add(left, BorderLayout.WEST);
     add(toolbar, BorderLayout.NORTH);
     
     add(panel, BorderLayout.CENTER);
