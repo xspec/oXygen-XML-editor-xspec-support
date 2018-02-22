@@ -45,9 +45,9 @@ public class Icons {
       PluginWorkspace pluginWorkspace = PluginWorkspaceProvider.getPluginWorkspace();
       if (pluginWorkspace != null) {
         icon = (Icon) pluginWorkspace.getImageUtilities().loadIcon(resource);
+      } else {
+        icon = new ImageIcon(resource);
       }
-      
-      icon = new ImageIcon(resource);
     }
     
     return icon;
