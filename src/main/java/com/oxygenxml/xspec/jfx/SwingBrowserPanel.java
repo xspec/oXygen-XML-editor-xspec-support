@@ -1,10 +1,23 @@
 package com.oxygenxml.xspec.jfx;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
+import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.net.URLEncoder;
 import java.util.Timer;
 import java.util.TimerTask;
+
+import javax.swing.JFrame;
+import javax.swing.JPanel;
+import javax.swing.UIManager;
+
+import org.apache.log4j.Logger;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.NodeList;
+import org.w3c.dom.Text;
 
 import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
@@ -21,11 +34,6 @@ import javafx.scene.web.WebEngine;
 import javafx.scene.web.WebErrorEvent;
 import javafx.scene.web.WebEvent;
 import javafx.scene.web.WebView;
-
-import javax.swing.JFrame;
-import javax.swing.JPanel;
-
-import org.apache.log4j.Logger;
 
 /**
  * A Web browser based on JFX.
@@ -107,9 +115,31 @@ public class SwingBrowserPanel extends JPanel {
    */
   private void initComponents() {
     createScene();
-
+    
     setLayout(new BorderLayout());
     add(jfxPanel, BorderLayout.CENTER);
+    
+  }
+
+  /**
+   * Gets some colors from the UIManager and installs them on the web engine.
+   */
+  private void installColors() {
+    // Take these colors from the UIManager. Useful if we are on a dark theme.
+    try {
+      Color color = (Color) UIManager.get("TextArea.background");
+      Color fg = (Color) UIManager.get("TextArea.foreground");
+      
+      String s = "body{" + 
+          "background-color:" + "rgb(" + color.getRed() + "," + color.getGreen() + "," + color.getBlue() + ");" +
+          "}div{color:" + "rgb(" + fg.getRed() + "," + fg.getGreen() + "," + fg.getBlue() + ");" +
+          "}";
+      String encoded = URLEncoder.encode(s, "UTF-8");
+      String dataURL = "data:text/plain;charset=utf-8," + encoded;
+      engine.setUserStyleSheetLocation(dataURL);
+    } catch (UnsupportedEncodingException e) {
+      logger.error(e, e);
+    }
   }
 
   /**
@@ -208,6 +238,7 @@ public class SwingBrowserPanel extends JPanel {
         
         jfxPanel.setScene(new Scene(root));
 
+        installColors();
       }
     });
   }
