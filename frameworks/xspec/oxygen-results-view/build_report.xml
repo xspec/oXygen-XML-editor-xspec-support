@@ -284,6 +284,7 @@
   	<echo>Step 1. Compile the XSPEC into an XSLT</echo>
   	
 	<echo>Saxon config: ${xspec.saxon.config}</echo>
+    <makeurl file="${xspec.xml}" property="xspec.xml.uri"/>
   	
   	<java classname="net.sf.saxon.Transform"
   	      fork="true">
@@ -301,6 +302,8 @@
   	      <arg value="-xsl:${compile.xspec.xsl}" />
   	    	
   	      <arg value="-config:${xspec.saxon.config}" />
+  	  
+  	      <arg value="originalSystemId=${xspec.xml.uri}" />
   	    </java>
   	
   	<echo>Step 2. Create the Driver XSLT</echo>
@@ -314,7 +317,6 @@
   	
   	<echo>Apply driver to execute the templates: ${xspec.template.name.entrypoint}</echo>
     <makeurl file="${xspec.xsl}" property="xspec.xsl.uri"/>
-  	
   	
   	<java classname="net.sf.saxon.Transform"
   	      fork="true">
@@ -335,6 +337,8 @@
   		    <arg value="compiled-stylesheet-uri=${xspec.xsl.uri}" />
   	    	
   	      <arg value="-config:${xspec.saxon.config}" />
+  	  
+  	  
   	    </java>
     
   	<!-- 
@@ -372,6 +376,7 @@
       <arg value="-it:{http://www.jenitennison.com/xslt/xspec}main" />
     	
       <arg value="-config:${xspec.saxon.config}" />
+      
     </java>
   	
   	
