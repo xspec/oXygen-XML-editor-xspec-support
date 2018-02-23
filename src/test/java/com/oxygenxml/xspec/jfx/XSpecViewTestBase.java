@@ -290,6 +290,8 @@ public class XSpecViewTestBase extends JFCTestCase {
     cl.append("-lib ").append(xerces.getAbsolutePath()).append(" ");
     File resolver = URLUtil.getCanonicalFileFromFileUrl(getClass().getClassLoader().getResource("cmd/resolver.jar"));
     cl.append("-lib ").append(resolver.getAbsolutePath()).append(" ");
+    File xmlApis = URLUtil.getCanonicalFileFromFileUrl(getClass().getClassLoader().getResource("cmd/xml-apis.jar"));
+    cl.append("-lib ").append(xmlApis.getAbsolutePath()).append(" ");
 
 
     File compilerXSL = new File("frameworks/xspec/oxygen-results-view/generate-xspec-tests-oxygen.xsl");

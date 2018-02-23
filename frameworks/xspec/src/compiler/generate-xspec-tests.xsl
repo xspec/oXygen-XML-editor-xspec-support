@@ -32,8 +32,9 @@
 
 <xsl:variable name="xspec-ns" select="'http://www.jenitennison.com/xslt/xspec'"/>
 
+<xsl:variable name="apostrophe">'</xsl:variable>
 <xsl:variable name="stylesheet-uri" as="xs:anyURI" 
-  select="resolve-uri(/x:description/@stylesheet, base-uri(/x:description))" />  
+  select="resolve-uri(/x:description/@stylesheet, replace(base-uri(/x:description), $apostrophe, '%27'))" />  
 
 <xsl:variable name="stylesheet" as="document-node()" 
   select="doc($stylesheet-uri)" />
@@ -52,6 +53,7 @@
     <xsl:apply-templates select="." mode="x:copy-namespaces" />
   	<import href="{$stylesheet-uri}" />
   	<import href="{resolve-uri('generate-tests-utils.xsl', static-base-uri())}"/>
+    <import href="{resolve-uri('../schematron/sch-location-compare.xsl', static-base-uri())}"/>
     <!-- This namespace alias is used for when the testing process needs to test
          the generation of XSLT! -->
     <namespace-alias stylesheet-prefix="__x" result-prefix="xsl" />
@@ -322,9 +324,14 @@
                    Have to experiment a bit to see if that really is the case.                   
                    TODO: To remove. Use directly $x:result instead.  See issue 14. -->
               <when test="$x:result instance of node()+">
-                <document>
-                  <copy-of select="$x:result" />
-                </document>
+                <!-- $impl:test-items-doc aims to create an implicit document node as described
+                     in http://www.w3.org/TR/xslt20/#temporary-trees
+                     So its "variable" element must not have @as or @select.
+                     Do not use "document" or "copy-of" element: xspec/xspec#47 -->
+                <variable name="impl:test-items-doc">
+                  <sequence select="$x:result" />
+                </variable>
+                <sequence select="$impl:test-items-doc treat as document-node()" />
               </when>
               <otherwise>
                 <sequence select="$x:result" />
@@ -413,16 +420,6 @@
   <text><xsl:value-of select="." /></text>
 </xsl:template>  
   
-<xsl:template match="node()" mode="test:create-xslt-generator">
-  <xsl:copy>
-    <xsl:apply-templates select="@* | node()" mode="#current"/>
-  </xsl:copy>
-</xsl:template>  
-
-<xsl:template match="@*" mode="test:create-xslt-generator">
-  <xsl:attribute name="{name()}" namespace="{namespace-uri()}"
-    select="replace(replace(., '\{', '{{'), '\}', '}}')" />
-</xsl:template>  
 
 <!-- *** x:compile *** -->
 <!-- Helper code for the tests -->

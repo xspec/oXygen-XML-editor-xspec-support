@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="UTF-8"?><html xmlns:test="http://www.jenitennison.com/xslt/unit-test" xmlns="http://www.w3.org/1999/xhtml">
+   <head>
+      <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+      <title>Test Report for C:/Users/alex_jitianu/Documents/Git-workspace/oXygen-XML-editor-xspec-plugin/src/test/resources/meta/escape-for-regex.xsl (passed: 2 / pending: 0 / failed: 1 / total: 3)</title>
+      <link rel="stylesheet" type="text/css" href="file:/C:/Users/alex_jitianu/Documents/Git-workspace/oXygen-XML-editor-xspec-plugin/frameworks/xspec/src/reporter/test-report.css" />
+   </head>
+   <body>
+      <h1>Test Report</h1>
+      <p>Stylesheet: <a href="file:/C:/Users/alex_jitianu/Documents/Git-workspace/oXygen-XML-editor-xspec-plugin/src/test/resources/meta/escape-for-regex.xsl">C:/Users/alex_jitianu/Documents/Git-workspace/oXygen-XML-editor-xspec-plugin/src/test/resources/meta/escape-for-regex.xsl</a></p>
+      <p>Tested: 23 February 2018 at 11:52</p>
+      <h2>Contents</h2>
+      <table class="xspec">
+         <col width="75%" />
+         <col width="6.25%" />
+         <col width="6.25%" />
+         <col width="6.25%" />
+         <col width="6.25%" />
+         <thead>
+            <tr>
+               <th></th>
+               <th class="totals">passed: 2</th>
+               <th class="totals">pending: 0</th>
+               <th class="totals">failed: 1</th>
+               <th class="totals">total: 3</th>
+            </tr>
+         </thead>
+         <tbody>
+            <tr class="successful">
+               <th><a href="#d3e4">No escaping</a></th>
+               <th class="totals">1</th>
+               <th class="totals">0</th>
+               <th class="totals">0</th>
+               <th class="totals">1</th>
+            </tr>
+            <tr class="failed">
+               <th><a href="#d3e25">When processing a list of phrases</a></th>
+               <th class="totals">1</th>
+               <th class="totals">0</th>
+               <th class="totals">1</th>
+               <th class="totals">2</th>
+            </tr>
+         </tbody>
+      </table>
+      <div id="d3e4">
+         <h2 class="successful">No escaping<span class="scenario-totals">passed: 1 / pending: 0 / failed: 0 / total: 1</span></h2>
+         <table class="xspec" id="t-d3e4">
+            <col width="75%" />
+            <col width="25%" />
+            <tbody>
+               <tr class="successful">
+                  <th>No escaping</th>
+                  <th>passed: 1 / pending: 0 / failed: 0 / total: 1</th>
+               </tr>
+               <tr class="successful">
+                  <td>Must not be escaped at all</td>
+                  <td>Success</td>
+               </tr>
+            </tbody>
+         </table>
+      </div>
+      <div id="d3e25">
+         <h2 class="failed">When processing a list of phrases<span class="scenario-totals">passed: 1 / pending: 0 / failed: 1 / total: 2</span></h2>
+         <table class="xspec" id="t-d3e25">
+            <col width="75%" />
+            <col width="25%" />
+            <tbody>
+               <tr class="failed">
+                  <th>When processing a list of phrases</th>
+                  <th>passed: 1 / pending: 0 / failed: 1 / total: 2</th>
+               </tr>
+               <tr class="successful">
+                  <td>All phrase elements should remain</td>
+                  <td>Success</td>
+               </tr>
+               <tr class="failed">
+                  <td><a href="#d3e68">Strings should be escaped and status attributes should be added. The 'status' attribute
+                        are not as expected, indicating a problem in the tested template.</a></td>
+                  <td>Failure</td>
+               </tr>
+            </tbody>
+         </table>
+         <h3 id="d3e25">When processing a list of phrases</h3>
+         <h4 id="d3e68">Strings should be escaped and status attributes should be added. The 'status' attribute
+            are not as expected, indicating a problem in the tested template.
+         </h4>
+         <table class="xspecResult">
+            <thead>
+               <tr>
+                  <th>Result</th>
+                  <th>Expected Result</th>
+               </tr>
+            </thead>
+            <tbody>
+               <tr>
+                  <td><pre>&lt;<span class="diff">phrases</span> xmlns:functx="http://www.functx.com"&gt;
+   &lt;<span class="diff">phrase</span> <span class="diff">status</span>="changed"&gt;<span class="same">Hello!</span>&lt;/phrase&gt;
+   &lt;<span class="diff">phrase</span> <span class="diff">status</span>="changed"&gt;<span class="same">Goodbye!</span>&lt;/phrase&gt;
+   &lt;<span class="diff">phrase</span> <span class="diff">status</span>="same"&gt;<span class="same">\(So long!\)</span>&lt;/phrase&gt;
+&lt;/phrases&gt;</pre></td>
+                  <td><pre>&lt;<span class="diff">phrases</span> xmlns:functx="http://www.functx.com"&gt;
+   &lt;<span class="diff">phrase</span> <span class="diff">status</span>="same"&gt;<span class="same">Hello!</span>&lt;/phrase&gt;
+   &lt;<span class="diff">phrase</span> <span class="diff">status</span>="same"&gt;<span class="same">Goodbye!</span>&lt;/phrase&gt;
+   &lt;<span class="diff">phrase</span> <span class="diff">status</span>="changed"&gt;<span class="same">\(So long!\)</span>&lt;/phrase&gt;
+&lt;/phrases&gt;</pre></td>
+               </tr>
+            </tbody>
+         </table>
+      </div>
+   </body>
+</html>

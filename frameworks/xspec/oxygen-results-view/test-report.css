@@ -41,9 +41,9 @@ p.passed {
 }
 
 
-p.failed:before {content:url('../resources/fail12.png') " "}
-p.skipped:before{content:url('../resources/pending12.png') " ";}
-p.passed:before {content:url('../resources/succes12.png') " "}
+p.failed:before {content:url('resources/fail12.png') " "}
+p.skipped:before{content:url('resources/pending12.png') " ";}
+p.passed:before {content:url('resources/succes12.png') " "}
 
 div.failure,
 p {

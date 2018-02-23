@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<serialized version="19.1" xml:space="preserve">
+<serialized version="20.0" xml:space="preserve">
 	<serializableOrderedMap>
 		<entry>
 			<String>document.types</String>
@@ -357,7 +357,7 @@
 												<String>The path to a catalog file that will be used for all XSLTs involved in the XSpec execution.</String>
 											</field>
 											<field name="value">
-												<String>${pdu}/catalog.xml</String>
+												<String>${pd}/catalog.xml</String>
 											</field>
 											<field name="defaultValue">
 												<null/>
@@ -397,13 +397,36 @@
 										</antParameter>
 										<antParameter>
 											<field name="name">
-												<String>format.xspec.report</String>
+												<String>test.type</String>
 											</field>
 											<field name="description">
 												<String></String>
 											</field>
 											<field name="value">
-												<String>${frameworkDir}/src/reporter/format-xspec-report-oxygen.xsl</String>
+												<String>${xpath_eval(if(doc('${currentFileURL}')/*:description/@schematron) then 's' else 't')}</String>
+											</field>
+											<field name="defaultValue">
+												<null/>
+											</field>
+											<field name="type">
+												<Integer>5</Integer>
+											</field>
+											<field name="possibleValues">
+												<null/>
+											</field>
+											<field name="possibleValuesDescriptions">
+												<null/>
+											</field>
+										</antParameter>
+										<antParameter>
+											<field name="name">
+												<String>xspec.fail</String>
+											</field>
+											<field name="description">
+												<String></String>
+											</field>
+											<field name="value">
+												<String>false</String>
 											</field>
 											<field name="defaultValue">
 												<null/>
@@ -628,6 +651,7 @@
 										<String>${oxygenHome}/lib/saxon9ee.jar</String>
 										<String>${oxygenHome}/lib/log4j.jar</String>
 										<String>${oxygenHome}/lib/xercesImpl.jar</String>
+										<String>${oxygenHome}/lib/guava-*.jar</String>
 									</String-array>
 								</field>
 							</antScenario>
@@ -651,7 +675,7 @@
 												<String>The path to a catalog file that will be used for all XSLTs involved in the XSpec execution.</String>
 											</field>
 											<field name="value">
-												<String>${pdu}/catalog.xml</String>
+												<String>${pd}/catalog.xml</String>
 											</field>
 											<field name="defaultValue">
 												<null/>
@@ -721,6 +745,52 @@
 											</field>
 											<field name="value">
 												<String>${frameworkDir}/oxygen-results-view/unit-report-oxygen.xsl</String>
+											</field>
+											<field name="defaultValue">
+												<null/>
+											</field>
+											<field name="type">
+												<Integer>5</Integer>
+											</field>
+											<field name="possibleValues">
+												<null/>
+											</field>
+											<field name="possibleValuesDescriptions">
+												<null/>
+											</field>
+										</antParameter>
+										<antParameter>
+											<field name="name">
+												<String>test.type</String>
+											</field>
+											<field name="description">
+												<String></String>
+											</field>
+											<field name="value">
+												<String>${xpath_eval(if(doc('${currentFileURL}')/*:description/@schematron) then 's' else 't')}</String>
+											</field>
+											<field name="defaultValue">
+												<null/>
+											</field>
+											<field name="type">
+												<Integer>5</Integer>
+											</field>
+											<field name="possibleValues">
+												<null/>
+											</field>
+											<field name="possibleValuesDescriptions">
+												<null/>
+											</field>
+										</antParameter>
+										<antParameter>
+											<field name="name">
+												<String>xspec.fail</String>
+											</field>
+											<field name="description">
+												<String></String>
+											</field>
+											<field name="value">
+												<String>false</String>
 											</field>
 											<field name="defaultValue">
 												<null/>
