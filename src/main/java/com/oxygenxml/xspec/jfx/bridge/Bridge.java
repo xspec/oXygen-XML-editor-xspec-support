@@ -128,7 +128,7 @@ public class Bridge {
     try {
       toOpen = new URL(scenarioLocation);
     } catch (MalformedURLException e1) {
-      e1.printStackTrace();
+      logger.error(e1, e1);
     }
     pluginWorkspace.open(toOpen);
 
@@ -137,11 +137,16 @@ public class Bridge {
     WSEditorPage currentPage = editor.getCurrentPage();
     if (currentPage instanceof WSXMLTextEditorPage) {
       WSXMLTextEditorPage textpage = (WSXMLTextEditorPage) currentPage;
-      String xpath = "//*:expect[@label=\"" + testName
+      String xpath = 
+          "if (/*:description/@schematron) then (\n" + 
+          "//*:scenario/*[\"" + testName + "\" = string-join((@label, tokenize(local-name(),'-')[.=('report','assert','not','rule')], @id, @role, @location, @context, .[@count]/string('count:'), @count), ' ')]\n" + 
+          ") else (\n" +
+          "//*:expect[@label=\"" + testName
           + "\" or *:label=\"" + testName
           + "\"][parent::*:scenario[@label=\"" + scenarioName
           + "\" or *:label/text()=\"" + scenarioName
-          + "\"]]";
+          + "\"]]"+
+          ")";
 
       if (logger.isDebugEnabled()) {
         logger.debug("Show test XPath: " + xpath);
