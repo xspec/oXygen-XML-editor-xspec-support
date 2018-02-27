@@ -259,10 +259,21 @@ public class XSpecViewTestBase extends JFCTestCase {
   }
   
   protected void executeANT(File xspecFile, File outputFile) throws IOException, InterruptedException {
-    executeANT(xspecFile, outputFile, "");
+    executeANT(xspecFile, outputFile, "", false);
   }
   
-  protected void executeANT(File xspecFile, File outputFile, String entryPoints)
+  /**
+   * Execute an XSpec script using ANT. 
+   * 
+   * @param xspecFile XSpec file to execute.
+   * @param outputFile Output file.
+   * @param entryPoints Template entry points.
+   * @param schematron <code>true</code> if the script represents a Schematron test.
+   * 
+   * @throws IOException If it fails.
+   * @throws InterruptedException If it fails.
+   */
+  protected void executeANT(File xspecFile, File outputFile, String entryPoints, boolean schematron)
       throws IOException, InterruptedException {
     URL saxonConfig = getClass().getClassLoader().getResource("config/saxon-config.xml");
 
@@ -338,6 +349,10 @@ public class XSpecViewTestBase extends JFCTestCase {
     lines.add("-Dxspec.xml=" + xspecFile.getAbsolutePath() );
     // From tests we Run Saxon in HE mode so we need a config file that creates a HE configuration. 
     lines.add("-Dxspec.saxon.config=" + URLUtil.getCanonicalFileFromFileUrl(saxonConfig).getAbsolutePath());
+    
+    if (schematron) {
+      lines.add("-Dtest.type=s");  
+    }
 
 
     System.out.println("-----LINES----");

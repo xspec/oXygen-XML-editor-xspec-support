@@ -20,17 +20,6 @@
   
   <xsl:include href="id-generation.xsl"/>
 
-  <!-- 
-      
-      Oxygen Patch START 
-      
-      Keep the location of the scenario for backmapping.
-      
-      For schematron, the XSpec is being compiled. This XSLT processes the compiled version.
-      We need the orignal URL.
-    -->
-  <xsl:param name="originalSystemId"/>
-  <!-- Oxygen Patch END -->
   
   
   <xd:doc xmlns:xd="http://www.oxygenxml.com/ns/doc/xsl">
@@ -49,7 +38,10 @@
       
       Keep the location of the scenario for backmapping. 
     -->
-    <x:scenario xslt-version="{$xslt-version}" source="{$originalSystemId}">
+    <x:scenario xslt-version="{$xslt-version}">
+      <xsl:if test="not(@source) or @source = ''">
+        <xsl:attribute name="source" select="base-uri(.)"></xsl:attribute>
+      </xsl:if>
     <!-- Oxygen Patch END -->
       <xsl:copy-of select="@*"/>
       <xsl:apply-templates mode="x:gather-specs"/>

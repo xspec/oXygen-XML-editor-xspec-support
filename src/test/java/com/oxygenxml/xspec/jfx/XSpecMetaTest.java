@@ -367,7 +367,7 @@ public class XSpecMetaTest extends XSpecViewTestBase {
     String firstID = XSpecUtil.generateId("Test no.1(0)");
     String secondID = XSpecUtil.generateId("Test no.2(1)");
     String entryPoints = firstID + " " + secondID;
-    executeANT(xspecFile, outputFile, entryPoints);
+    executeANT(xspecFile, outputFile, entryPoints, false);
     
     File xmlFormatOutput = new File(xspecFile.getParentFile(), "xspec/driverTest-result.xml");
     

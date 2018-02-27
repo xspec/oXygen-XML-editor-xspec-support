@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<article>
+  <title>Article title</title>
+  <section>
+    <title>Section title</title>
+    <p>This is an example.</p>
+  </section>
+  <section>
+    <p>This is an example.</p>
+  </section>
+</article>

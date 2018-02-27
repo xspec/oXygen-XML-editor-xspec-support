@@ -8,17 +8,33 @@
     <xsl:param name="stylesheet" select="concat(x:description/@schematron, '.xsl')"/>
     <xsl:param name="test_dir" select="'xspec'"/>
     
-
+    
     <xsl:variable name="error" select="('error', 'fatal')"/>
     <xsl:variable name="warn" select="('warn', 'warning')"/>
     <xsl:variable name="info" select="('info', 'information')"/>
-
-
+    
+    
     <xsl:template match="@* | node()" priority="-2">
         <xsl:copy>
             <xsl:apply-templates select="@* | node()"/>
         </xsl:copy>
     </xsl:template>
+    
+    <!--
+        
+        Oxygen Patch Start 
+        
+        Keep the original location of the module.
+        
+        -->
+    <xsl:template match="x:scenario" priority="-2">
+        <xsl:param name="source" tunnel="yes"></xsl:param>
+        <xsl:copy>
+            <xsl:attribute name="source" select="if ($source and $source != '') then ($source) else (base-uri(.))"></xsl:attribute>
+            <xsl:apply-templates select="@* | node()"/>
+        </xsl:copy>
+    </xsl:template>
+    <!-- Oxygen Patch END -->
     
     <xsl:template match="x:description[@schematron]">
         <xsl:element name="x:description">
@@ -37,7 +53,7 @@
             <xsl:apply-templates select="node()"/>
         </xsl:element>
     </xsl:template>
-
+    
     <xsl:template match="@schematron">
         <xsl:attribute name="stylesheet" select="$stylesheet"/>
         <xsl:variable name="path" select="resolve-uri(string(), base-uri())"/>
@@ -45,7 +61,7 @@
             <xsl:namespace name="{./@prefix}" select="./@uri"/>
         </xsl:for-each>
     </xsl:template>
-
+    
     <xsl:template match="x:import">
         <xsl:variable name="href" select="resolve-uri(@href, base-uri())"/>
         <xsl:choose>
@@ -54,7 +70,18 @@
                 self::x:expect-report | self::x:expect-not-report |
                 self::x:expect-valid | self::x:description[@schematron] ]">
                 <xsl:comment>BEGIN IMPORT "<xsl:value-of select="@href"/>"</xsl:comment>
-                <xsl:apply-templates select="doc($href)/x:description/node()"/>
+                <xsl:apply-templates select="doc($href)/x:description/node()">
+                    <!--
+        
+        Oxygen Patch Start 
+        
+        Keep the original location of the module.
+        
+        -->
+                    <xsl:with-param name="source" select="resolve-uri($href, base-uri(.))" tunnel="yes"></xsl:with-param>
+                    
+                    <!-- Oxygen patch END -->
+                </xsl:apply-templates>
                 <xsl:comment>END IMPORT "<xsl:value-of select="@href"/>"</xsl:comment>
             </xsl:when>
             <xsl:otherwise>
@@ -88,7 +115,7 @@
             </xsl:attribute>
         </xsl:element>
     </xsl:template>
-
+    
     <xsl:template match="x:expect-not-assert">
         <xsl:element name="x:expect">
             <xsl:call-template name="make-label"/>
@@ -99,7 +126,7 @@
             </xsl:attribute>
         </xsl:element>
     </xsl:template>
-
+    
     <xsl:template match="x:expect-report">
         <xsl:element name="x:expect">
             <xsl:call-template name="make-label"/>
@@ -112,8 +139,8 @@
             </xsl:attribute>
         </xsl:element>
     </xsl:template>
-
-
+    
+    
     <xsl:template match="x:expect-not-report">
         <xsl:element name="x:expect">
             <xsl:call-template name="make-label"/>
@@ -124,14 +151,14 @@
             </xsl:attribute>
         </xsl:element>
     </xsl:template>
-
+    
     <xsl:template match="@location" mode="make-predicate">
         <xsl:variable name="escaped" select="if (not(contains(., codepoints-to-string(39)))) then 
             concat(codepoints-to-string(39), ., codepoints-to-string(39)) else 
             concat('concat(', codepoints-to-string(39), replace(., codepoints-to-string(39), concat(codepoints-to-string(39), ', codepoints-to-string(39), ', codepoints-to-string(39))), codepoints-to-string(39), ')')"/>
         <xsl:sequence select="concat('[x:schematron-location-compare(', $escaped, ', @location, preceding-sibling::svrl:ns-prefix-in-attribute-values)]')"/>
     </xsl:template>
-
+    
     <xsl:template match="@id | @role" mode="make-predicate">
         <xsl:sequence select="concat('[(@', local-name(.), 
             ', preceding-sibling::svrl:fired-rule[1]/@',local-name(.), 
@@ -149,7 +176,7 @@
     <xsl:template name="make-label">
         <xsl:attribute name="label" select="string-join((@label, tokenize(local-name(),'-')[.=('report','assert','not','rule')], @id, @role, @location, @context, current()[@count]/string('count:'), @count), ' ')"/>
     </xsl:template>
-
+    
     <xsl:template match="x:expect-valid">
         <xsl:element name="x:expect">
             <xsl:attribute name="label" select="'valid'"/>

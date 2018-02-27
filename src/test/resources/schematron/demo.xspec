@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<x:description xmlns:x="http://www.jenitennison.com/xslt/xspec" schematron="demo.sch">
+    <x:import href="demo-module.xspec"/>
+    <x:scenario label="demo-01">
+        <x:context href="demo.xml"/>
+        <x:scenario label="article should have a title">
+            <x:expect-not-assert label="Some other thing" id="a001"/>
+        </x:scenario>
+    </x:scenario>
+</x:description>
