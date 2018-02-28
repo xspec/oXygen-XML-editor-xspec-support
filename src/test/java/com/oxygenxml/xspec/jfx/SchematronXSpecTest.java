@@ -47,7 +47,7 @@ public class SchematronXSpecTest extends XSpecViewTestBase {
         "    </xsl:template>\n" + 
         "</xsl:stylesheet>"));
     Transformer transformer = new TransformerFactoryImpl().newTransformer(xslSource);
-    Source xmlSource = new SAXSource(new InputSource(new File("frameworks\\xspec\\src\\schematron\\schut-to-xspec.xsl").toURI().toURL().toString()));
+    Source xmlSource = new SAXSource(new InputSource(new File("frameworks/xspec/src/schematron/schut-to-xspec.xsl").toURI().toURL().toString()));
     StringWriter writer = new StringWriter();
     Result outputTarget = new StreamResult(writer);
     transformer.transform(xmlSource, outputTarget);
@@ -64,12 +64,12 @@ public class SchematronXSpecTest extends XSpecViewTestBase {
    * 
    * @throws Exception If it fails.
    */
-  public void testLocation() throws Exception {
+  public void testMetaData() throws Exception {
     URL xspecURL = getClass().getClassLoader().getResource("schematron/demo.xspec");
     URL xspecModuleURL = getClass().getClassLoader().getResource("schematron/demo-module.xspec");
     
     URL xmlURL = getClass().getClassLoader().getResource("schematron/demo.xml");
-    URL schCompiledURL = getClass().getClassLoader().getResource("schematron/demo.sch-compiled.xsl");
+    URL schCompiledURL = new File(URLUtil.getCanonicalFileFromFileUrl(xmlURL).getParentFile(), "demo.sch-compiled.xsl").toURI().toURL();
     File xspecFile = URLUtil.getCanonicalFileFromFileUrl(xspecURL);
     File outputFile = new File(xspecFile.getParentFile(), "demo-report.html");
     
