@@ -2,7 +2,6 @@ package com.oxygenxml.xspec;
 
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.UUID;
 
 import org.apache.log4j.Logger;
 
@@ -250,7 +249,7 @@ public class XSpecUtil {
    * @return A unique ID.
    */
   public static String generateId(String seed) {
-    return "x" + UUID.nameUUIDFromBytes(seed.getBytes()).toString();
+    return com.oxygenxml.xspec.saxon.GenerateIDExtensionFunction.generateId(seed);
   }
   
   /**

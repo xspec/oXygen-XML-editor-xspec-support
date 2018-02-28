@@ -1,6 +1,6 @@
 package com.oxygenxml.xspec.saxon;
 
-import com.oxygenxml.xspec.XSpecUtil;
+import java.util.UUID;
 
 import net.sf.saxon.expr.StaticProperty;
 import net.sf.saxon.expr.XPathContext;
@@ -38,9 +38,20 @@ public class GenerateIDExtensionFunction extends net.sf.saxon.lib.ExtensionFunct
 
         String arg = arguments[0].head().getStringValue();
         
-        return new StringValue(XSpecUtil.generateId(arg).toString());
+        return new StringValue(generateId(arg));
       }
     };
+  }
+  
+  /**
+   * Generates an unique ID based on the given seed.
+   * 
+   * @param seed The seed.
+   * 
+   * @return A unique ID.
+   */
+  public static String generateId(String seed) {
+    return "x" + UUID.nameUUIDFromBytes(seed.getBytes()).toString();
   }
 
   @Override

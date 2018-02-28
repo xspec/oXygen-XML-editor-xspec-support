@@ -9,7 +9,6 @@ import javax.swing.JFrame;
 import com.oxygenxml.xspec.XSpecResultsView;
 import com.oxygenxml.xspec.XSpecUtil;
 
-import de.schlichtherle.io.FileOutputStream;
 import javafx.application.Platform;
 
 /**
@@ -134,16 +133,7 @@ public class XSpecResultsViewTest extends XSpecViewTestBase {
     URL xspecURL = getClass().getClassLoader().getResource("runFailed/escape-for-regex.xspec");
     URL resultsURL = getClass().getClassLoader().getResource("runFailed/escape-for-regex-report.html");
     
-    URL css = new File("frameworks/xspec/oxygen-results-view/test-report.css").toURI().toURL();
-    URL js = new File("frameworks/xspec/oxygen-results-view/test-report.js").toURI().toURL();
-    
-    File f = new File(resultsURL.getPath());
-    String content = read(resultsURL).toString();
-    content = content.replace("CSS_MARKER", css.toString());
-    content = content.replace("JS_MARKER", js.toString());
-    FileOutputStream fs = new FileOutputStream(f);
-    fs.write(content.getBytes("UTF-8"));
-    fs.close();
+    executeANT(new File(xspecURL.getPath()), new File(resultsURL.getPath()));
     
     initXSpec(xspecURL);
     
@@ -173,8 +163,8 @@ public class XSpecResultsViewTest extends XSpecViewTestBase {
     assertNull("Unexpected exception:"  + (ex[0] != null ? ex[0].getMessage() : ""), ex[0]);
     
     StringBuilder expected = new StringBuilder();
-    expected.append(XSpecUtil.generateId(" / No escaping bad(0)")).append(" ")
-    .append(XSpecUtil.generateId(" / When processing a list of phrases(2)"));
+    expected.append(XSpecUtil.generateId("No escaping bad(0)")).append(" ")
+    .append(XSpecUtil.generateId("When processing a list of phrases(2)"));
     assertEquals(expected.toString(), b.toString());
   }
 
