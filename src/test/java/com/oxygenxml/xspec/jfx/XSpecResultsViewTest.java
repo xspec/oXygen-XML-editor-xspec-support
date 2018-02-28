@@ -167,10 +167,10 @@ public class XSpecResultsViewTest extends XSpecViewTestBase {
     waitForFX();
     
     if (ex[0] != null) {
-      ex[0].printStackTrace();
+      ex[0].printStackTrace(System.out);
     }
     
-    assertNull(ex[0]);
+    assertNull("Unexpected exception:"  + (ex[0] != null ? ex[0].getMessage() : ""), ex[0]);
     
     StringBuilder expected = new StringBuilder();
     expected.append(XSpecUtil.generateId(" / No escaping bad(0)")).append(" ")
