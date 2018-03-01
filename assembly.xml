@@ -30,11 +30,6 @@
 			<outputDirectory>/</outputDirectory>
 			<filtered>true</filtered>
 		</file>
-		<file>
-			<source>extension.xml</source>
-			<outputDirectory>/</outputDirectory>
-			<filtered>true</filtered>
-		</file>
 	</files>
 		 
 </assembly>
