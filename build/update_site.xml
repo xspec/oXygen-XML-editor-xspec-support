@@ -6,7 +6,7 @@
         id="com.oxygenxml.xspec.XSpecSupportPlugin">
         <xt:location href="https://github.com/xspec/oXygen-XML-editor-xspec-support/releases/download/0.0.11/xspec.support-0.0.11-plugin.zip"/>
         <xt:version>0.0.11</xt:version>
-        <xt:oxy_version>18.0+</xt:oxy_version>
+        <xt:oxy_version>18.1+</xt:oxy_version>
         <xt:type>plugin</xt:type>
         <xt:author>Alex Jitianu</xt:author>
         <xt:name>XSpec Helper view</xt:name>
