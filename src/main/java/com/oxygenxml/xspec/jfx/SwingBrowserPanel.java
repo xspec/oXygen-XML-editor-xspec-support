@@ -14,10 +14,6 @@ import javax.swing.JPanel;
 import javax.swing.UIManager;
 
 import org.apache.log4j.Logger;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.NodeList;
-import org.w3c.dom.Text;
 
 import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
@@ -107,7 +103,6 @@ public class SwingBrowserPanel extends JPanel {
       logger.debug("Create browser");
     }
     
-//    initHooks();
   }
 
   /**

@@ -1,17 +1,20 @@
 package com.oxygenxml.xspec;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.event.ActionEvent;
 import java.net.URL;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
+import javax.swing.BorderFactory;
 import javax.swing.Icon;
 import javax.swing.JButton;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.JToolBar;
 import javax.swing.SwingUtilities;
+import javax.swing.UIManager;
 
 import org.apache.log4j.Logger;
 
@@ -135,6 +138,13 @@ public class XSpecResultsView extends JPanel implements XSpecResultPresenter {
         logger.info(message);
       }
     });
+    
+    Object object = UIManager.get("SidePane.lineColor");
+    if (object instanceof Color) {
+      Color c = (Color) object;
+      
+      panel.setBorder(BorderFactory.createMatteBorder(1, 0, 0, 0, c));
+    }
     
     panel.loadContent("");
     

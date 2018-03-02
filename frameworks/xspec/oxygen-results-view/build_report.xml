@@ -271,21 +271,18 @@
     description="Runs the XSpec unit tests in ${xspec.compiled.xml}" depends="compileSchematron">
     
     <echo message="Creating Test Stylesheet..."/>
-  	
   	<!-- 
 
   	    Oxygen XSpec Report View Patch Start 
   	    
   	    Impose a custom compile stylesheet.
   	-->
-  	<echo>Clean up</echo>
-  	<delete dir="${xspec.dir}"/>
   	
   	<echo>Step 1. Compile the XSPEC into an XSLT</echo>
   	
 	<echo>Saxon config: ${xspec.saxon.config}</echo>
     <makeurl file="${xspec.xml}" property="xspec.xml.uri"/>
-  	
+    
   	<java classname="net.sf.saxon.Transform"
   	      fork="true">
   	      <classpath>
@@ -305,8 +302,11 @@
   	  
   	      <arg value="originalSystemId=${xspec.xml.uri}" />
   	    </java>
-  	
+    <!--<fail>STOPPED</fail>-->
+    
   	<echo>Step 2. Create the Driver XSLT</echo>
+    
+
   	<!-- 
 
   	  	    Oxygen XSpec Report View Patch Start 
@@ -340,7 +340,7 @@
   	  
   	  
   	    </java>
-    
+    <!--<fail>STOPPED</fail>-->
   	<!-- 
   	
   	OXYGEN PATCH END 
@@ -378,6 +378,7 @@
       <arg value="-config:${xspec.saxon.config}" />
       
     </java>
+    
   	
   	
   	<java classname="net.sf.saxon.Transform"
