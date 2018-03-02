@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-model href="../../src/schemas/xspec.rnc" type="application/relax-ng-compact-syntax"?>
+<x:description xmlns:x="http://www.jenitennison.com/xslt/xspec" schematron="demo-03.sch">
+    <x:scenario label="inline context">
+        <x:context>
+            <document>
+                <title>Introduction</title>
+                <p>some paragraph text</p>
+            </document>
+        </x:context>
+        <x:expect-not-assert id="a0001"/>
+        <x:expect-valid/>
+    </x:scenario>
+</x:description>
