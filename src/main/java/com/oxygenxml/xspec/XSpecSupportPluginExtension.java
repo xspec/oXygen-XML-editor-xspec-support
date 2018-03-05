@@ -59,7 +59,7 @@ public class XSpecSupportPluginExtension implements WorkspaceAccessPluginExtensi
           };
           ToolbarButton b = new ToolbarButton(action, false);
           b.setToolTipText("Run XSpec test scenarios");
-          b.setIcon(Icons.loadIcon(Icons.RUN_TESTS));
+          b.setIcon(Icons.loadIcon(Icons.RUN_TESTS_TOOLBAR));
           
           toolbarInfo.setComponents(new JComponent[] {b});
         }

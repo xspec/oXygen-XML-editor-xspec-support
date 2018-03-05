@@ -23,6 +23,10 @@ public class Icons {
    */
   public static final String RUN_TESTS = "icons/XSpecRun16.png";
   /**
+   * Run all Xspec tests from a file. A big icon for the toolbar.
+   */
+  public static final String RUN_TESTS_TOOLBAR = "icons/XSpecRun24.png";
+  /**
    * Run just the failed tests.
    */
   public static final String RUN_FAILED_TESTS = "icons/XSpecRunFailures16.png";
