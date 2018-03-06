@@ -36,7 +36,7 @@ div.testcase > p {
 p.failed,
 p.skipped,
 p.passed {
-    color: rgb(0, 0, 150);
+    color: #178bfd;
     font-weight: bold;
 }
 
