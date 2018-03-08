@@ -86,6 +86,10 @@ public class SwingBrowserPanel extends JPanel {
    */
   private Timer timer = new Timer(false);
   /**
+   * Web view containing the web engine.
+   */
+  private WebView view;
+  /**
    * Load listener.
    */
   private ChangeListener<State> changeListener = null;
@@ -153,7 +157,7 @@ public class SwingBrowserPanel extends JPanel {
         // On HiDPI screens running on windows, the youtube video have problems.
         // If we scale the font size, videos will not fit to boundaries.
         // The font will be a bit smaller, but the embedded videos will behave proper.
-        final WebView view = new WebView();
+        view = new WebView();
         engine = view.getEngine();
         
         
@@ -360,6 +364,17 @@ public class SwingBrowserPanel extends JPanel {
           t.printStackTrace();
         }
       }
+    });
+  }
+  
+  /**
+   * Sets the scale factor.
+   * 
+   * @param scale The scale factor.
+   */
+  public void setScaleFactor(float scale) {
+    Platform.runLater(() -> {
+      view.setFontScale(scale);
     });
   }
 }

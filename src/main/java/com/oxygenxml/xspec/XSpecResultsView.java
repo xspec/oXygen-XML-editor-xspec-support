@@ -37,6 +37,7 @@ import ro.sync.exml.workspace.api.listeners.WSEditorChangeListener;
 import ro.sync.exml.workspace.api.standalone.StandalonePluginWorkspace;
 import ro.sync.exml.workspace.api.standalone.ui.ToolbarButton;
 import ro.sync.exml.workspace.api.standalone.ui.ToolbarToggleButton;
+import ro.sync.ui.hidpi.RetinaDetector;
 import ro.sync.util.URLUtil;
 
 /**
@@ -144,6 +145,11 @@ public class XSpecResultsView extends JPanel implements XSpecResultPresenter {
       Color c = (Color) object;
       
       panel.setBorder(BorderFactory.createMatteBorder(1, 0, 0, 0, c));
+    }
+    
+    if (RetinaDetector.getInstance().isRetinaNoImplicitSupport()) {
+      float scalingFactor = RetinaDetector.getInstance().getScalingFactor();
+      panel.setScaleFactor(scalingFactor);
     }
     
     panel.loadContent("");

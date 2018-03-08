@@ -3,18 +3,18 @@
 }
 
 .testsuite {
-    margin-top:10px;
+    margin-top: 0.625em
 }
 
 .testsuite > .testsuite {
-    margin-left:10px;
+    margin-left: 0.625em;
     margin-top:0px;
     
 }
 
 .testcase {
-    margin-top: 5px;
-    margin-bottom: 5px;
+    margin-top: 0.313em;
+    margin-bottom: 0.313em;
 }
 
 div.testcase > p {
@@ -48,7 +48,7 @@ p.passed:before {content:url('resources/succes12.png') " "}
 div.failure,
 p {
     
-	margin-left: 20px;
+	margin-left: 1.250em;
 }
 
 
@@ -58,18 +58,18 @@ p {
 
 a.button { 
 	text-decoration: none; 
-	margin: 0 1px; 
+	margin: 0 0.063em; 
 }
 a.button {
 	display: inline-block;
 	color: #667;
 	background-color: #eee;
 	font-weight: normal;
-	font-size: 12px;
-	padding: 1px 2px;
-	border-radius: 5px;
-	border: 1px solid rgba(0,0,0,0.3);
-	border-bottom-width: 3px;
+	font-size: 1em;
+	padding: 0.063em 0.125em;
+	border-radius: 0.313em;
+	border: 0.063em solid rgba(0,0,0,0.3);
+	border-bottom-width: 0.188em;
 }
 
 	a.button:hover {
@@ -98,7 +98,7 @@ pre {
 
 body {
     font-family:arial, helvetica, sans-serif;
-    font-size:12px;
+    font-size:0.750em;
 }
 
 
