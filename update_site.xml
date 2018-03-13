@@ -15,6 +15,14 @@
                 <title>XSpec Helper view</title>
             </head>
             <body>
+            	<div>
+		            <h3>What's new in version 1.0.0</h3>
+		            <ol>
+		               <li>Comes bundled with XSpec version 1.0.0.</li>
+		               <li>The plugin can now execute Schematron tests.</li>
+		               <li>Activating an Oxygen dark theme will also reflect in the view.</li>
+		            </ol>
+		         </div>
                 <div>
                     <p style="color:red">This plugin also requires the <b>XSpec Framework</b>. Please install them both.</p>
                     <p><b>What's New:</b> The posibility to rerun just the failed scenarios.</p>
