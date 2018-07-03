@@ -70,13 +70,12 @@ SOFTWARE.
         <xt:name>XSpec Framework (required by the XSpec Helper view plugin)</xt:name>
         <xt:description><html xmlns="http://www.w3.org/1999/xhtml">
             <head>
-                <title>XSpec Helper view</title>
+                <title>XSpec Helper View</title>
             </head>
             <body>
                 <div>
-                    <p style="color:red">This framework is required by the <b>XSpec Helper view</b> plugin. Please install them both.</p>
-                    <p>A customized version of the oXygen's built-in XSpec framework. It contributes a transformation scenario
-                        named "XSpec Report" that generates an HTML report that will be loaded by the <b>XSpec Helper view</b></p>
+                    <p style="color:red">This framework is required for the <b>XSpec Helper view</b> plugin. Both add-ons must be installed.</p>
+                    <p>This add-on constributes a customized version of Oxygen's built-in XSpec framework. The <b>XSpec Helper view</b> add-on uses this framework for XSpec test scenarios.</p>
                 </div>
             </body>
         </html>
