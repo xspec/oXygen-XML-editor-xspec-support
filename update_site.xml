@@ -12,25 +12,22 @@
         <xt:name>XSpec Helper view</xt:name>
         <xt:description><html xmlns="http://www.w3.org/1999/xhtml">
             <head>
-                <title>XSpec Helper view</title>
+                <title>XSpec Helper View</title>
             </head>
             <body>
             	<div>
+			<p>This add-on contributes an <b>XSpec Test Results</b> view that provides the ability to run XSpec test scenarios and view the results directly in Oxygen. To use the new view, after installation, open an XSpec file and click the <b>Run XSpec test scenarios</b> button on the toolbar.</p>
+                    <p style="color:red">This plugin also requires the <b>XSpec Framework</b>. Please install them both.</p>
+  	        </div>
+		<div>    
 		            <h3>What's new in version 1.0.0</h3>
 		            <ol>
 		               <li>Comes bundled with XSpec version 1.0.0.</li>
 		               <li>The plugin can now execute Schematron tests.</li>
 		               <li>Activating an Oxygen dark theme will also reflect in the view.</li>
+			       <li>The possibility to rerun only the failed scenario.</li>
 		            </ol>
 		         </div>
-                <div>
-                    <p style="color:red">This plugin also requires the <b>XSpec Framework</b>. Please install them both.</p>
-                    <p><b>What's New:</b> The posibility to rerun just the failed scenarios.</p>
-                    <p>A proof of concept plugin that contributes a view that presents the results of an XSpec 
-                        transformation. After instalation, to use it, open an XSpec file and invoke the <b>XSpec Run</b>
-                        action from the toolbar.</p>
-                    
-                </div>
             </body>
         </html>
         </xt:description>
