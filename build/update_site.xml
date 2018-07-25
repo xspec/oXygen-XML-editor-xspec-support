@@ -4,33 +4,30 @@
 
     <xt:extension xmlns:xt="http://www.oxygenxml.com/ns/extension"
         id="com.oxygenxml.xspec.XSpecSupportPlugin">
-        <xt:location href="https://github.com/xspec/oXygen-XML-editor-xspec-support/releases/download/1.0.0/xspec.support-1.0.0-plugin.zip"/>
-        <xt:version>1.0.0</xt:version>
+        <xt:location href="https://github.com/xspec/oXygen-XML-editor-xspec-support/releases/download/1.0.1/xspec.support-1.0.1-plugin.zip"/>
+        <xt:version>1.0.1</xt:version>
         <xt:oxy_version>18.1+</xt:oxy_version>
         <xt:type>plugin</xt:type>
         <xt:author>Alex Jitianu</xt:author>
         <xt:name>XSpec Helper view</xt:name>
         <xt:description><html xmlns="http://www.w3.org/1999/xhtml">
             <head>
-                <title>XSpec Helper view</title>
+                <title>XSpec Helper View</title>
             </head>
             <body>
             	<div>
+			<p>This add-on contributes an <b>XSpec Test Results</b> view that provides the ability to run XSpec test scenarios and view the results directly in Oxygen. To use the new view, after installation, open an XSpec file and click the <b>Run XSpec test scenarios</b> button on the toolbar.</p>
+                    <p style="color:red">This plugin also requires the <b>XSpec Framework</b>. Please install them both.</p>
+  	        </div>
+		<div>    
 		            <h3>What's new in version 1.0.0</h3>
 		            <ol>
 		               <li>Comes bundled with XSpec version 1.0.0.</li>
 		               <li>The plugin can now execute Schematron tests.</li>
 		               <li>Activating an Oxygen dark theme will also reflect in the view.</li>
+			       <li>The possibility to rerun only the failed scenario.</li>
 		            </ol>
 		         </div>
-                <div>
-                    <p style="color:red">This plugin also requires the <b>XSpec Framework</b>. Please install them both.</p>
-                    <p><b>What's New:</b> The posibility to rerun just the failed scenarios.</p>
-                    <p>A proof of concept plugin that contributes a view that presents the results of an XSpec 
-                        transformation. After instalation, to use it, open an XSpec file and invoke the <b>XSpec Run</b>
-                        action from the toolbar.</p>
-                    
-                </div>
             </body>
         </html>
         </xt:description>
@@ -62,21 +59,20 @@ SOFTWARE.
     
     <xt:extension xmlns:xt="http://www.oxygenxml.com/ns/extension"
         id="com.oxygenxml.xspec.XSpecSupportFramework">
-        <xt:location href="https://github.com/xspec/oXygen-XML-editor-xspec-support/releases/download/1.0.0/xspec.support-1.0.0-framework.zip"/>
-        <xt:version>1.0.0</xt:version>
+        <xt:location href="https://github.com/xspec/oXygen-XML-editor-xspec-support/releases/download/1.0.1/xspec.support-1.0.1-framework.zip"/>
+        <xt:version>1.0.1</xt:version>
         <xt:oxy_version>18.0+</xt:oxy_version>
         <xt:type>framework</xt:type>
         <xt:author>Alex Jitianu</xt:author>
         <xt:name>XSpec Framework (required by the XSpec Helper view plugin)</xt:name>
         <xt:description><html xmlns="http://www.w3.org/1999/xhtml">
             <head>
-                <title>XSpec Helper view</title>
+                <title>XSpec Helper View</title>
             </head>
             <body>
                 <div>
-                    <p style="color:red">This framework is required by the <b>XSpec Helper view</b> plugin. Please install them both.</p>
-                    <p>A customized version of the oXygen's built-in XSpec framework. It contributes a transformation scenario
-                        named "XSpec Report" that generates an HTML report that will be loaded by the <b>XSpec Helper view</b></p>
+                    <p style="color:red">This framework is required for the <b>XSpec Helper view</b> plugin. Both add-ons must be installed.</p>
+                    <p>This add-on constributes a customized version of Oxygen's built-in XSpec framework. The <b>XSpec Helper view</b> add-on uses this framework for XSpec test scenarios.</p>
                 </div>
             </body>
         </html>
