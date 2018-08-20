@@ -331,7 +331,7 @@
 									<String-array/>
 								</field>
 								<field name="xslTransformer">
-									<String>Calabash XProc</String>
+									<String>Add-on for Calabash XProc Engine</String>
 								</field>
 								<field name="extensionURLs">
 									<String-array/>
