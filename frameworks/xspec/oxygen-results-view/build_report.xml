@@ -284,7 +284,7 @@
     <makeurl file="${xspec.xml}" property="xspec.xml.uri"/>
     
   	<java classname="net.sf.saxon.Transform"
-  	      fork="true">
+  	  fork="false" failonerror="true">
   	      <classpath>
   	        <pathelement path="${java.class.path}"/>
   	      	<pathelement path="${xspec.saxon.config.jar}"/>
@@ -319,7 +319,7 @@
     <makeurl file="${xspec.xsl}" property="xspec.xsl.uri"/>
   	
   	<java classname="net.sf.saxon.Transform"
-  	      fork="true">
+  	  fork="false" failonerror="true">
   	      <classpath>
   	        <pathelement path="${java.class.path}"/>
   	      	<pathelement path="${xspec.saxon.config.jar}"/>
@@ -354,7 +354,7 @@
   	
   	<echo>Step 3. Execute the script</echo>
     <java classname="net.sf.saxon.Transform"
-      fork="true">
+      fork="false" failonerror="true">
       <!-- Saxon should be included in the classpath -->
       <classpath>
         <pathelement path="${java.class.path}"/>
@@ -379,10 +379,13 @@
       
     </java>
     
-  	
+    <echo>Got ${xspec.result.xml}</echo>
+
+    
+    <echo>Step 4. Transform the test results to HTML.</echo>
   	
   	<java classname="net.sf.saxon.Transform"
-  	      fork="true">
+  	  fork="false" failonerror="true">
   	      <classpath>
   	        <pathelement path="${java.class.path}"/>
   	      	<pathelement path="${xspec.saxon.config.jar}"/>
