@@ -379,9 +379,6 @@
       
     </java>
     
-    <echo>Got ${xspec.result.xml}</echo>
-
-    
     <echo>Step 4. Transform the test results to HTML.</echo>
   	
   	<java classname="net.sf.saxon.Transform"
