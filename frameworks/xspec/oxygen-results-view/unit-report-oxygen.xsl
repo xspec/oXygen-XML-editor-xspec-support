@@ -8,6 +8,7 @@
                 xmlns:pkg="http://expath.org/ns/pkg"
                 xmlns:xhtml="http://www.w3.org/1999/xhtml"
                 xmlns:fn="http://www.w3.org/2005/xpath-functions"
+                xmlns:saxon="http://saxon.sf.net/"
                 exclude-result-prefixes="x xs test pkg xhtml fn xsl">
     
     <xsl:param name="report-css-uri" select="
@@ -164,40 +165,64 @@
         <xsl:variable name="result" as="element(x:result)"
             select="if (x:result) then x:result else ../x:result" />
         
-        
-        <xsl:variable name="params">
-            <output:serialization-parameters 
-            xmlns:output="http://www.w3.org/2010/xslt-xquery-serialization">
-            <output:omit-xml-declaration value="yes"/>
-        </output:serialization-parameters>            
-        </xsl:variable> 
-        
         <pre class="embeded.diff.data" style="display:none;">
             <div class="embeded.diff.result" style="white-space:pre;">
-                <!-- The value can also appear in teh @select attribute. -->
-                <xsl:variable name="tmp">
-                    <xsl:value-of select="$result/@select"/>
-                    <xsl:apply-templates select="$result/node()" mode="copy">
-                        <xsl:with-param name="level" select="0"/>
-                    </xsl:apply-templates>
-                </xsl:variable>
-
-                <xsl:value-of select="serialize($tmp, $params/*:serialization-parameters)" />
+                <xsl:apply-templates select="$result" mode="serialize-result-for-diff"/>
             </div>
             
             <div class="embeded.diff.expected" style="white-space:pre;">
-                <xsl:variable name="tmp">
-                    <xsl:value-of select="x:expect/@select"/>
-                    <xsl:apply-templates select="x:expect/node()" mode="copy">
-                        <xsl:with-param name="level" select="0"/>
-                    </xsl:apply-templates>   
-                </xsl:variable>
-
-            <xsl:value-of select="serialize($tmp, $params/*:serialization-parameters)" />                
+                <xsl:apply-templates select="x:expect" mode="serialize-result-for-diff"/>
             </div>
         </pre>
     </xsl:template>
     
+    <!-- Serializes the expected/actual results for Oxugen's Diff view.  -->
+    <xsl:template match="x:expect | x:result" mode="serialize-result-for-diff">
+        <xsl:variable name="tmp">
+            <xsl:choose>
+                <xsl:when test="@select and node()">
+                    <!-- Applies the XPath filter to get the subset of interest. -->
+                    <xsl:variable name="filtered">
+                        <xsl:variable name="expr" select="if (normalize-space(@select) = '/') then concat('.', @select, 'node()') else concat('.', @select)"/>
+                        <xsl:copy-of select="saxon:eval(saxon:expression($expr))"/>
+                    </xsl:variable>
+                    <!-- Convert to a version ready to be serialized. -->
+                    <xsl:apply-templates select="$filtered" mode="copy">
+                        <xsl:with-param name="level" select="0"/>
+                    </xsl:apply-templates>   
+                </xsl:when>
+                <xsl:when test="node()">
+                    <xsl:apply-templates select="node()" mode="copy">
+                        <xsl:with-param name="level" select="0"/>
+                    </xsl:apply-templates>
+                </xsl:when>
+                <xsl:otherwise>
+                    <xsl:value-of select="@select"/>
+                </xsl:otherwise>
+            </xsl:choose>
+        </xsl:variable>
+        
+        <xsl:variable name="params">
+            <output:serialization-parameters 
+                xmlns:output="http://www.w3.org/2010/xslt-xquery-serialization">
+                <output:omit-xml-declaration value="yes"/>
+            </output:serialization-parameters>            
+        </xsl:variable> 
+        
+        <xsl:value-of select="serialize($tmp, $params/*:serialization-parameters)" />
+    </xsl:template>
+    
+    
+    <xsl:template match="node() | @*" mode="serialize-result-for-diff">
+        <xsl:copy>
+            <xsl:apply-templates select="node() | @*"/>
+        </xsl:copy>
+    </xsl:template>
+    
+    <!-- Wrapper for significant spaces. -->
+    <xsl:template match="test:ws" mode="copy">
+      <!--<xsl:value-of select="text()"/>-->
+    </xsl:template>
     
     <xsl:template match="node() | @*" mode="copy" >
         <xsl:param name="level" as="xs:integer"/>
