@@ -68,8 +68,7 @@ public class XSpecMetaTest extends XSpecViewTestBase {
     assertEquals(
         "<html xmlns:test=\"http://www.jenitennison.com/xslt/unit-test\">\n" + 
         "   <head>\n" + 
-        "      <meta http-equiv=\"Content-Type\" content=\"text/html; charset=UTF-8\">\n" + 
-        "      <link rel=\"stylesheet\" type=\"text/css\" href=\"" + css.toURI().toURL().toString()
+        "      <meta http-equiv=\"Content-Type\" content=\"text/html; charset=UTF-8\"><link rel=\"stylesheet\" type=\"text/css\" href=\"" + css.toURI().toURL().toString()
         + "\"><script type=\"text/javascript\" src=\""
         + js.toURI().toURL().toString() + "\"></script></head>\n" + 
         "   <body>\n" + 
@@ -177,8 +176,7 @@ public class XSpecMetaTest extends XSpecViewTestBase {
     assertEquals(
         "<html xmlns:test=\"http://www.jenitennison.com/xslt/unit-test\">\n" + 
         "   <head>\n" + 
-        "      <meta http-equiv=\"Content-Type\" content=\"text/html; charset=UTF-8\">\n" + 
-        "      <link rel=\"stylesheet\" type=\"text/css\" href=\"" + css.toURI().toURL().toString() + "\">"
+        "      <meta http-equiv=\"Content-Type\" content=\"text/html; charset=UTF-8\"><link rel=\"stylesheet\" type=\"text/css\" href=\"" + css.toURI().toURL().toString() + "\">"
             + "<script type=\"text/javascript\" src=\"" + js.toURI().toURL().toString() + "\"></script></head>\n" + 
         "   <body>\n" + 
         "      <div class=\"testsuite\" "
@@ -318,8 +316,7 @@ public class XSpecMetaTest extends XSpecViewTestBase {
     assertEquals(
         "<html xmlns:test=\"http://www.jenitennison.com/xslt/unit-test\">\n" + 
         "   <head>\n" + 
-        "      <meta http-equiv=\"Content-Type\" content=\"text/html; charset=UTF-8\">\n" + 
-        "      <link rel=\"stylesheet\" type=\"text/css\" href=\"" + css.toURI().toURL().toString() + "\"><script type=\"text/javascript\" src=\"" + js.toURI().toURL().toString()
+        "      <meta http-equiv=\"Content-Type\" content=\"text/html; charset=UTF-8\"><link rel=\"stylesheet\" type=\"text/css\" href=\"" + css.toURI().toURL().toString() + "\"><script type=\"text/javascript\" src=\"" + js.toURI().toURL().toString()
             + "\"></script></head>\n" + 
         "   <body>\n" + 
         "      <div class=\"testsuite\" data-name=\"Test no.1\" template-id=\"" + firstID + "\" data-source=\"" + xspecURL.toString()

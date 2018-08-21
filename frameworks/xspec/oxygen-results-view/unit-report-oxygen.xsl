@@ -9,7 +9,7 @@
                 xmlns:xhtml="http://www.w3.org/1999/xhtml"
                 xmlns:fn="http://www.w3.org/2005/xpath-functions"
                 xmlns:saxon="http://saxon.sf.net/"
-                exclude-result-prefixes="x xs test pkg xhtml fn xsl">
+                exclude-result-prefixes="x xs test pkg xhtml fn xsl saxon">
     
     <xsl:param name="report-css-uri" select="
         resolve-uri('test-report.css')"/>
@@ -184,7 +184,7 @@
                     <!-- Applies the XPath filter to get the subset of interest. -->
                     <xsl:variable name="filtered">
                         <xsl:variable name="expr" select="if (normalize-space(@select) = '/') then concat('.', @select, 'node()') else concat('.', @select)"/>
-                        <xsl:copy-of select="saxon:eval(saxon:expression($expr))"/>
+                        <xsl:evaluate xpath="$expr" context-item="."/>
                     </xsl:variable>
                     <!-- Convert to a version ready to be serialized. -->
                     <xsl:apply-templates select="$filtered" mode="copy">
