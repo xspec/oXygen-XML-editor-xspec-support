@@ -5,7 +5,7 @@
     <xt:extension xmlns:xt="http://www.oxygenxml.com/ns/extension"
         id="com.oxygenxml.xspec.XSpecSupportPlugin">
         <xt:location href="https://github.com/xspec/oXygen-XML-editor-xspec-support/releases/download/1.0.1/xspec.support-1.0.1-plugin.zip"/>
-        <xt:version>1.0.2</xt:version>
+        <xt:version>1.1.0</xt:version>
         <xt:oxy_version>18.1+</xt:oxy_version>
         <xt:type>plugin</xt:type>
         <xt:author>Alex Jitianu</xt:author>
