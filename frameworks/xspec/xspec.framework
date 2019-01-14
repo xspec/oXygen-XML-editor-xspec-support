@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<serialized version="20.1" xml:space="preserve">
+<serialized version="21.0" xml:space="preserve">
 	<serializableOrderedMap>
 		<entry>
 			<String>document.types</String>
@@ -560,7 +560,7 @@
 									<null/>
 								</field>
 								<field name="name">
-									<String>XSpec for XSLT</String>
+									<String>Run XSpec Test</String>
 								</field>
 								<field name="baseURL">
 									<null/>
@@ -647,12 +647,15 @@
 										<String>${oxygenHome}/lib/oxygenAuthorEclipse.jar</String>
 										<String>${oxygenHome}/lib/oxygenDeveloperEclipse.jar</String>
 										<String>${oxygenHome}/lib/xml-apis.jar</String>
-										<String>${oxygenHome}/lib/resolver.jar</String>
+										<String>${oxygenHome}/lib/*resolver*.jar</String>
 										<String>${oxygenHome}/lib/saxon9ee.jar</String>
 										<String>${oxygenHome}/lib/log4j.jar</String>
-										<String>${oxygenHome}/lib/xercesImpl.jar</String>
+										<String>${oxygenHome}/lib/*xerces*.jar</String>
 										<String>${oxygenHome}/lib/guava-*.jar</String>
 										<String>${oxygenHome}/lib/oxygen-basic-utilities.jar</String>
+										<String>${oxygenHome}/lib/oxygen-patched-saxon-9.jar</String>
+										<String>${oxygenHome}/lib/oxygen-patched-xerces.jar</String>
+										<String>${oxygenHome}/lib/oxygen-patched-resolver.jar</String>
 									</String-array>
 								</field>
 							</antScenario>
@@ -699,7 +702,7 @@
 												<String>Cleans up all the intermediate files created by the unit process. Set in to false if you want to inspect these files.</String>
 											</field>
 											<field name="value">
-												<String>true</String>
+												<String>false</String>
 											</field>
 											<field name="defaultValue">
 												<null/>
@@ -1036,10 +1039,13 @@
 										<String>${oxygenHome}/lib/oxygenDeveloperEclipse.jar</String>
 										<String>${oxygenHome}/lib/oxygen-basic-utilities.jar</String>
 										<String>${oxygenHome}/lib/xml-apis.jar</String>
-										<String>${oxygenHome}/lib/resolver.jar</String>
+										<String>${oxygenHome}/lib/*resolver*.jar</String>
 										<String>${oxygenHome}/lib/saxon9ee.jar</String>
 										<String>${oxygenHome}/lib/log4j.jar</String>
-										<String>${oxygenHome}/lib/xercesImpl.jar</String>
+										<String>${oxygenHome}/lib/*xerces*.jar</String>
+										<String>${oxygenHome}/lib/oxygen-patched-saxon-9.jar</String>
+										<String>${oxygenHome}/lib/oxygen-patched-xerces.jar</String>
+										<String>${oxygenHome}/lib/oxygen-patched-resolver.jar</String>
 									</String-array>
 								</field>
 							</antScenario>
@@ -1053,7 +1059,7 @@
 					</field>
 					<field name="defaultTransformationScenarios">
 						<list>
-							<String>XSpec for XSLT</String>
+							<String>Run XSpec Test</String>
 						</list>
 					</field>
 					<field name="extensionsBundleClassName">

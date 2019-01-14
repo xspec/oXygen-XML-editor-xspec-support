@@ -14,6 +14,8 @@ import javax.xml.transform.stream.StreamSource;
 
 import org.xml.sax.InputSource;
 
+import com.oxygenxml.xspec.XSpecUtil;
+
 import net.sf.saxon.TransformerFactoryImpl;
 import ro.sync.util.URLUtil;
 
@@ -69,6 +71,7 @@ public class SchematronXSpecTest extends XSpecViewTestBase {
     URL xspecModuleURL = getClass().getClassLoader().getResource("schematron/demo-module.xspec");
     
     URL xmlURL = getClass().getClassLoader().getResource("schematron/demo.xml");
+    URL schURL = new File(URLUtil.getCanonicalFileFromFileUrl(xmlURL).getParentFile(), "demo.sch").toURI().toURL();
     URL schCompiledURL = new File(URLUtil.getCanonicalFileFromFileUrl(xmlURL).getParentFile(), "demo.sch-compiled.xsl").toURI().toURL();
     File xspecFile = URLUtil.getCanonicalFileFromFileUrl(xspecURL);
     File outputFile = new File(xspecFile.getParentFile(), "demo-report.html");
@@ -79,6 +82,12 @@ public class SchematronXSpecTest extends XSpecViewTestBase {
     String replaceAll = read(xmlFormatOutput.toURI().toURL()).toString().replaceAll("date=\".*\"", "date=\"XXX\"").replaceAll("<\\?xml-stylesheet.*\\?>", "");
     replaceAll = replaceAll.replace('\u0009', ' ').replace('\u00A0', ' ');
     
+    // XSpecUtil.generateId("No escaping bad(0)")
+    
+    // demo-02
+    
+    System.out.println("+++++ " + XSpecUtil.generateId("demo-02(0)"));
+    
     assertEquals("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" + 
         "\n" + 
         "<x:report xmlns:xsl=\"http://www.w3.org/1999/XSL/Transform\"\n" + 
@@ -87,17 +96,16 @@ public class SchematronXSpecTest extends XSpecViewTestBase {
         "          xmlns:x=\"http://www.jenitennison.com/xslt/xspec\"\n" + 
         "          xmlns:svrl=\"http://purl.oclc.org/dsdl/svrl\"\n" + 
         "          stylesheet=\"" + schCompiledURL.toString() + "\"\n" + 
-        "          date=\"XXX\">\n" + 
-        "   <x:scenario source=\""  + xspecURL.toString() + "-compiled.xspec\"\n" + 
-        "               template-id=\"x9ae5aa33-d58b-3195-b9e3-8a2b85dd7771\">\n" + 
-        "      <x:label>Schematron: \"demo.sch\"</x:label>\n" + 
-        "   </x:scenario>\n" + 
+        "          date=\"XXX\"\n" +
+        "          xspec=\"" + xspecURL.toExternalForm() + "\"\n" + 
+        "          schematron=\"" + schURL.toExternalForm() + "\">\n" + 
         "   <x:scenario source=\"" + xspecModuleURL.toString() + "\"\n" + 
-        "               template-id=\"xcc306880-76c5-3770-9bc7-ec063845d822\">\n" + 
+        "               template-id=\"" + XSpecUtil.generateId("demo-02(0)") + "\">\n" + 
         "      <x:label>demo-02</x:label>\n" + 
         "      <x:context href=\"" + xmlURL.toString() + "\"/>\n" + 
         "      <x:scenario source=\"" + xspecModuleURL.toString() + "\"\n" + 
-        "                  template-id=\"x19ca6324-6d67-3c11-bb75-0f0633a22428\">\n" + 
+        "                  template-id=\"" + XSpecUtil.generateId("demo-02(0) / article should have a title(0)")
+        + "\">\n" + 
         "         <x:label>article should have a title</x:label>\n" + 
         "         <x:result>\n" + 
         "            <svrl:schematron-output xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\"\n" + 
@@ -127,7 +135,8 @@ public class SchematronXSpecTest extends XSpecViewTestBase {
         "         </x:test>\n" + 
         "      </x:scenario>\n" + 
         "      <x:scenario source=\"" + xspecModuleURL.toString() + "\"\n" + 
-        "                  template-id=\"x022d17af-b3c5-3f4f-91ac-ed81ebe64e9d\">\n" + 
+        "                  template-id=\"" + XSpecUtil.generateId("demo-02(0) / section should have a title(1)")
+        + "\">\n" + 
         "         <x:label>section should have a title</x:label>\n" + 
         "         <x:result>\n" + 
         "            <svrl:schematron-output xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\"\n" + 
@@ -162,11 +171,12 @@ public class SchematronXSpecTest extends XSpecViewTestBase {
         "      </x:scenario>\n" + 
         "   </x:scenario>\n" + 
         "   <x:scenario source=\"" + xspecURL.toString() + "\"\n" + 
-        "               template-id=\"x6e823221-abc6-39f3-9fe0-74456261d735\">\n" + 
+        "               template-id=\"" + XSpecUtil.generateId("demo-01(1)") + "\">\n" + 
         "      <x:label>demo-01</x:label>\n" + 
         "      <x:context href=\"" + xmlURL.toString() + "\"/>\n" + 
         "      <x:scenario source=\"" + xspecURL.toString() + "\"\n" + 
-        "                  template-id=\"xb05ec4a7-67c6-3e67-a5d2-51a8182115a5\">\n" + 
+        "                  template-id=\"" + XSpecUtil.generateId("demo-01(1) / article should have a title(0)")
+        + "\">\n" + 
         "         <x:label>article should have a title</x:label>\n" + 
         "         <x:result>\n" + 
         "            <svrl:schematron-output xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\"\n" + 
@@ -207,6 +217,8 @@ public class SchematronXSpecTest extends XSpecViewTestBase {
     File js = new File("frameworks/xspec/oxygen-results-view/test-report.js");
     
     
+    String expected = read(outputFile.toURI().toURL()).toString();
+    expected = expected.replaceAll("template-id=\".*?\"", "template-id=\"\"");
     assertEquals(
         "<html xmlns:test=\"http://www.jenitennison.com/xslt/unit-test\">\n" + 
         "   <head>\n" + 
@@ -214,18 +226,15 @@ public class SchematronXSpecTest extends XSpecViewTestBase {
         + "\"><script type=\"text/javascript\" src=\""
         + js.toURI().toURL().toString() + "\"></script></head>\n" + 
         "   <body>\n" + 
-        "      <div class=\"testsuite\" data-name=\"Schematron: &#34;demo.sch&#34;\" template-id=\"x9ae5aa33-d58b-3195-b9e3-8a2b85dd7771\" data-source=\"" + xspecURL.toString() + "-compiled.xspec\" data-tests=\"0\" data-failures=\"0\">\n" + 
-        "         <p style=\"margin:0px;\"><span>Schematron: \"demo.sch\"</span><span>&nbsp;</span><a class=\"button\" onclick=\"runScenario(this)\">Run</a></p>\n" + 
-        "      </div>\n" + 
-        "      <div class=\"testsuite\" data-name=\"demo-02\" template-id=\"xcc306880-76c5-3770-9bc7-ec063845d822\" data-source=\"" + xspecModuleURL.toString()  + "\" data-tests=\"3\" data-failures=\"0\">\n" + 
+        "      <div class=\"testsuite\" data-name=\"demo-02\" template-id=\"\" data-source=\"" + xspecModuleURL.toString()  + "\" data-tests=\"3\" data-failures=\"0\">\n" + 
         "         <p style=\"margin:0px;\"><span>demo-02</span><span>&nbsp;</span><a class=\"button\" onclick=\"runScenario(this)\">Run</a></p>\n" + 
-        "         <div class=\"testsuite\" data-name=\"article should have a title\" template-id=\"x19ca6324-6d67-3c11-bb75-0f0633a22428\" data-source=\"" + xspecModuleURL.toString() + "\" data-tests=\"1\" data-failures=\"0\">\n" + 
+        "         <div class=\"testsuite\" data-name=\"article should have a title\" template-id=\"\" data-source=\"" + xspecModuleURL.toString() + "\" data-tests=\"1\" data-failures=\"0\">\n" + 
         "            <p style=\"margin:0px;\"><span>article should have a title</span><span>&nbsp;</span><a class=\"button\" onclick=\"runScenario(this)\">Run</a></p>\n" + 
         "            <div class=\"testcase\" data-name=\"Some other thing not assert a001\">\n" + 
         "               <p class=\"passed\"><span class=\"test-passed\" onclick=\"toggleResult(this)\">Some other thing not assert a001</span><span>&nbsp;</span><a class=\"button\" onclick=\"showTest(this)\">Show</a></p>\n" + 
         "            </div>\n" + 
         "         </div>\n" + 
-        "         <div class=\"testsuite\" data-name=\"section should have a title\" template-id=\"x022d17af-b3c5-3f4f-91ac-ed81ebe64e9d\" data-source=\"" + xspecModuleURL.toString() + "\" data-tests=\"2\" data-failures=\"0\">\n" + 
+        "         <div class=\"testsuite\" data-name=\"section should have a title\" template-id=\"\" data-source=\"" + xspecModuleURL.toString() + "\" data-tests=\"2\" data-failures=\"0\">\n" + 
         "            <p style=\"margin:0px;\"><span>section should have a title</span><span>&nbsp;</span><a class=\"button\" onclick=\"runScenario(this)\">Run</a></p>\n" + 
         "            <div class=\"testcase\" data-name=\"Do a thing not assert a002 /article[1]/section[1]\">\n" + 
         "               <p class=\"passed\"><span class=\"test-passed\" onclick=\"toggleResult(this)\">Do a thing not assert a002 /article[1]/section[1]</span><span>&nbsp;</span><a class=\"button\" onclick=\"showTest(this)\">Show</a></p>\n" + 
@@ -235,9 +244,9 @@ public class SchematronXSpecTest extends XSpecViewTestBase {
         "            </div>\n" + 
         "         </div>\n" + 
         "      </div>\n" + 
-        "      <div class=\"testsuite\" data-name=\"demo-01\" template-id=\"x6e823221-abc6-39f3-9fe0-74456261d735\" data-source=\"" + xspecURL.toString() + "\" data-tests=\"1\" data-failures=\"0\">\n" + 
+        "      <div class=\"testsuite\" data-name=\"demo-01\" template-id=\"\" data-source=\"" + xspecURL.toString() + "\" data-tests=\"1\" data-failures=\"0\">\n" + 
         "         <p style=\"margin:0px;\"><span>demo-01</span><span>&nbsp;</span><a class=\"button\" onclick=\"runScenario(this)\">Run</a></p>\n" + 
-        "         <div class=\"testsuite\" data-name=\"article should have a title\" template-id=\"xb05ec4a7-67c6-3e67-a5d2-51a8182115a5\" data-source=\"" + xspecURL.toString() + "\" data-tests=\"1\" data-failures=\"0\">\n" + 
+        "         <div class=\"testsuite\" data-name=\"article should have a title\" template-id=\"\" data-source=\"" + xspecURL.toString() + "\" data-tests=\"1\" data-failures=\"0\">\n" + 
         "            <p style=\"margin:0px;\"><span>article should have a title</span><span>&nbsp;</span><a class=\"button\" onclick=\"runScenario(this)\">Run</a></p>\n" + 
         "            <div class=\"testcase\" data-name=\"Some other thing not assert a001\">\n" + 
         "               <p class=\"passed\"><span class=\"test-passed\" onclick=\"toggleResult(this)\">Some other thing not assert a001</span><span>&nbsp;</span><a class=\"button\" onclick=\"showTest(this)\">Show</a></p>\n" + 
@@ -245,7 +254,7 @@ public class SchematronXSpecTest extends XSpecViewTestBase {
         "         </div>\n" + 
         "      </div>\n" + 
         "   </body>\n" + 
-        "</html>", read(outputFile.toURI().toURL()).toString());
+        "</html>", expected);
     
   }
   

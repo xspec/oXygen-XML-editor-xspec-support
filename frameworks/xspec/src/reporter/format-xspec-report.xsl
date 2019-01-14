@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- ===================================================================== -->
 <!--  File:       format-xspec-report.xsl                                  -->
-<!--  Author:     Jeni Tennsion                                            -->
+<!--  Author:     Jeni Tennison                                            -->
 <!--  Tags:                                                                -->
-<!--    Copyright (c) 2008, 2010 Jeni Tennsion (see end of file.)          -->
+<!--    Copyright (c) 2008, 2010 Jeni Tennison (see end of file.)          -->
 <!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
 
 
@@ -128,7 +128,7 @@
     <head>
       <title>
          <xsl:text>Test Report for </xsl:text>
-         <xsl:value-of select="x:report/test:format-URI(@stylesheet|@query)"/>
+         <xsl:value-of select="x:report/test:format-URI((@schematron,@stylesheet,@query)[1])"/>
          <xsl:text> (</xsl:text>
          <xsl:call-template name="x:totals">
             <xsl:with-param name="tests" select="//x:scenario/x:test"/>
@@ -159,10 +159,16 @@
 
 <xsl:template match="x:report" mode="x:html-report">
   <p>
-     <xsl:value-of select="if ( exists(@query) ) then 'Query: ' else 'Stylesheet: '"/>
-     <a href="{ @stylesheet|@query }">
-        <xsl:value-of select="test:format-URI(@stylesheet|@query)"/>
+     <xsl:value-of select="if ( exists(@schematron) ) then 'Schematron: ' else if ( exists(@query) ) then 'Query: ' else 'Stylesheet: '"/>
+     <a href="{ (@schematron, @stylesheet, @query)[1] }">
+       <xsl:value-of select="test:format-URI((@schematron, @stylesheet, @query)[1])"/>
      </a>
+  </p>
+  <p>
+    <xsl:text>XSpec: </xsl:text>
+    <a href="{@xspec}">
+      <xsl:value-of select="test:format-URI(@xspec)"/>
+    </a>
   </p>
   <p>
     <xsl:text>Tested: </xsl:text>
@@ -384,7 +390,7 @@
 <!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
 <!-- DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS COMMENT.             -->
 <!--                                                                       -->
-<!-- Copyright (c) 2008, 2010 Jeni Tennsion                                -->
+<!-- Copyright (c) 2008, 2010 Jeni Tennison                                -->
 <!--                                                                       -->
 <!-- The contents of this file are subject to the MIT License (see the URI -->
 <!-- http://www.opensource.org/licenses/mit-license.php for details).      -->

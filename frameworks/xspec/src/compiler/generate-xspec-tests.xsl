@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- ===================================================================== -->
 <!--  File:       generate-xspec-tests.xsl                                 -->
-<!--  Author:     Jeni Tennsion                                            -->
+<!--  Author:     Jeni Tennison                                            -->
 <!--  Tags:                                                                -->
-<!--    Copyright (c) 2008, 2010 Jeni Tennsion (see end of file.)          -->
+<!--    Copyright (c) 2008, 2010 Jeni Tennison (see end of file.)          -->
 <!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
 
 
@@ -81,6 +81,8 @@
 	        test stylesheet, which can then be picked up by stylesheets that
 	        process *that* to generate a coverage report -->
 	      <x:report stylesheet="{{$x:stylesheet-uri}}" date="{{current-dateTime()}}">
+	        <xsl:attribute name="xspec" select="(@xspec-original-location, $base-uri)[1]"/>
+	        <xsl:copy-of select="@schematron"/>
                  <!-- Generate calls to the compiled top-level scenarios. -->
                  <xsl:call-template name="x:call-scenarios"/>
 	      </x:report>
@@ -477,7 +479,7 @@
 <!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
 <!-- DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS COMMENT.             -->
 <!--                                                                       -->
-<!-- Copyright (c) 2008, 2010 Jeni Tennsion                                -->
+<!-- Copyright (c) 2008, 2010 Jeni Tennison                                -->
 <!--                                                                       -->
 <!-- The contents of this file are subject to the MIT License (see the URI -->
 <!-- http://www.opensource.org/licenses/mit-license.php for details).      -->

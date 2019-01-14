@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- ===================================================================== -->
 <!--  File:       generate-query-tests.xsl                                 -->
-<!--  Author:     Jeni Tennsion                                            -->
+<!--  Author:     Jeni Tennison                                            -->
 <!--  URL:        http://github.com/xspec/xspec                            -->
 <!--  Tags:                                                                -->
-<!--    Copyright (c) 2008, 2010 Jeni Tennsion (see end of file.)          -->
+<!--    Copyright (c) 2008, 2010 Jeni Tennison (see end of file.)          -->
 <!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
 
 
@@ -113,6 +113,7 @@
          <xsl:if test="exists($query-at)">
             <xsl:attribute name="query-at" select="$query-at"/>
          </xsl:if>
+         <xsl:attribute name="xspec" select="$base-uri"/>
          <xsl:text> {&#10;</xsl:text>
          <!-- Generate calls to the compiled top-level scenarios. -->
          <xsl:call-template name="x:call-scenarios"/>
@@ -447,7 +448,7 @@
 <!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
 <!-- DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS COMMENT.             -->
 <!--                                                                       -->
-<!-- Copyright (c) 2008, 2010 Jeni Tennsion                                -->
+<!-- Copyright (c) 2008, 2010 Jeni Tennison                                -->
 <!--                                                                       -->
 <!-- The contents of this file are subject to the MIT License (see the URI -->
 <!-- http://www.opensource.org/licenses/mit-license.php for details).      -->

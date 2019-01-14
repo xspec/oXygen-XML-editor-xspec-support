@@ -39,7 +39,8 @@ public class XSpecMetaTest extends XSpecViewTestBase {
         "          xmlns:x=\"http://www.jenitennison.com/xslt/xspec\"\n" + 
         "          xmlns:functx=\"http://www.functx.com\"\n" + 
         "          stylesheet=\"" + xslURL.toString() + "\"\n" + 
-        "          date=\"XXX\">\n" + 
+        "          date=\"XXX\"\n" + 
+        "          xspec=\"" + xspecURL.toExternalForm() + "\">\n" + 
         // The source attribute is present.
         // To ensure back mapping we need to remember in which file a scenario was defined.
         "   <x:scenario source=\"" + xspecURL.toString() + "\"\n" + 
@@ -115,7 +116,8 @@ public class XSpecMetaTest extends XSpecViewTestBase {
         "          xmlns:x=\"http://www.jenitennison.com/xslt/xspec\"\n" + 
         "          xmlns:functx=\"http://www.functx.com\"\n" + 
         "          stylesheet=\"" + xslURL.toString() + "\"\n" + 
-        "          date=\"XXX\">\n" + 
+        "          date=\"XXX\"\n" +
+        "          xspec=\"" + xspecURL.toExternalForm() + "\">\n" + 
         "   <x:scenario source=\"" + xspecFile.toURI().toURL().toString() + "\"\n" + 
             "               template-id=\"" + firstID + "\">\n" + 
         "      <x:label>When processing a list of phrases</x:label>\n" + 
@@ -279,7 +281,8 @@ public class XSpecMetaTest extends XSpecViewTestBase {
         "          xmlns:x=\"http://www.jenitennison.com/xslt/xspec\"\n" + 
         "          xmlns:functx=\"http://www.functx.com\"\n" + 
         "          stylesheet=\"" + xslURL.toString() + "\"\n" + 
-        "          date=\"XXX\">\n" + 
+        "          date=\"XXX\"\n" +
+        "          xspec=\"" + xspecURL.toExternalForm() + "\">\n" + 
         "   <x:scenario source=\"" + xspecURL.toString() + "\"\n" + 
             "               template-id=\"" + firstID + "\">\n" + 
         "      <x:label>Test no.1</x:label>\n" + 
