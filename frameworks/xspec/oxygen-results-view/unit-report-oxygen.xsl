@@ -221,8 +221,17 @@
     
     <!-- Wrapper for significant spaces. -->
     <xsl:template match="test:ws" mode="copy">
-      <!--<xsl:value-of select="text()"/>-->
-    </xsl:template>
+      <xsl:analyze-string select="." regex="\s">
+        <xsl:matching-substring>
+          <xsl:choose>
+            <xsl:when test=". = '&#xA;'">\n</xsl:when>
+            <xsl:when test=". = '&#xD;'">\r</xsl:when>
+            <xsl:when test=". = '&#x9;'">\t</xsl:when>
+            <xsl:when test=". = ' '">.</xsl:when>
+          </xsl:choose>
+        </xsl:matching-substring>
+      </xsl:analyze-string>
+</xsl:template>
     
     <xsl:template match="node() | @*" mode="copy" >
         <xsl:param name="level" as="xs:integer"/>

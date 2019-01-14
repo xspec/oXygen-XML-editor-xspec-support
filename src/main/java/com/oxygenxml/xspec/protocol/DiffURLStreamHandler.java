@@ -42,7 +42,7 @@ public class DiffURLStreamHandler extends URLStreamHandler {
       String fragment = DiffFragmentRepository.getInstance().getFragment(url);
       if (fragment == null) {
         // Unable 
-        throw new IOException("Unable to get the content");
+        throw new IOException("Unable to get the content for: " + url);
       }
       
       return new ByteArrayInputStream(fragment.getBytes("UTF-8"));
