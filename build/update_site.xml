@@ -5,7 +5,7 @@
     <xt:extension xmlns:xt="http://www.oxygenxml.com/ns/extension"
         id="com.oxygenxml.xspec.XSpecSupportPlugin">
         <xt:location href="https://github.com/xspec/oXygen-XML-editor-xspec-support/releases/download/1.0.1/xspec.support-1.0.1-plugin.zip"/>
-        <xt:version>1.0.1</xt:version>
+        <xt:version>1.0.2</xt:version>
         <xt:oxy_version>18.1+</xt:oxy_version>
         <xt:type>plugin</xt:type>
         <xt:author>Alex Jitianu</xt:author>
@@ -19,6 +19,14 @@
 			<p>This add-on contributes an <b>XSpec Test Results</b> view that provides the ability to run XSpec test scenarios and view the results directly in Oxygen. To use the new view, after installation, open an XSpec file and click the <b>Run XSpec test scenarios</b> button on the toolbar.</p>
                     <p style="color:red">This plugin also requires the <b>XSpec Framework</b>. Please install them both.</p>
   	        </div>
+		<div>    
+		    <h3>What's new in version 1.0.2</h3>
+		    <ol>
+		        <li>Comes bundled with XSpec version 1.1.0.</li>
+		        <li>Unwraps test:ws and replaces its whitespaceswith specific markers.</li>
+		        <li>The execution fails if any of its XSLT transformations fail.</li>
+		    </ol>
+		</div>
 		<div>    
 		            <h3>What's new in version 1.0.0</h3>
 		            <ol>
