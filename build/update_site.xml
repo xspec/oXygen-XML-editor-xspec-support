@@ -20,7 +20,7 @@
                     <p style="color:red">This plugin also requires the <b>XSpec Framework</b>. Please install them both.</p>
   	        </div>
 		<div>    
-		    <h3>What's new in version 1.0.2</h3>
+		    <h3>What's new in version 1.1.0</h3>
 		    <ol>
 		        <li>Comes bundled with XSpec version 1.1.0.</li>
 		        <li>Unwraps test:ws and replaces its whitespaceswith specific markers.</li>
