@@ -5,7 +5,7 @@
 <plugin
  id="com.oxygenxml.xspec.XSpecSupportPlugin"
  name="XSpec Helper View"
- description="This plugin contributes an "XSpec Test Results" view that provides the ability to run XSpec test scenarios and view the results directly in Oxygen." 
+ description="This plugin contributes an 'XSpec Test Results' view that provides the ability to run XSpec test scenarios and view the results directly in Oxygen." 
  version="${project.version}"
  vendor="Alex Jitianu"
  class="com.oxygenxml.xspec.XSpecSupportPlugin"
