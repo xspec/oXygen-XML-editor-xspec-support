@@ -31,7 +31,7 @@
     <xd:param name="xslt-version"></xd:param>
   </xd:doc>
   <xsl:template match="x:scenario" mode="x:gather-specs">
-    <xsl:param name="xslt-version" as="xs:string" tunnel="yes" required="yes"/>
+    <xsl:param name="xslt-version" as="xs:decimal" tunnel="yes" required="yes"/>
     <!-- 
       
       Oxygen Patch START 
