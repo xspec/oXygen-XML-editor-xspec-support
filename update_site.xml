@@ -19,15 +19,28 @@
 			<p>This add-on contributes an <b>XSpec Test Results</b> view that provides the ability to run XSpec test scenarios and view the results directly in Oxygen. To use the new view, after installation, open an XSpec file and click the <b>Run XSpec test scenarios</b> button on the toolbar.</p>
                     <p style="color:red">This plugin also requires the <b>XSpec Framework</b>. Please install them both.</p>
   	        </div>
-		<div>    
-		            <h3>What's new in version 1.0.0</h3>
-		            <ol>
-		               <li>Comes bundled with XSpec version 1.0.0.</li>
-		               <li>The plugin can now execute Schematron tests.</li>
-		               <li>Activating an Oxygen dark theme will also reflect in the view.</li>
-			       <li>The possibility to rerun only the failed scenario.</li>
-		            </ol>
-		         </div>
+            <div>    
+                <h3>What's new in version 1.2.1</h3>
+                <ol>
+                    <li>Fixed bug that didn't allow running XSpec scenarios that needed Saxon EE.</li>
+                </ol>
+            </div>
+            <div>    
+                <h3>What's new in version 1.2.0</h3>
+                <ol>
+                    <li>Comes bundled with XSpec version 1.2.0.</li>
+                    <li>Better handling of witespaces in when presenting the diff. <a href="https://github.com/xspec/oXygen-XML-editor-xspec-support/issues/29">#29</a></li>
+                </ol>
+            </div>
+            <div>    
+                <h3>What's new in version 1.0.0</h3>
+                <ol>
+                   <li>Comes bundled with XSpec version 1.0.0.</li>
+                   <li>The plugin can now execute Schematron tests.</li>
+                   <li>Activating an Oxygen dark theme will also reflect in the view.</li>
+                   <li>The possibility to rerun only the failed scenario.</li>
+                </ol>
+             </div>
             </body>
         </html>
         </xt:description>
