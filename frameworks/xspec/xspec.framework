@@ -1050,6 +1050,7 @@
 										<String>${oxygenHome}/lib/oxygen-patched-resolver.jar</String>
 										<String>${oxygenHome}/lib/oxygen-sandbox.jar</String>
 										<String>${oxygenHome}/lib/oxygen-license.jar</String>
+										<String>${oxygenHome}/lib/guava-*.jar</String>
 									</String-array>
 								</field>
 							</antScenario>
