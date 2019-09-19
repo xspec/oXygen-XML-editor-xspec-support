@@ -37,15 +37,17 @@ public class XSpecVariablesResolver extends EditorVariablesResolver {
   @Override
   public String resolveEditorVariables(String contentWithEditorVariables,
       String currentEditedFileURL) {
-    String tpl = "";
-    if (templateNames != null) {
-      tpl = templateNames;
+    if (contentWithEditorVariables != null) {
+      String tpl = "";
+      if (templateNames != null) {
+        tpl = templateNames;
+      }
+
+      contentWithEditorVariables = contentWithEditorVariables.replace(TEMPLATE_NAME_VAR, tpl);
+
+      contentWithEditorVariables = contentWithEditorVariables.replace(SKIP_COMPILE_VAR, String.valueOf(skipCompilation));
     }
     
-    String expr = contentWithEditorVariables.replace(TEMPLATE_NAME_VAR, tpl);
-    
-    expr = expr.replace(SKIP_COMPILE_VAR, String.valueOf(skipCompilation));
-    
-    return expr;
+    return contentWithEditorVariables;
   }
 }
