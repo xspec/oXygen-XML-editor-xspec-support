@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<serialized version="21.0" xml:space="preserve">
+<serialized version="22.1" xml:space="preserve">
 	<serializableOrderedMap>
 		<entry>
 			<String>document.types</String>
@@ -294,9 +294,6 @@
 								<field name="openInBrowser">
 									<Boolean>false</Boolean>
 								</field>
-								<field name="outputFile">
-									<null/>
-								</field>
 								<field name="outputResource">
 									<null/>
 								</field>
@@ -403,7 +400,7 @@
 												<String></String>
 											</field>
 											<field name="value">
-												<String>${xpath_eval(if(doc('${currentFileURL}')/*:description/@schematron) then 's' else 't')}</String>
+												<String>${xpath_eval(((doc('${currentFileURL}')!*:description!(@query,@schematron)!substring(name(),1,1)),'t')[1])}</String>
 											</field>
 											<field name="defaultValue">
 												<null/>
@@ -469,7 +466,7 @@
 												<String>xspec.result.html</String>
 											</field>
 											<field name="description">
-												<String>The location where the result will be copied.</String>
+												<String>The file path where the test result HTML will be created.</String>
 											</field>
 											<field name="value">
 												<String>${cfd}/${cfn}-result.html</String>
@@ -598,9 +595,6 @@
 								<field name="openInBrowser">
 									<Boolean>true</Boolean>
 								</field>
-								<field name="outputFile">
-									<null/>
-								</field>
 								<field name="outputResource">
 									<null/>
 								</field>
@@ -640,24 +634,21 @@
 								<field name="extensionURLs">
 									<String-array>
 										<String>${oxygenHome}/classes</String>
+										<String>${oxygenHome}/lib/oxygenCommons.jar</String>
 										<String>${oxygenHome}/lib/oxygen.jar</String>
-										<String>${oxygenHome}/lib/oxygenAuthor.jar</String>
 										<String>${oxygenHome}/lib/oxygenDeveloper.jar</String>
 										<String>${oxygenHome}/lib/oxygenEclipse.jar</String>
-										<String>${oxygenHome}/lib/oxygenAuthorEclipse.jar</String>
 										<String>${oxygenHome}/lib/oxygenDeveloperEclipse.jar</String>
-										<String>${oxygenHome}/lib/xml-apis.jar</String>
-										<String>${oxygenHome}/lib/*resolver*.jar</String>
-										<String>${oxygenHome}/lib/saxon9ee.jar</String>
-										<String>${oxygenHome}/lib/log4j.jar</String>
-										<String>${oxygenHome}/lib/*xerces*.jar</String>
-										<String>${oxygenHome}/lib/guava-*.jar</String>
-										<String>${oxygenHome}/lib/oxygen-basic-utilities.jar</String>
-										<String>${oxygenHome}/lib/oxygen-patched-saxon-9.jar</String>
-										<String>${oxygenHome}/lib/oxygen-patched-xerces.jar</String>
-										<String>${oxygenHome}/lib/oxygen-patched-resolver.jar</String>
 										<String>${oxygenHome}/lib/oxygen-sandbox.jar</String>
 										<String>${oxygenHome}/lib/oxygen-license.jar</String>
+										<String>${oxygenHome}/lib/oxygen-basic-utilities.jar</String>
+										<String>${oxygenHome}/lib/oxygen-editor-variables-parser.jar</String>
+										<String>${oxygenHome}/lib/xml-apis.jar</String>
+										<String>${oxygenHome}/lib/*resolver*.jar</String>
+										<String>${oxygenHome}/lib/*saxon*9*.jar</String>
+										<String>${oxygenHome}/lib/*log4j*.jar</String>
+										<String>${oxygenHome}/lib/*xerces*.jar</String>
+										<String>${oxygenHome}/lib/guava-*.jar</String>
 									</String-array>
 								</field>
 							</antScenario>
@@ -721,36 +712,13 @@
 										</antParameter>
 										<antParameter>
 											<field name="name">
-												<String>compile.xspec.xsl</String>
+												<String>ext.xspec.compiler.xsl</String>
 											</field>
 											<field name="description">
 												<String>The XSLT that processes the XSPEC file into XSLT.</String>
 											</field>
 											<field name="value">
 												<String>${frameworkDir}/oxygen-results-view/generate-xspec-tests-oxygen.xsl</String>
-											</field>
-											<field name="defaultValue">
-												<null/>
-											</field>
-											<field name="type">
-												<Integer>5</Integer>
-											</field>
-											<field name="possibleValues">
-												<null/>
-											</field>
-											<field name="possibleValuesDescriptions">
-												<null/>
-											</field>
-										</antParameter>
-										<antParameter>
-											<field name="name">
-												<String>format.xspec.report</String>
-											</field>
-											<field name="description">
-												<String></String>
-											</field>
-											<field name="value">
-												<String>${frameworkDir}/oxygen-results-view/unit-report-oxygen.xsl</String>
 											</field>
 											<field name="defaultValue">
 												<null/>
@@ -797,6 +765,29 @@
 											</field>
 											<field name="value">
 												<String>false</String>
+											</field>
+											<field name="defaultValue">
+												<null/>
+											</field>
+											<field name="type">
+												<Integer>5</Integer>
+											</field>
+											<field name="possibleValues">
+												<null/>
+											</field>
+											<field name="possibleValuesDescriptions">
+												<null/>
+											</field>
+										</antParameter>
+										<antParameter>
+											<field name="name">
+												<String>xspec.html.reporter.xsl</String>
+											</field>
+											<field name="description">
+												<String></String>
+											</field>
+											<field name="value">
+												<String>${frameworkDir}/oxygen-results-view/unit-report-oxygen.xsl</String>
 											</field>
 											<field name="defaultValue">
 												<null/>
@@ -991,9 +982,6 @@
 								<field name="openInBrowser">
 									<Boolean>false</Boolean>
 								</field>
-								<field name="outputFile">
-									<null/>
-								</field>
 								<field name="outputResource">
 									<null/>
 								</field>
@@ -1033,23 +1021,20 @@
 								<field name="extensionURLs">
 									<String-array>
 										<String>${oxygenHome}/classes</String>
+										<String>${oxygenHome}/lib/oxygenCommons.jar</String>
 										<String>${oxygenHome}/lib/oxygen.jar</String>
-										<String>${oxygenHome}/lib/oxygenAuthor.jar</String>
 										<String>${oxygenHome}/lib/oxygenDeveloper.jar</String>
 										<String>${oxygenHome}/lib/oxygenEclipse.jar</String>
-										<String>${oxygenHome}/lib/oxygenAuthorEclipse.jar</String>
 										<String>${oxygenHome}/lib/oxygenDeveloperEclipse.jar</String>
-										<String>${oxygenHome}/lib/oxygen-basic-utilities.jar</String>
-										<String>${oxygenHome}/lib/xml-apis.jar</String>
-										<String>${oxygenHome}/lib/*resolver*.jar</String>
-										<String>${oxygenHome}/lib/saxon9ee.jar</String>
-										<String>${oxygenHome}/lib/log4j.jar</String>
-										<String>${oxygenHome}/lib/*xerces*.jar</String>
-										<String>${oxygenHome}/lib/oxygen-patched-saxon-9.jar</String>
-										<String>${oxygenHome}/lib/oxygen-patched-xerces.jar</String>
-										<String>${oxygenHome}/lib/oxygen-patched-resolver.jar</String>
 										<String>${oxygenHome}/lib/oxygen-sandbox.jar</String>
 										<String>${oxygenHome}/lib/oxygen-license.jar</String>
+										<String>${oxygenHome}/lib/oxygen-basic-utilities.jar</String>
+										<String>${oxygenHome}/lib/oxygen-editor-variables-parser.jar</String>
+										<String>${oxygenHome}/lib/xml-apis.jar</String>
+										<String>${oxygenHome}/lib/*resolver*.jar</String>
+										<String>${oxygenHome}/lib/*saxon*9*.jar</String>
+										<String>${oxygenHome}/lib/*log4j*.jar</String>
+										<String>${oxygenHome}/lib/*xerces*.jar</String>
 										<String>${oxygenHome}/lib/guava-*.jar</String>
 									</String-array>
 								</field>

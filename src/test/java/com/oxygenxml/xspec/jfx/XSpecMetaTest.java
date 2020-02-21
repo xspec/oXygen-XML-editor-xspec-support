@@ -33,9 +33,8 @@ public class XSpecMetaTest extends XSpecViewTestBase {
     
     File xmlFormatOutput = new File(xspecFile.getParentFile(), "xspec/escape-for-regex-result.xml");
     assertEquals("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n\n" + 
-        "<x:report xmlns:xsl=\"http://www.w3.org/1999/XSL/Transform\"\n" + 
+        "<x:report xmlns:test=\"http://www.jenitennison.com/xslt/unit-test\"\n" + 
         "          xmlns:xs=\"http://www.w3.org/2001/XMLSchema\"\n" + 
-        "          xmlns:test=\"http://www.jenitennison.com/xslt/unit-test\"\n" + 
         "          xmlns:x=\"http://www.jenitennison.com/xslt/xspec\"\n" + 
         "          xmlns:functx=\"http://www.functx.com\"\n" + 
         "          stylesheet=\"" + xslURL.toString() + "\"\n" + 
@@ -67,7 +66,7 @@ public class XSpecMetaTest extends XSpecViewTestBase {
     
     
     assertEquals(
-        "<html xmlns:test=\"http://www.jenitennison.com/xslt/unit-test\">\n" + 
+        "<html>\n" + 
         "   <head>\n" + 
         "      <meta http-equiv=\"Content-Type\" content=\"text/html; charset=UTF-8\"><link rel=\"stylesheet\" type=\"text/css\" href=\"" + css.toURI().toURL().toString()
         + "\"><script type=\"text/javascript\" src=\""
@@ -84,7 +83,7 @@ public class XSpecMetaTest extends XSpecViewTestBase {
         "         </div>\n" + 
         "      </div>\n" + 
         "   </body>\n" + 
-        "</html>", read(outputFile.toURI().toURL()).toString());
+        "</html>", simplify(read(outputFile.toURI().toURL()).toString()));
   }
 
   /**
@@ -110,9 +109,8 @@ public class XSpecMetaTest extends XSpecViewTestBase {
     
     
     assertEquals("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n\n" + 
-        "<x:report xmlns:xsl=\"http://www.w3.org/1999/XSL/Transform\"\n" + 
+        "<x:report xmlns:test=\"http://www.jenitennison.com/xslt/unit-test\"\n" + 
         "          xmlns:xs=\"http://www.w3.org/2001/XMLSchema\"\n" + 
-        "          xmlns:test=\"http://www.jenitennison.com/xslt/unit-test\"\n" + 
         "          xmlns:x=\"http://www.jenitennison.com/xslt/xspec\"\n" + 
         "          xmlns:functx=\"http://www.functx.com\"\n" + 
         "          stylesheet=\"" + xslURL.toString() + "\"\n" + 
@@ -128,7 +126,7 @@ public class XSpecMetaTest extends XSpecViewTestBase {
         "            <phrase>(So long!)</phrase>\n" + 
         "         </phrases>\n" + 
         "      </x:context>\n" + 
-        "      <x:result>\n" + 
+        "      <x:result select=\"/element()\">\n" + 
         "         <phrases>\n" + 
         "            <phrase status=\"changed\">Hello!</phrase>\n" + 
         "            <phrase status=\"changed\">Goodbye!</phrase>\n" + 
@@ -137,11 +135,11 @@ public class XSpecMetaTest extends XSpecViewTestBase {
         "      </x:result>\n" + 
         "      <x:test successful=\"true\">\n" + 
         "         <x:label>All phrase elements should remain</x:label>\n" + 
-        "         <x:expect select=\"()\"/>\n" + 
+        "         <x:expect test=\"count(phrases/phrase) = 3\" select=\"()\"/>\n" + 
         "      </x:test>\n" + 
         "      <x:test successful=\"false\">\n" + 
         "         <x:label>Strings should be escaped and status attributes should be added. The 'status' attribute are not as expected, indicating a problem in the tested template.</x:label>\n" + 
-        "         <x:expect>\n" + 
+        "         <x:expect select=\"/element()\">\n" + 
         "            <phrases>\n" + 
         "               <phrase status=\"same\">Hello!</phrase>\n" + 
         "               <phrase status=\"same\">Goodbye!</phrase>\n" + 
@@ -176,7 +174,7 @@ public class XSpecMetaTest extends XSpecViewTestBase {
     
     
     assertEquals(
-        "<html xmlns:test=\"http://www.jenitennison.com/xslt/unit-test\">\n" + 
+        "<html>\n" + 
         "   <head>\n" + 
         "      <meta http-equiv=\"Content-Type\" content=\"text/html; charset=UTF-8\"><link rel=\"stylesheet\" type=\"text/css\" href=\"" + css.toURI().toURL().toString() + "\">"
             + "<script type=\"text/javascript\" src=\"" + js.toURI().toURL().toString() + "\"></script></head>\n" + 
@@ -204,7 +202,7 @@ public class XSpecMetaTest extends XSpecViewTestBase {
         // A button to show the DIFF inside Oxygen's DIFF.
         + "<a class=\"button\" onclick=\"showDiff(this)\">Diff</a></p>\n" +
         // Q-DIFF data in HTML format.
-        "            <div class=\"failure\" id=\"d3e47\" style=\"display:none;\">\n" + 
+        "            <div class=\"failure\" id=\"d4e47\" style=\"display:none;\">\n" + 
         "               <table class=\"xspecResult\">\n" + 
         "                  <thead>\n" + 
         "                     <tr>\n" + 
@@ -214,34 +212,30 @@ public class XSpecMetaTest extends XSpecViewTestBase {
         "                  </thead>\n" + 
         "                  <tbody>\n" + 
         "                     <tr>\n" + 
-        "                        <td><pre>&lt;<span xmlns=\"http://www.w3.org/1999/xhtml\" class=\"diff\">phrases</span> xmlns:functx=\"http://www.functx.com\"&gt;\n" + 
-        "   &lt;<span xmlns=\"http://www.w3.org/1999/xhtml\" class=\"diff\">phrase</span> <span xmlns=\"http://www.w3.org/1999/xhtml\" class=\"diff\">status</span>=\"changed\"&gt;<span xmlns=\"http://www.w3.org/1999/xhtml\" class=\"same\">Hello!</span>&lt;/phrase&gt;\n" + 
-        "   &lt;<span xmlns=\"http://www.w3.org/1999/xhtml\" class=\"diff\">phrase</span> <span xmlns=\"http://www.w3.org/1999/xhtml\" class=\"diff\">status</span>=\"changed\"&gt;<span xmlns=\"http://www.w3.org/1999/xhtml\" class=\"same\">Goodbye!</span>&lt;/phrase&gt;\n" + 
-        "   &lt;<span xmlns=\"http://www.w3.org/1999/xhtml\" class=\"diff\">phrase</span> <span xmlns=\"http://www.w3.org/1999/xhtml\" class=\"diff\">status</span>=\"same\"&gt;<span xmlns=\"http://www.w3.org/1999/xhtml\" class=\"same\">\\(So long!\\)</span>&lt;/phrase&gt;\n" + 
+        "                        <td><pre>&lt;<span class=\"inner-diff\">phrases</span> xmlns:functx=\"http://www.functx.com\"&gt;\n" + 
+        "   &lt;<span class=\"inner-diff\">phrase</span> <span class=\"inner-diff\">status</span>=<span class=\"diff\">\"changed\"</span>&gt;<span class=\"same\">Hello!</span>&lt;/phrase&gt;\n" + 
+        "   &lt;<span class=\"inner-diff\">phrase</span> <span class=\"inner-diff\">status</span>=<span class=\"diff\">\"changed\"</span>&gt;<span class=\"same\">Goodbye!</span>&lt;/phrase&gt;\n" + 
+        "   &lt;<span class=\"inner-diff\">phrase</span> <span class=\"inner-diff\">status</span>=<span class=\"diff\">\"same\"</span>&gt;<span class=\"same\">\\(So long!\\)</span>&lt;/phrase&gt;\n" + 
         "&lt;/phrases&gt;</pre></td>\n" + 
-        "                        <td><pre>&lt;<span xmlns=\"http://www.w3.org/1999/xhtml\" class=\"diff\">phrases</span> xmlns:functx=\"http://www.functx.com\"&gt;\n" + 
-        "   &lt;<span xmlns=\"http://www.w3.org/1999/xhtml\" class=\"diff\">phrase</span> <span xmlns=\"http://www.w3.org/1999/xhtml\" class=\"diff\">status</span>=\"same\"&gt;<span xmlns=\"http://www.w3.org/1999/xhtml\" class=\"same\">Hello!</span>&lt;/phrase&gt;\n" + 
-        "   &lt;<span xmlns=\"http://www.w3.org/1999/xhtml\" class=\"diff\">phrase</span> <span xmlns=\"http://www.w3.org/1999/xhtml\" class=\"diff\">status</span>=\"same\"&gt;<span xmlns=\"http://www.w3.org/1999/xhtml\" class=\"same\">Goodbye!</span>&lt;/phrase&gt;\n" + 
-        "   &lt;<span xmlns=\"http://www.w3.org/1999/xhtml\" class=\"diff\">phrase</span> <span xmlns=\"http://www.w3.org/1999/xhtml\" class=\"diff\">status</span>=\"changed\"&gt;<span xmlns=\"http://www.w3.org/1999/xhtml\" class=\"same\">\\(So long!\\)</span>&lt;/phrase&gt;\n" + 
+        "                        <td><pre>&lt;<span class=\"inner-diff\">phrases</span> xmlns:functx=\"http://www.functx.com\"&gt;\n" + 
+        "   &lt;<span class=\"inner-diff\">phrase</span> <span class=\"inner-diff\">status</span>=<span class=\"diff\">\"same\"</span>&gt;<span class=\"same\">Hello!</span>&lt;/phrase&gt;\n" + 
+        "   &lt;<span class=\"inner-diff\">phrase</span> <span class=\"inner-diff\">status</span>=<span class=\"diff\">\"same\"</span>&gt;<span class=\"same\">Goodbye!</span>&lt;/phrase&gt;\n" + 
+        "   &lt;<span class=\"inner-diff\">phrase</span> <span class=\"inner-diff\">status</span>=<span class=\"diff\">\"changed\"</span>&gt;<span class=\"same\">\\(So long!\\)</span>&lt;/phrase&gt;\n" + 
         "&lt;/phrases&gt;</pre></td>\n" + 
         "                     </tr>\n" + 
         "                  </tbody>\n" + 
         "               </table>\n" + 
         "            </div>"
         // DATA for the Oxygen DIFF.
-        + "<pre class=\"embeded.diff.data\" style=\"display:none;\"><div class=\"embeded.diff.result\" style=\"white-space:pre;\">\n" + 
-        "&lt;phrases&gt;\n" + 
+        + "<pre class=\"embeded.diff.data\" style=\"display:none;\"><div class=\"embeded.diff.result\" style=\"white-space:pre;\">&lt;phrases&gt;\n" + 
         "   &lt;phrase status=\"changed\"&gt;Hello!&lt;/phrase&gt;\n" + 
         "   &lt;phrase status=\"changed\"&gt;Goodbye!&lt;/phrase&gt;\n" + 
         "   &lt;phrase status=\"same\"&gt;\\(So long!\\)&lt;/phrase&gt;\n" + 
-        "&lt;/phrases&gt;\n" + 
-        "</div><div class=\"embeded.diff.expected\" style=\"white-space:pre;\">\n" + 
-        "&lt;phrases&gt;\n" + 
+        "&lt;/phrases&gt;</div><div class=\"embeded.diff.expected\" style=\"white-space:pre;\">&lt;phrases&gt;\n" + 
         "   &lt;phrase status=\"same\"&gt;Hello!&lt;/phrase&gt;\n" + 
         "   &lt;phrase status=\"same\"&gt;Goodbye!&lt;/phrase&gt;\n" + 
         "   &lt;phrase status=\"changed\"&gt;\\(So long!\\)&lt;/phrase&gt;\n" + 
-        "&lt;/phrases&gt;\n" + 
-        "</div></pre></div>\n" + 
+        "&lt;/phrases&gt;</div></pre></div>\n" + 
         "      </div>\n" + 
         "      <div class=\"testsuite\" data-name=\"No escaping\" template-id=\"" + secondID +  "\" data-source=\""
         + importedXSpecURL.toString()
@@ -252,7 +246,11 @@ public class XSpecMetaTest extends XSpecViewTestBase {
         "         </div>\n" + 
         "      </div>\n" + 
         "   </body>\n" + 
-        "</html>", read(outputFile.toURI().toURL()).toString());
+        "</html>", simplify(read(outputFile.toURI().toURL()).toString()));
+  }
+
+  private String simplify(String string) {
+    return string.replaceAll("<span xmlns=\"http://www.w3.org/1999/xhtml\"", "<span");
   }
 
   /**
@@ -275,9 +273,8 @@ public class XSpecMetaTest extends XSpecViewTestBase {
     
     assertEquals("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" + 
         "\n" + 
-        "<x:report xmlns:xsl=\"http://www.w3.org/1999/XSL/Transform\"\n" + 
+        "<x:report xmlns:test=\"http://www.jenitennison.com/xslt/unit-test\"\n" + 
         "          xmlns:xs=\"http://www.w3.org/2001/XMLSchema\"\n" + 
-        "          xmlns:test=\"http://www.jenitennison.com/xslt/unit-test\"\n" + 
         "          xmlns:x=\"http://www.jenitennison.com/xslt/xspec\"\n" + 
         "          xmlns:functx=\"http://www.functx.com\"\n" + 
         "          stylesheet=\"" + xslURL.toString() + "\"\n" + 
@@ -317,7 +314,7 @@ public class XSpecMetaTest extends XSpecViewTestBase {
     File js = new File("frameworks/xspec/oxygen-results-view/test-report.js");
     
     assertEquals(
-        "<html xmlns:test=\"http://www.jenitennison.com/xslt/unit-test\">\n" + 
+        "<html>\n" + 
         "   <head>\n" + 
         "      <meta http-equiv=\"Content-Type\" content=\"text/html; charset=UTF-8\"><link rel=\"stylesheet\" type=\"text/css\" href=\"" + css.toURI().toURL().toString() + "\"><script type=\"text/javascript\" src=\"" + js.toURI().toURL().toString()
             + "\"></script></head>\n" + 
@@ -340,8 +337,8 @@ public class XSpecMetaTest extends XSpecViewTestBase {
         "</html>", read(outputFile.toURI().toURL()).toString());
     
     // Assert the driver.
-    File compiledXSL = new File(xspecFile.getParentFile(), "xspec/driverTest.xsl");
-    File driverXSL = new File(xspecFile.getParentFile(), "xspec/driverTest-driver.xsl");
+    File compiledXSL = new File(xspecFile.getParentFile(), "xspec/driverTest-compiled-original.xsl");
+    File driverXSL = new File(xspecFile.getParentFile(), "xspec/driverTest-compiled.xsl");
     
     assertEquals("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" + 
         "<xsl:stylesheet xmlns:xsl=\"http://www.w3.org/1999/XSL/Transform\"\n" + 
@@ -372,8 +369,7 @@ public class XSpecMetaTest extends XSpecViewTestBase {
     File xmlFormatOutput = new File(xspecFile.getParentFile(), "xspec/driverTest-result.xml");
     
     assertEquals("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" + 
-        "<x:report xmlns:xsl=\"http://www.w3.org/1999/XSL/Transform\"\n" + 
-        "          xmlns:xs=\"http://www.w3.org/2001/XMLSchema\"\n" + 
+        "<x:report xmlns:xs=\"http://www.w3.org/2001/XMLSchema\"\n" + 
         "          xmlns:x=\"http://www.jenitennison.com/xslt/xspec\">\n" + 
         "   <x:scenario xmlns:test=\"http://www.jenitennison.com/xslt/unit-test\"\n" + 
         "               xmlns:functx=\"http://www.functx.com\"\n" + 
@@ -408,7 +404,7 @@ public class XSpecMetaTest extends XSpecViewTestBase {
     
         
     // Assert the driver.
-    File compiledXSL = new File(xspecFile.getParentFile(), "xspec/driverTest.xsl");
+    File compiledXSL = new File(xspecFile.getParentFile(), "xspec/driverTest-compiled.xsl");
     File driverXSL = new File(xspecFile.getParentFile(), "xspec/driverTest-driver.xsl");
     
     assertEquals("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" + 

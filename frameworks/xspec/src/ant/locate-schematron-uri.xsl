@@ -3,17 +3,19 @@
 	xmlns:x="http://www.jenitennison.com/xslt/xspec" xmlns:xs="http://www.w3.org/2001/XMLSchema"
 	xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
 
+	<xsl:include href="../common/xspec-utils.xsl" />
+
 	<!--
-		Extracts Schematron phase from .xspec file.
+		Just outputs the fully resolved Schematron file URI.
 		Output XML structure is for Ant <xmlproperty> task.
 	-->
 	<xsl:template as="element(xspec)" match="document-node()">
-		<!-- "xspec.phase" property: Documented in Wiki. DO NOT RENAME. -->
 		<xspec>
-			<phase>
-				<!-- TODO: @href and @select should be taken into account -->
-				<xsl:value-of select="/x:description/x:param[@name = 'phase'][1]" />
-			</phase>
+			<schematron>
+				<uri>
+					<xsl:value-of select="x:locate-schematron-uri(x:description)" />
+				</uri>
+			</schematron>
 		</xspec>
 	</xsl:template>
 </xsl:stylesheet>

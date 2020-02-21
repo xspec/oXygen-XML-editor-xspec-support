@@ -16,16 +16,14 @@
 
   ======================================================================== -->
 <xsl:stylesheet version="3.0"
-                xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
-                xmlns:xs="http://www.w3.org/2001/XMLSchema"
                 xmlns:x="http://www.jenitennison.com/xslt/xspec"
-                xmlns:test="http://www.jenitennison.com/xslt/unit-test"
-                xmlns:pkg="http://expath.org/ns/pkg"
-                xmlns:xhtml="http://www.w3.org/1999/xhtml"
-                xmlns:fn="http://www.w3.org/2005/xpath-functions"
-                exclude-result-prefixes="x xs test pkg xhtml fn">
+                xmlns:xs="http://www.w3.org/2001/XMLSchema"
+                xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+                exclude-result-prefixes="#all">
         
-    <xsl:output name="escaped" method="xml" omit-xml-declaration="yes" indent="yes"/>
+    <xsl:include href="../common/parse-report.xsl" />
+
+    <xsl:output indent="yes"/>
 
     <xsl:template match="x:report">
         <testsuites>
@@ -37,8 +35,8 @@
     <xsl:template match="x:scenario">
         <testsuite>
             <xsl:attribute name="name" select="x:label"/>
-            <xsl:attribute name="tests" select="count(.//x:test)"/>
-            <xsl:attribute name="failures" select="count(.//x:test[@successful='false'])"/>
+            <xsl:attribute name="tests" select="count(x:descendant-tests(.))"/>
+            <xsl:attribute name="failures" select="count(x:descendant-failed-tests(.))"/>
             <xsl:apply-templates select="x:test"/>
             <xsl:apply-templates select="x:scenario" mode="nested"/>
         </testsuite>
@@ -61,14 +59,14 @@
             <xsl:attribute name="name" select="concat($prefix, x:label)"/>
             <xsl:attribute name="status">
                 <xsl:choose>
-                    <xsl:when test="@pending">skipped</xsl:when>
-                    <xsl:when test="@successful='true'">passed</xsl:when>
+                    <xsl:when test="x:is-pending-test(.)">skipped</xsl:when>
+                    <xsl:when test="x:is-passed-test(.)">passed</xsl:when>
                     <xsl:otherwise>failed</xsl:otherwise>
                 </xsl:choose>
             </xsl:attribute>
             <xsl:choose>
-                <xsl:when test="@pending"><skipped><xsl:value-of select="@pending"/></skipped></xsl:when>
-                <xsl:when test="@successful='false'">
+                <xsl:when test="x:is-pending-test(.)"><skipped><xsl:value-of select="@pending"/></skipped></xsl:when>
+                <xsl:when test="x:is-failed-test(.)">
                     <failure message="expect assertion failed">
                         <xsl:apply-templates select="x:expect"/>
                     </failure>
@@ -78,7 +76,7 @@
     </xsl:template>
     
     <xsl:template match="x:expect[@select]">
-        <xsl:text>Expected: </xsl:text><xsl:value-of select="x:expect/@select"/>
+        <xsl:text>Expected: </xsl:text><xsl:value-of select="@select"/>
     </xsl:template>
     
     <xsl:template match="x:expect">
@@ -88,7 +86,7 @@
                 <output:omit-xml-declaration value="yes"/>
             </output:serialization-parameters>
         </xsl:variable>
-        <xsl:value-of select="fn:serialize(., $serialization-parameters)"></xsl:value-of>
+        <xsl:value-of select="serialize(., $serialization-parameters)"/>
     </xsl:template>
     
 </xsl:stylesheet>

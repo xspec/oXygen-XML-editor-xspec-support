@@ -72,7 +72,7 @@ public class SchematronXSpecTest extends XSpecViewTestBase {
     
     URL xmlURL = getClass().getClassLoader().getResource("schematron/demo.xml");
     URL schURL = new File(URLUtil.getCanonicalFileFromFileUrl(xmlURL).getParentFile(), "demo.sch").toURI().toURL();
-    URL schCompiledURL = new File(URLUtil.getCanonicalFileFromFileUrl(xmlURL).getParentFile(), "demo.sch-compiled.xsl").toURI().toURL();
+    URL schCompiledURL = new File(URLUtil.getCanonicalFileFromFileUrl(xmlURL).getParentFile(), "demo.sch-preprocessed.xsl").toURI().toURL();
     File xspecFile = URLUtil.getCanonicalFileFromFileUrl(xspecURL);
     File outputFile = new File(xspecFile.getParentFile(), "demo-report.html");
     
@@ -90,11 +90,10 @@ public class SchematronXSpecTest extends XSpecViewTestBase {
     
     assertEquals("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" + 
         "\n" + 
-        "<x:report xmlns:xsl=\"http://www.w3.org/1999/XSL/Transform\"\n" + 
+        "<x:report xmlns:test=\"http://www.jenitennison.com/xslt/unit-test\"\n" + 
         "          xmlns:xs=\"http://www.w3.org/2001/XMLSchema\"\n" + 
-        "          xmlns:test=\"http://www.jenitennison.com/xslt/unit-test\"\n" + 
-        "          xmlns:x=\"http://www.jenitennison.com/xslt/xspec\"\n" + 
         "          xmlns:svrl=\"http://purl.oclc.org/dsdl/svrl\"\n" + 
+        "          xmlns:x=\"http://www.jenitennison.com/xslt/xspec\"\n" +
         "          stylesheet=\"" + schCompiledURL.toString() + "\"\n" + 
         "          date=\"XXX\"\n" +
         "          xspec=\"" + xspecURL.toExternalForm() + "\"\n" + 
@@ -107,7 +106,7 @@ public class SchematronXSpecTest extends XSpecViewTestBase {
         "                  template-id=\"" + XSpecUtil.generateId("demo-02(0) / article should have a title(0)")
         + "\">\n" + 
         "         <x:label>article should have a title</x:label>\n" + 
-        "         <x:result>\n" + 
+        "         <x:result select=\"/element()\">\n" + 
         "            <svrl:schematron-output xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\"\n" + 
         "                                    xmlns:saxon=\"http://saxon.sf.net/\"\n" + 
         "                                    xmlns:schold=\"http://www.ascc.net/xml/schematron\"\n" + 
@@ -131,14 +130,15 @@ public class SchematronXSpecTest extends XSpecViewTestBase {
         "         </x:result>\n" + 
         "         <x:test successful=\"true\">\n" + 
         "            <x:label>Some other thing not assert a001</x:label>\n" + 
-        "            <x:expect select=\"()\"/>\n" + 
+        "            <x:expect test=\"boolean(svrl:schematron-output[svrl:fired-rule]) and empty(svrl:schematron-output/svrl:failed-assert[(@id, preceding-sibling::svrl:fired-rule[1]/@id, preceding-sibling::svrl:active-pattern[1]/@id)[1] = 'a001'])\"\n" + 
+        "                      select=\"()\"/>\n" + 
         "         </x:test>\n" + 
         "      </x:scenario>\n" + 
         "      <x:scenario source=\"" + xspecModuleURL.toString() + "\"\n" + 
         "                  template-id=\"" + XSpecUtil.generateId("demo-02(0) / section should have a title(1)")
         + "\">\n" + 
         "         <x:label>section should have a title</x:label>\n" + 
-        "         <x:result>\n" + 
+        "         <x:result select=\"/element()\">\n" + 
         "            <svrl:schematron-output xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\"\n" + 
         "                                    xmlns:saxon=\"http://saxon.sf.net/\"\n" + 
         "                                    xmlns:schold=\"http://www.ascc.net/xml/schematron\"\n" + 
@@ -162,11 +162,13 @@ public class SchematronXSpecTest extends XSpecViewTestBase {
         "         </x:result>\n" + 
         "         <x:test successful=\"true\">\n" + 
         "            <x:label>Do a thing not assert a002 /article[1]/section[1]</x:label>\n" + 
-        "            <x:expect select=\"()\"/>\n" + 
+        "            <x:expect test=\"boolean(svrl:schematron-output[svrl:fired-rule]) and empty(svrl:schematron-output/svrl:failed-assert[(@id, preceding-sibling::svrl:fired-rule[1]/@id, preceding-sibling::svrl:active-pattern[1]/@id)[1] = 'a002'][x:schematron-location-compare('/article[1]/section[1]', @location, preceding-sibling::svrl:ns-prefix-in-attribute-values)])\"\n" + 
+        "                      select=\"()\"/>\n" + 
         "         </x:test>\n" + 
         "         <x:test successful=\"true\">\n" + 
         "            <x:label>Do something assert a002 /article[1]/section[2]</x:label>\n" + 
-        "            <x:expect select=\"()\"/>\n" + 
+        "            <x:expect test=\"exists(svrl:schematron-output/svrl:failed-assert[(@id, preceding-sibling::svrl:fired-rule[1]/@id, preceding-sibling::svrl:active-pattern[1]/@id)[1] = 'a002'][x:schematron-location-compare('/article[1]/section[2]', @location, preceding-sibling::svrl:ns-prefix-in-attribute-values)])\"\n" + 
+        "                      select=\"()\"/>\n" + 
         "         </x:test>\n" + 
         "      </x:scenario>\n" + 
         "   </x:scenario>\n" + 
@@ -178,7 +180,7 @@ public class SchematronXSpecTest extends XSpecViewTestBase {
         "                  template-id=\"" + XSpecUtil.generateId("demo-01(1) / article should have a title(0)")
         + "\">\n" + 
         "         <x:label>article should have a title</x:label>\n" + 
-        "         <x:result>\n" + 
+        "         <x:result select=\"/element()\">\n" + 
         "            <svrl:schematron-output xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\"\n" + 
         "                                    xmlns:saxon=\"http://saxon.sf.net/\"\n" + 
         "                                    xmlns:schold=\"http://www.ascc.net/xml/schematron\"\n" + 
@@ -202,7 +204,8 @@ public class SchematronXSpecTest extends XSpecViewTestBase {
         "         </x:result>\n" + 
         "         <x:test successful=\"true\">\n" + 
         "            <x:label>Some other thing not assert a001</x:label>\n" + 
-        "            <x:expect select=\"()\"/>\n" + 
+        "            <x:expect test=\"boolean(svrl:schematron-output[svrl:fired-rule]) and empty(svrl:schematron-output/svrl:failed-assert[(@id, preceding-sibling::svrl:fired-rule[1]/@id, preceding-sibling::svrl:active-pattern[1]/@id)[1] = 'a001'])\"\n" + 
+        "                      select=\"()\"/>\n" + 
         "         </x:test>\n" + 
         "      </x:scenario>\n" + 
         "   </x:scenario>\n" + 
@@ -220,7 +223,7 @@ public class SchematronXSpecTest extends XSpecViewTestBase {
     String expected = read(outputFile.toURI().toURL()).toString();
     expected = expected.replaceAll("template-id=\".*?\"", "template-id=\"\"");
     assertEquals(
-        "<html xmlns:test=\"http://www.jenitennison.com/xslt/unit-test\">\n" + 
+        "<html>\n" + 
         "   <head>\n" + 
         "      <meta http-equiv=\"Content-Type\" content=\"text/html; charset=UTF-8\"><link rel=\"stylesheet\" type=\"text/css\" href=\"" + css.toURI().toURL().toString()
         + "\"><script type=\"text/javascript\" src=\""
@@ -256,55 +259,5 @@ public class SchematronXSpecTest extends XSpecViewTestBase {
         "   </body>\n" + 
         "</html>", expected);
     
-  }
-  
-  /**
-   * The scenario contains inline XML. Schematron pre-parsing stages extracts it as an external XML.
-   * Our build file accidently removed these generated files. 
-   * 
-   * <pre>
-   * <x:scenario label="valid">
-   *             <x:context>
-   *                 <document>
-   *                     <title>Introduction</title>
-   *                     <p>some paragraph text</p>
-   *                 </document>
-   *             </x:context>
-   *             <x:expect-not-assert id="a0001"/>
-   *             <x:expect-valid/>
-   *  </x:scenario>
-   *  </pre>
-   * @throws Exception
-   */
-  public void testInlineContext() throws Exception {
-    URL xspecURL = getClass().getClassLoader().getResource("sch-inline-context/demo-03.xspec");
-    
-    File xspecFile = URLUtil.getCanonicalFileFromFileUrl(xspecURL);
-    File outputFile = new File(xspecFile.getParentFile(), "demo-03-report.html");
-    
-    executeANT(xspecFile, outputFile,"", true);
-    
-    File xmlFormatOutput = new File(xspecFile.getParentFile(), "xspec/demo-03-result.xml");
-    String replaceAll = read(xmlFormatOutput.toURI().toURL()).toString().replaceAll("date=\".*\"", "date=\"XXX\"").replaceAll("<\\?xml-stylesheet.*\\?>", "");
-    replaceAll = replaceAll.replace('\u0009', ' ').replace('\u00A0', ' ');
-    
-    String getContext = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" + 
-        "<xsl:stylesheet xmlns:xsl=\"http://www.w3.org/1999/XSL/Transform\"\n" + 
-        "    xmlns:xs=\"http://www.w3.org/2001/XMLSchema\"\n" + 
-        "    exclude-result-prefixes=\"xs\"\n" + 
-        "    version=\"2.0\">\n" + 
-        "    <xsl:output omit-xml-declaration=\"yes\"/>\n" + 
-        "    <xsl:template match=\"*:context\">\n" + 
-        "        <xsl:value-of select=\"@href\"/>\n" + 
-        "    </xsl:template>\n" + 
-        "    <xsl:template match=\"text()\"/>\n" + 
-        "</xsl:stylesheet>";
-    Transformer newTransformer = new TransformerFactoryImpl().newTransformer(new StreamSource(new StringReader(getContext)));
-    StringWriter writer = new StringWriter();
-    Result outputTarget = new StreamResult(writer);
-    newTransformer.transform(new SAXSource(new InputSource(xmlFormatOutput.toURI().toURL().toString())), outputTarget);
-    
-    File contextFile = URLUtil.getCanonicalFileFromFileUrl(new URL(writer.toString()));
-    assertTrue("The generated file must exist", contextFile.exists());
   }
 }

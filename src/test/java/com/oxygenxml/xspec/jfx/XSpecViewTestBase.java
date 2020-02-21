@@ -335,11 +335,11 @@ public class XSpecViewTestBase extends JFCTestCase {
     lines.add("-Dclean.output.dir=false");
 
     // Compile XSL.
-    lines.add("-Dcompile.xspec.xsl=" + compilerXSL.getAbsolutePath() );
+    lines.add("-Dext.xspec.compiler.xsl=" + compilerXSL.getAbsolutePath() );
     // Driver XSL that is applied over the the compiled XSL.
     lines.add("-Dcompile.xspec.xsl.driver=" + compilerXSLDriver.getAbsolutePath() );
     // Report formatter.
-    lines.add("-Dformat.xspec.report=" + reportXSL.getAbsolutePath() );
+    lines.add("-Dxspec.html.reporter.xsl=" + reportXSL.getAbsolutePath() );
     // XSpec project dir.
     lines.add("-Dxspec.project.dir=" + xspecProjectDir.getAbsolutePath() );
     // Output file name.

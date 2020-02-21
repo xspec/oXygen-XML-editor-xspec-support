@@ -111,6 +111,10 @@ body {
   background-color: #FCC;
 }
 
+.inner-diff {
+  background-color: #ffeaea;
+}
+
 .whitespace {
 	font-style: italic;
 	color: #999;
