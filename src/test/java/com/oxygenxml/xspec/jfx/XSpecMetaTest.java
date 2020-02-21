@@ -404,8 +404,8 @@ public class XSpecMetaTest extends XSpecViewTestBase {
     
         
     // Assert the driver.
-    File compiledXSL = new File(xspecFile.getParentFile(), "xspec/driverTest-compiled.xsl");
-    File driverXSL = new File(xspecFile.getParentFile(), "xspec/driverTest-driver.xsl");
+    File compiledXSL = new File(xspecFile.getParentFile(), "xspec/driverTest-compiled-original.xsl");
+    File driverXSL = new File(xspecFile.getParentFile(), "xspec/driverTest-compiled.xsl");
     
     assertEquals("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" + 
         "<xsl:stylesheet xmlns:xsl=\"http://www.w3.org/1999/XSL/Transform\"\n" + 
