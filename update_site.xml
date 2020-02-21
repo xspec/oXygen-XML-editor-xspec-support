@@ -19,6 +19,36 @@
 			<p>This add-on contributes an <b>XSpec Test Results</b> view that provides the ability to run XSpec test scenarios and view the results directly in Oxygen. To use the new view, after installation, open an XSpec file and click the <b>Run XSpec test scenarios</b> button on the toolbar.</p>
                     <p style="color:red">This plugin also requires the <b>XSpec Framework</b>. Please install them both.</p>
   	        </div>
+                
+              <div>
+                  <h3>How to Use It</h3>
+
+                  <ol>
+                      <li>Inside Oxygen XML Editor/Developer, open an XSpec file.</li>
+                      <li>Click the <b>XSpec Run</b> button on the toolbar or use the <b>Run test scenario(s)</b> action from the 
+                      editor contextual menu.</li>
+                  </ol>
+                  
+                  <p><b>Result:</b> An <b>XSpec Test Results</b> view will be opened.</p> 
+                  
+                  <p><b>Tip:</b> At this point you can switch to the XSLT and use the <b>Run</b> actions in this view to execute the scenarios.</p>
+                  
+                  <h3>What you can do inside the <b>XSpec Test Results</b> view</h3>
+                  
+                  <ul>
+                      <li>For each test, there is a <b>Show</b> action that selects the coresponding test in the editor.</li>
+                      <li>For each scenario, there is a <b>Run</b> action that just runs that particular scenario.</li>
+                      <li>For a failed test, you can click on it to open the diff comparison between the expected and actual results.</li>
+                  </ul>
+              </div>
+                
+            <div>    
+                <h3>What's new in version 1.5.0</h3>
+                <ol>
+                    <li>Comes bundled with XSpec version 1.5.0.</li>
+                    <li>Fixed some classpath issues that made it crash in Oxygen version 22.0.</li>
+                </ol>
+            </div>
             <div>    
                 <h3>What's new in version 1.2.1</h3>
                 <ol>
