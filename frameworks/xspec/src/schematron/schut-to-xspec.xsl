@@ -17,23 +17,6 @@
         <xsl:call-template name="x:identity" />
     </xsl:template>
     
-    
-    <!--
-        
-        Oxygen Patch Start 
-        
-        Keep the original location of the module.
-        
-        -->
-    <xsl:template match="x:scenario" priority="-2">
-        <xsl:param name="source" tunnel="yes"></xsl:param>
-        <xsl:copy>
-            <xsl:attribute name="source" select="if ($source and $source != '') then ($source) else (base-uri(.))"></xsl:attribute>
-            <xsl:apply-templates select="@* | node()"/>
-        </xsl:copy>
-    </xsl:template>
-    <!-- Oxygen Patch END -->
-    
     <xsl:template match="x:description[@schematron]">
         <xsl:element name="x:description">
             <!-- Place xsl:namespace before x:copy-namespaces(), otherwise Saxon 9.6 complains,
@@ -67,18 +50,7 @@
                 self::x:expect-report | self::x:expect-not-report |
                 self::x:expect-valid | self::x:description[@schematron] ]">
                 <xsl:comment>BEGIN IMPORT "<xsl:value-of select="@href"/>"</xsl:comment>
-                <xsl:apply-templates select="doc($href)/x:description/node()">
-                    <!--
-        
-        Oxygen Patch Start 
-        
-        Keep the original location of the module.
-        
-        -->
-                    <xsl:with-param name="source" select="resolve-uri($href, base-uri(.))" tunnel="yes"></xsl:with-param>
-                    
-                    <!-- Oxygen patch END -->
-                </xsl:apply-templates>
+                <xsl:apply-templates select="doc($href)/x:description/node()"/>
                 <xsl:comment>END IMPORT "<xsl:value-of select="@href"/>"</xsl:comment>
             </xsl:when>
             <xsl:otherwise>

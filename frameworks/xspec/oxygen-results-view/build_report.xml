@@ -67,12 +67,40 @@
   <!-- ================================== -->
   <!-- OXYGEN XSPEC REPORT VIEW PATCH START-->
   <!-- ================================== -->  
+  
+  
+  <!-- 
+      Overriden target: <target name="preprocess-schematron-xspec">
+      
+      Why we do this because we want to:
+      - apply a different XSLT ${xspec.project.dir}/oxygen-results-view/schut-to-xspec.xsl
+      This XSLT stores the location into the scenario before all modules are merged into one big file.
+      We need this for backmapping, to locate a specific scenario from the generated output.
+  	    
+  	-->
+  
+  <!-- Converts Schematron XSpec into XSLT XSpec -->
+  <target name="preprocess-schematron-xspec"
+    depends="preprocess-schematron-xslt"
+    if="${xspec.is.schematron}">
+    <makeurl property="xspec.schematron.preprocessed.xsl.url"
+      file="${xspec.schematron.preprocessed.xsl.file}" />
+    
+    <saxon-xslt in="${xspec.xspecfile.original}"
+      out="${xspec.xspecfile.preprocessed}"
+      style="${xspec.project.dir}/oxygen-results-view/schut-to-xspec.xsl">
+      <xslt-elements>
+        <param name="stylesheet-uri" expression="${xspec.schematron.preprocessed.xsl.url}" />
+      </xslt-elements>
+    </saxon-xslt>
+  </target>
+  
   <target name="compile" depends="init, preprocess-schematron-xspec">
     
 	<!-- 
       Use a custom compiler : ext.xspec.compiler.xsl
       
-      Why we do that because we want to:
+      We do this because we want to:
       - embed inside the compiled output backmapping information, the URL of the original XSpec 
       file. XSpecs can be imported into one another so we remember for each scenario the file it came from.
       - control the scenario-to-template ID generation so we can request a specific scenario to run.
