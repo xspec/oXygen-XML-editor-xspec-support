@@ -405,6 +405,7 @@ public class XSpecResultsView extends JPanel implements XSpecResultPresenter {
         XSpecResultPresenter resultsPresenter = XSpecResultsView.this;
         // Step 3. Run the scenario
         try {
+          enableButtons(false);
           XSpecUtil.runScenario(
               editorAccess,
               (StandalonePluginWorkspace) pluginWorkspace, 
@@ -417,6 +418,7 @@ public class XSpecResultsView extends JPanel implements XSpecResultPresenter {
               });
         } catch (OperationCanceledException ex) {
           logger.error(ex, ex);
+          enableButtons(true);
         }
       }
     };
