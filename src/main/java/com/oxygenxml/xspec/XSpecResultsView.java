@@ -410,12 +410,7 @@ public class XSpecResultsView extends JPanel implements XSpecResultPresenter {
               editorAccess,
               (StandalonePluginWorkspace) pluginWorkspace, 
               resultsPresenter,
-              new TransformationFeedback() {
-                @Override
-                public void transformationStopped() {}
-                @Override
-                public void transformationFinished(boolean success) {}
-              });
+              createTransformationFeedback());
         } catch (OperationCanceledException ex) {
           logger.error(ex, ex);
           enableButtons(true);
