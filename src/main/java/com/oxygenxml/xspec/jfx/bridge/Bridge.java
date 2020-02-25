@@ -10,9 +10,7 @@ import javax.swing.text.BadLocationException;
 
 import org.apache.log4j.Logger;
 
-import com.oxygenxml.xspec.OperationCanceledException;
 import com.oxygenxml.xspec.XSpecResultPresenter;
-import com.oxygenxml.xspec.XSpecUtil;
 import com.oxygenxml.xspec.XSpecVariablesResolver;
 import com.oxygenxml.xspec.protocol.DiffFragmentRepository;
 
@@ -25,7 +23,6 @@ import ro.sync.exml.workspace.api.editor.page.WSEditorPage;
 import ro.sync.exml.workspace.api.editor.page.text.xml.WSXMLTextEditorPage;
 import ro.sync.exml.workspace.api.editor.page.text.xml.WSXMLTextNodeRange;
 import ro.sync.exml.workspace.api.editor.page.text.xml.XPathException;
-import ro.sync.exml.workspace.api.editor.transformation.TransformationFeedback;
 import ro.sync.exml.workspace.api.standalone.StandalonePluginWorkspace;
 import ro.sync.exml.workspace.api.util.XMLUtilAccess;
 
@@ -204,37 +201,7 @@ public class Bridge {
   }
   
   private void runScenarioAWT(String scenarioName, String scenarioLocation) {
-    try {
-        WSEditor xspecToExecute = getEditorAccess(xspec);
-        
-        // We only need to execute this scenario.
-        variablesResolver.setTemplateNames(scenarioName);
-        
-        // Step 3. Run the scenario
-        XSpecUtil.runScenario(
-            xspecToExecute,
-            (StandalonePluginWorkspace) pluginWorkspace, 
-            resultsPresenter,
-            new TransformationFeedback() {
-              @Override
-              public void transformationStopped() {}
-              @Override
-              public void transformationFinished(boolean success) {}
-            });
-    } catch (OperationCanceledException e1) {
-      // The user canceled the operation.
-    }
-  }
-
-  private WSEditor getEditorAccess(URL toOpen) {
-    WSEditor e = pluginWorkspace.getEditorAccess(toOpen, PluginWorkspace.MAIN_EDITING_AREA);
-    if (e == null) {
-      // Just in case the file is no longer opened.
-      pluginWorkspace.open(toOpen);
-
-      e = pluginWorkspace.getEditorAccess(toOpen, PluginWorkspace.MAIN_EDITING_AREA);
-    }
-    return e;
+    resultsPresenter.runScenario(scenarioName);
   }
 
   /**

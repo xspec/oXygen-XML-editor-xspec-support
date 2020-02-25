@@ -2,6 +2,8 @@ package com.oxygenxml.xspec;
 
 import java.net.URL;
 
+import com.oxygenxml.xspec.saxon.GenerateIDExtensionFunction;
+
 /**
  * Presents the HTML resulted from executing an XSpec scenario.
  * 
@@ -30,4 +32,12 @@ public interface XSpecResultPresenter {
    * @param results The results in a HTML format.
    */
   public void load(URL xspecURL, URL resultHTML);
+  
+  /**
+   * Executes a given scenario.
+   * 
+   * @param scenarioId Name of the scenario to execute. Usually something generated with 
+   * {@link GenerateIDExtensionFunction}
+   */
+  public void runScenario(String scenarioId);
 }

@@ -441,4 +441,37 @@ public class XSpecResultsView extends JPanel implements XSpecResultPresenter {
   public void runXSpec() {
     runAction.actionPerformed(null);
   }
+
+  @Override
+  public void runScenario(String scenarioId) {
+    try {
+      WSEditor xspecToExecute = getEditorAccess(xspec);
+
+      // We only need to execute this scenario.
+      resolver.setTemplateNames(scenarioId);
+
+      enableButtons(false);
+      // Step 3. Run the scenario
+      XSpecUtil.runScenario(
+          xspecToExecute,
+          (StandalonePluginWorkspace) pluginWorkspace, 
+          this,
+          createTransformationFeedback());
+    } catch (OperationCanceledException e1) {
+      // The user canceled the operation.
+      enableButtons(true);
+    }
+  }
+  
+
+  private WSEditor getEditorAccess(URL toOpen) {
+    WSEditor e = pluginWorkspace.getEditorAccess(toOpen, PluginWorkspace.MAIN_EDITING_AREA);
+    if (e == null) {
+      // Just in case the file is no longer opened.
+      pluginWorkspace.open(toOpen);
+
+      e = pluginWorkspace.getEditorAccess(toOpen, PluginWorkspace.MAIN_EDITING_AREA);
+    }
+    return e;
+  }
 }
