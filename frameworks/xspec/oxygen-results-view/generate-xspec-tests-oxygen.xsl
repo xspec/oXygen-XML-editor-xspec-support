@@ -11,9 +11,7 @@
                 exclude-result-prefixes="#all"
                 
                 
-                xmlns:uuid="java:java.util.UUID"
   				xmlns:local="http://oxygenxml.com/local"
- 				xmlns:string="java:java.lang.String"
                 >
   
   
