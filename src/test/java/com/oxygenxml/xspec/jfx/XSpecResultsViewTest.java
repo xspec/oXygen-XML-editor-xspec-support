@@ -2,9 +2,12 @@ package com.oxygenxml.xspec.jfx;
 
 import java.awt.BorderLayout;
 import java.io.File;
+import java.io.InputStreamReader;
 import java.net.URL;
 
 import javax.swing.JFrame;
+
+import org.apache.commons.io.IOUtils;
 
 import com.oxygenxml.xspec.XSpecResultsView;
 import com.oxygenxml.xspec.XSpecUtil;

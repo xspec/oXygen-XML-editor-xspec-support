@@ -96,6 +96,14 @@
   </target>
   
   <target name="compile" depends="init, preprocess-schematron-xspec">
+    <condition property="xspec.compiler.xsl"
+        value="generate-query-tests.xsl"
+        else="generate-xspec-tests.xsl">
+        <istrue value="${xspec.is.xquery}" />
+    </condition>
+    
+    <echo message="Compiling Tests..."
+        level="info" />
     
 	<!-- 
       Use a custom compiler : ext.xspec.compiler.xsl

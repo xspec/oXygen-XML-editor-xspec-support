@@ -34,7 +34,8 @@
 			select="resolve-uri('iso-schematron/iso_svrl_for_xslt2.xsl')" />
 
 		<stylesheet exclude-result-prefixes="#all" version="{x:decimal-string(x:xslt-version(.))}">
-			<!-- Standard namespace required by the wrapper stylesheet being generated -->
+			<!-- Namespaces required by the wrapper stylesheet being generated -->
+			<xsl:namespace name="impl" select="'urn:x-xspec:compile:xslt:impl'" />
 			<xsl:namespace name="xs" select="'http://www.w3.org/2001/XMLSchema'" />
 
 			<!-- Import the stylesheet of the Schematron Step 3 preprocessor -->
@@ -45,15 +46,21 @@
 				<import href="{resolve-uri('patch-step3.xsl')}" />
 			</xsl:if>
 
+			<!-- Set up a pseudo x:param which holds the fully-resolved Schematron file URI
+				so that $x:schematron-uri holding the URI is generated and made available in
+				the wrapper stylesheet being generated -->
+			<xsl:variable as="element(x:param)" name="xml-base-param">
+				<x:param as="xs:anyURI" name="x:schematron-uri">
+					<xsl:value-of select="x:locate-schematron-uri(.)" />
+				</x:param>
+			</xsl:variable>
+
 			<!-- Resolve x:param -->
-			<xsl:apply-templates select="x:param" />
+			<xsl:apply-templates select="$xml-base-param, x:param" />
 		</stylesheet>
 	</xsl:template>
 
 	<xsl:template as="element()+" match="x:param">
-		<xsl:apply-templates mode="test:generate-variable-declarations" select=".">
-			<xsl:with-param name="var" select="@name" />
-			<xsl:with-param name="type" select="'param'" />
-		</xsl:apply-templates>
+		<xsl:apply-templates mode="test:generate-variable-declarations" select="." />
 	</xsl:template>
 </xsl:stylesheet>

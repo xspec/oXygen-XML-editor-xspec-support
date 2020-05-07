@@ -70,7 +70,8 @@
    </xsl:template>
 
    <!-- *** x:generate-tests *** -->
-   <!-- Does the generation of the test stylesheet -->
+   <!-- Does the generation of the test stylesheet.
+      This mode assumes that all the scenarios have already been gathered and unshared. -->
   
    <xsl:template match="x:description" mode="x:generate-tests">
       <xsl:variable name="this" select="." as="element(x:description)" />
@@ -134,7 +135,7 @@
       <xsl:text>declare option output:method "xml";&#x0A;</xsl:text>
       <xsl:text>declare option output:indent "yes";&#x0A;</xsl:text>
 
-      <!-- Absolute URI of .xspec file -->
+      <!-- Absolute URI of the master .xspec file -->
       <xsl:call-template name="test:declare-or-let-variable">
          <xsl:with-param name="is-global" select="true()" />
          <xsl:with-param name="name" select="x:xspec-name($this,'xspec-uri')" />
@@ -146,17 +147,14 @@
          </xsl:with-param>
       </xsl:call-template>
 
-      <!-- Compile the test suite params (aka global params). -->
-      <xsl:call-template name="x:compile-params"/>
+      <!-- Compile global params and global variables. -->
+      <xsl:call-template name="x:compile-global-params-and-vars" />
 
       <!-- Compile the top-level scenarios. -->
       <xsl:call-template name="x:compile-scenarios"/>
       <xsl:text>&#10;</xsl:text>
 
       <xsl:text>document {&#x0A;</xsl:text>
-
-      <xsl:apply-templates select="$html-reporter-pi" mode="test:create-node-generator" />
-      <xsl:text>,&#x0A;</xsl:text>
 
       <xsl:element name="{x:xspec-name($this,'report')}" namespace="{$xspec-namespace}">
          <xsl:attribute name="date"  select="'{current-dateTime()}'" />
@@ -184,9 +182,12 @@
       <xsl:context-item as="element()" use="required"
          use-when="element-available('xsl:context-item')" />
 
-      <xsl:param name="local-name" as="xs:string"/>
-      <xsl:param name="last"       as="xs:boolean"/>
-      <xsl:param name="params"     as="element(param)*"/>
+      <xsl:param name="last"   as="xs:boolean" />
+      <xsl:param name="params" as="element(param)*" />
+
+      <xsl:variable name="local-name" as="xs:string">
+         <xsl:apply-templates select="." mode="x:generate-id" />
+      </xsl:variable>
 
       <xsl:if test="exists(preceding-sibling::x:*[1][self::x:pending])">
          <xsl:text>,&#10;</xsl:text>
@@ -232,6 +233,10 @@
 
       <xsl:variable name="pending-p" select="exists($pending) and empty(ancestor-or-self::*/@focus)"/>
 
+      <xsl:variable name="scenario-id" as="xs:string">
+         <xsl:apply-templates select="." mode="x:generate-id" />
+      </xsl:variable>
+
       <!-- x:context and x:call/@template not supported for XQuery -->
       <xsl:if test="exists($context)">
          <xsl:variable name="msg" select="
@@ -256,7 +261,7 @@
         {
       -->
       <xsl:text>&#10;declare function local:</xsl:text>
-      <xsl:value-of select="generate-id()"/>
+      <xsl:value-of select="$scenario-id" />
       <xsl:text>(</xsl:text>
       <xsl:value-of select="$params/concat('$', @name)" separator=", "/>
       <xsl:text>)&#10;{&#10;</xsl:text>
@@ -264,15 +269,14 @@
       <!-- If there are variables before x:call, the caller passed them in as $variables.
            Define them here followed by "return". -->
       <xsl:if test="exists($variables)">
-         <xsl:for-each select="$variables">
-            <xsl:apply-templates select="." mode="test:generate-variable-declarations">
-               <xsl:with-param name="var" select="@name"/>
-            </xsl:apply-templates>
-         </xsl:for-each>
+         <xsl:apply-templates select="$variables" mode="test:generate-variable-declarations" />
          <xsl:text>    return&#10;</xsl:text>
       </xsl:if>
 
       <xsl:element name="{x:xspec-name(.,'scenario')}" namespace="{$xspec-namespace}">
+         <xsl:attribute name="id" select="$scenario-id" />
+         <xsl:sequence select="@xspec" />
+
          <!-- Create @pending generator -->
          <xsl:if test="$pending-p">
             <xsl:text>{ </xsl:text>
@@ -308,7 +312,7 @@
                      <xsl:for-each select="$call/x:param">
                         <xsl:sort select="xs:integer(@position)"/>
                         <xsl:text>$</xsl:text>
-                        <xsl:value-of select="( @name, generate-id() )[1]"/>
+                        <xsl:value-of select="test:variable-name(.)" />
                         <xsl:if test="position() != last()">, </xsl:if>
                      </xsl:for-each>
                      <xsl:text>)&#10;</xsl:text>
@@ -389,12 +393,17 @@
       <xsl:param name="params"  required="yes"              as="element(param)*"/>
 
       <xsl:variable name="pending-p" select="exists($pending) and empty(ancestor::*/@focus)"/>
+
+      <xsl:variable name="expect-id" as="xs:string">
+         <xsl:apply-templates select="." mode="x:generate-id" />
+      </xsl:variable>
+
       <!--
         declare function local:...($t:result as item()*)
         {
       -->
       <xsl:text>&#10;declare function local:</xsl:text>
-      <xsl:value-of select="generate-id()"/>
+      <xsl:value-of select="$expect-id" />
       <xsl:text>(</xsl:text>
       <xsl:for-each select="$params">
          <xsl:text>$</xsl:text>
@@ -406,9 +415,7 @@
       <xsl:text>)&#10;{&#10;</xsl:text>
       <xsl:if test="not($pending-p)">
          <!-- Set up the $local:expected variable -->
-         <xsl:call-template name="x:setup-expected">
-            <xsl:with-param name="var" select="'local:expected'" />
-         </xsl:call-template>
+         <xsl:apply-templates select="." mode="test:generate-variable-declarations" />
 
          <!-- Flags for test:deep-equal() enclosed in ''. -->
          <xsl:variable name="deep-equal-flags" as="xs:string">''</xsl:variable>
@@ -438,7 +445,9 @@
                <xsl:text>  let $local:successful as xs:boolean := (&#x0A;</xsl:text>
                <xsl:text>    if ($local:boolean-test)&#x0A;</xsl:text>
                <xsl:text>    then boolean($local:test-result)&#x0A;</xsl:text>
-               <xsl:text>    else test:deep-equal($local:expected, $local:test-result, </xsl:text>
+               <xsl:text>    else test:deep-equal($</xsl:text>
+               <xsl:value-of select="test:variable-name(.)" />
+               <xsl:text>, $local:test-result, </xsl:text>
                <xsl:value-of select="$deep-equal-flags" />
                <xsl:text>)&#x0A;</xsl:text>
                <xsl:text>  )&#x0A;</xsl:text>
@@ -448,7 +457,9 @@
             <xsl:otherwise>
                <!-- $local:successful -->
                <xsl:text>  let $local:successful as xs:boolean :=&#x0A;</xsl:text>
-               <xsl:text>      test:deep-equal($local:expected, $</xsl:text>
+               <xsl:text>      test:deep-equal($</xsl:text>
+               <xsl:value-of select="test:variable-name(.)" />
+               <xsl:text>, $</xsl:text>
                <xsl:value-of select="x:xspec-name(.,'result')" />
                <xsl:text>, </xsl:text>
                <xsl:value-of select="$deep-equal-flags" />
@@ -464,6 +475,8 @@
         return the x:test element for the report
       -->
       <xsl:element name="{x:xspec-name(.,'test')}" namespace="{$xspec-namespace}">
+         <xsl:attribute name="id" select="$expect-id" />
+
          <!-- Create @pending generator or create @successful directly -->
          <xsl:choose>
             <xsl:when test="$pending-p">
@@ -492,7 +505,9 @@
             </xsl:if>
 
             <xsl:text>&#x0A;</xsl:text>
-            <xsl:text>      { test:report-sequence($local:expected, '</xsl:text>
+            <xsl:text>      { test:report-sequence($</xsl:text>
+            <xsl:value-of select="test:variable-name(.)" />
+            <xsl:text>, '</xsl:text>
             <xsl:value-of select="x:xspec-name(.,'expect')" />
             <xsl:text>'</xsl:text>
 
@@ -505,20 +520,6 @@
          </xsl:if>
       </xsl:element>
       <xsl:text>&#10;};&#10;</xsl:text>
-   </xsl:template>
-
-   <!-- *** x:generate-declarations *** -->
-   <!-- Code to generate parameter declarations -->
-   <!--
-       TODO: For x:param, define external variable (which can have a
-       default value in XQuery 1.1, but not in 1.0, so we will need to
-       generate an error for global x:param with default value...)
-   -->
-   <xsl:template match="x:param|x:variable" mode="x:generate-declarations">
-      <xsl:apply-templates select="." mode="test:generate-variable-declarations">
-         <xsl:with-param name="var"    select="@name" />
-         <xsl:with-param name="global" select="true()"/>
-      </xsl:apply-templates>
    </xsl:template>
 
    <!-- *** x:report *** -->

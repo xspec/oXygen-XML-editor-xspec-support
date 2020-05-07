@@ -114,13 +114,22 @@
 
   <!-- Properties indicating whether the test type is a specific type -->
   <condition property="xspec.is.schematron" else="false">
-    <equals arg1="${test.type}" arg2="s" />
+    <or>
+      <equals arg1="${test.type}" arg2="s" />
+      <equals arg1="${test.type}" arg2="schematron" casesensitive="no" />
+    </or>
   </condition>
   <condition property="xspec.is.xquery" else="false">
-    <equals arg1="${test.type}" arg2="q" />
+    <or>
+      <equals arg1="${test.type}" arg2="q" />
+      <equals arg1="${test.type}" arg2="xquery" casesensitive="no" />
+    </or>
   </condition>
   <condition property="xspec.is.xslt" else="false">
-    <equals arg1="${test.type}" arg2="t" />
+    <or>
+      <equals arg1="${test.type}" arg2="t" />
+      <equals arg1="${test.type}" arg2="xslt" casesensitive="no" />
+    </or>
   </condition>
 
   <!-- "xspec.fail" property: Documented in Wiki. DO NOT RENAME.
@@ -301,13 +310,8 @@
               value="${xspec.output.dir}/${xspec.xspecfile.name.without.ext}-step1.sch" />
     <property name="xspec.schematron.preprocessed.step2"
               value="${xspec.output.dir}/${xspec.xspecfile.name.without.ext}-step2.sch" />
-
-    <!-- Location of the preprocessed Schematron XSLT file.
-      Since the original Schematron file may reference other files at relative paths,
-      the preprocessed XSLT file needs to go in the same folder as the original Schematron file.
-      This file is created at "STEP 3" and deleted by cleanup. -->
     <property name="xspec.schematron.preprocessed.xsl.file"
-              value="${xspec.schematron.file}-preprocessed.xsl" />
+              value="${xspec.output.dir}/${xspec.xspecfile.name.without.ext}-sch-preprocessed.xsl" />
 
     <echo message="STEP 1: Include modules"
           level="info" />
@@ -346,17 +350,20 @@
 
   <!-- Compiles the XSpec file into the test runner file written in XSLT or XQuery -->
   <target name="compile" depends="init, preprocess-schematron-xspec">
-    <condition property="xspec.compiler.xsl"
+    <condition property="xspec.compiler.xsl.name"
                value="generate-query-tests.xsl"
                else="generate-xspec-tests.xsl">
       <istrue value="${xspec.is.xquery}" />
     </condition>
 
+    <property name="xspec.compiler.xsl"
+              value="${xspec.project.dir}/src/compiler/${xspec.compiler.xsl.name}" />
+
     <echo message="Compiling Tests..."
           level="info" />
     <saxon-xslt in="${xspec.xspecfile.preprocessed}"
                 out="${xspec.compiled.runner}"
-                style="${xspec.project.dir}/src/compiler/${xspec.compiler.xsl}" />
+                style="${xspec.compiler.xsl}" />
   </target>
 
   <!-- Runs the compiled XSpec for XQuery -->
@@ -368,6 +375,7 @@
       <!-- Saxon should be included in the classpath -->
       <classpath>
         <pathelement path="${java.class.path}" />
+        <pathelement path="${xspec.additional.classpath}" if:set="xspec.additional.classpath" />
       </classpath>
 
       <arg line="${saxon.custom.options}" if:set="saxon.custom.options" />
@@ -404,6 +412,7 @@
       <!-- Saxon should be included in the classpath -->
       <classpath>
         <pathelement path="${java.class.path}" />
+        <pathelement path="${xspec.additional.classpath}" if:set="xspec.additional.classpath" />
         <pathelement location="${xspec.project.dir}/java" if:true="${xspec.coverage.enabled}" />
       </classpath>
 
@@ -460,10 +469,14 @@
                 out="${xspec.coverage.html}"
                 style="${xspec.coverage.reporter.xsl}">
       <factory-elements>
-        <attribute name="http://saxon.sf.net/feature/linenumbering"
-                   value="true"/>
+        <attribute name="http://saxon.sf.net/feature/configuration-file"
+                   value="${xspec.project.dir}/src/reporter/coverage-report-config.xml" />
       </factory-elements>
       <xslt-elements>
+        <classpath>
+          <pathelement path="${java.class.path}" />
+          <pathelement location="${xspec.project.dir}/java" />
+        </classpath>
         <param name="inline-css" expression="true" />
         <param name="report-css-uri" expression="${xspec.coverage.html.css.url}"
                if="xspec.coverage.html.css.url" />
@@ -506,8 +519,6 @@
     <retry retrycount="1" retrydelay="1000">
       <delete dir="${xspec.output.dir}" />
     </retry>
-
-    <delete file="${xspec.schematron.preprocessed.xsl.file}" />
   </target>
 
 </project>

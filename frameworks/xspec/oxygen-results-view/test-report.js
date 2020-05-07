@@ -57,7 +57,7 @@ function showTest(element) {
     var scenario = getAncestor(element, "testsuite");
     
     var scenarioName = scenario.getAttribute('data-name');
-    var scenarioLocation = scenario.getAttribute('data-source');
+    var scenarioLocation = scenario.getAttribute('data-xspec');
     
     
     xspecBridge.showTest(testName, scenarioName, scenarioLocation);
@@ -68,8 +68,8 @@ function runScenario(currentNode) {
     
     var scenario = getAncestor(currentNode, "testsuite");
     
-    var scenarioName = scenario.getAttribute('template-id');
-    var scenarioLocation = scenario.getAttribute('data-source');
+    var scenarioName = scenario.getAttribute('id');
+    var scenarioLocation = scenario.getAttribute('data-xspec');
     
     xspecBridge.runScenario(scenarioName, scenarioLocation);
 }
@@ -163,7 +163,7 @@ function getFailedScenarios() {
              }
         	
             if (hasAssert) {
-                var scenarioName = scenario.getAttribute('template-id');
+                var scenarioName = scenario.getAttribute('id');
                 listOfObjects.push(scenarioName);
             }
         }

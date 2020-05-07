@@ -106,6 +106,9 @@
 
   <!-- Output namespace nodes -->
   <xsl:for-each select="$new-namespaces">
+    <!-- Sort in namespace prefix -->
+    <xsl:sort select="name()" />
+
     <xsl:if test="position() ge 2">
       <xsl:value-of select="$ns-attr-indent" />
     </xsl:if>
@@ -313,6 +316,11 @@
         not(preceding-sibling::node()) or not(following-sibling::node())
       )">
       <!-- Discard -->
+    </xsl:when>
+
+    <xsl:when test="preceding-sibling::node()[1]/self::test:ws
+      or following-sibling::node()[1]/self::test:ws">
+      <!-- Indentation created after or before whitespace-only text nodes. Discard. -->
     </xsl:when>
 
     <xsl:otherwise>

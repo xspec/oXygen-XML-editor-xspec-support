@@ -57,8 +57,8 @@
     <xsl:template match="x:scenario">
         <div class="testsuite">
             <xsl:attribute name="data-name" select="x:label"/>
-            <xsl:attribute name="template-id" select="@template-id"/>
-            <xsl:attribute name="data-source" select="@source"/>
+            <xsl:attribute name="id" select="@id"/>
+            <xsl:attribute name="data-xspec" select="@xspec"/>
             <xsl:attribute name="data-tests" select="count(.//x:test)"/>
             <xsl:attribute name="data-failures" select="count(.//x:test[@successful='false'])"/>
             <p style="margin:0px;">

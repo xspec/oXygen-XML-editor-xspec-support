@@ -394,4 +394,31 @@ public class XSpecViewTestBase extends JFCTestCase {
     p.waitFor();
 
   }
+  
+  /**
+   * Filter "x:test" ids.
+   * 
+   * @param content Content to filter.
+   * 
+   * @return The content without the ids.
+   */
+  protected String filterTestElementId(String content) {
+    return content.replaceAll("x:test id=\"[^\"]*\"", "x:test");
+  }
+  
+  /**
+   * Filters various things that are not important for an assert or generated content
+   * that changes on every run.
+   * 
+   * @param content Content to filter.
+   * 
+   * @return The filtered content.
+   */
+  protected String filterAll(String content) {
+    return content
+        .replaceAll("date=\".*\"", "date=\"XXX\"")
+        .replaceAll("<\\?xml-stylesheet.*\\?>", "")
+        .replaceAll("x:test id=\"[^\"]*\"", "x:test");
+  }
+
 }

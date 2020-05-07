@@ -62,7 +62,7 @@
     select="exists(@pending)" />
   <xsl:variable name="any-failure" as="xs:boolean"
     select="exists(x:test[x:is-failed-test(.)])" />
-  <div id="top-level-{local-name()}-{generate-id()}">
+  <div id="top_{@id}">
     <h2 class="{if ($pending) then 'pending' else if ($any-failure) then 'failed' else 'successful'}">
       <xsl:sequence select="x:pending-callback(@pending)"/>
       <xsl:apply-templates select="x:label" mode="x:html-report" />
@@ -73,7 +73,7 @@
         </xsl:call-template>
       </span>
     </h2>
-    <table class="xspec" id="t-{generate-id()}">
+    <table class="xspec" id="table_{@id}">
       <colgroup>
         <col style="width:75%" />
         <col style="width:25%" />
@@ -110,7 +110,7 @@
               <xsl:sequence select="x:pending-callback(@pending)"/>
               <xsl:choose>
                 <xsl:when test="$any-failure">
-                  <a href="#{local-name()}-{generate-id()}">
+                  <a href="#{@id}">
                     <xsl:sequence select="$label" />
                   </a>
                 </xsl:when>
@@ -241,7 +241,7 @@
             <xsl:sequence select="x:pending-callback(@pending)"/>
             <a>
               <xsl:if test="x:top-level-scenario-needs-format(.)">
-                <xsl:attribute name="href" select="string-join(('#top-level', local-name(), generate-id()), '-')" />
+                <xsl:attribute name="href" select="concat('#top_', @id)" />
               </xsl:if>
               <xsl:apply-templates select="x:label" mode="x:html-report" />
             </a>
@@ -290,7 +290,7 @@
 <xsl:template match="x:test[x:is-failed-test(.)]" as="element(xhtml:tr)" mode="x:html-summary">
   <tr class="failed">
     <td>
-      <a href="#{local-name()}-{generate-id()}">
+      <a href="#{@id}">
       	<xsl:apply-templates select="x:label" mode="x:html-report" />
       </a>
     </td>
@@ -299,7 +299,7 @@
 </xsl:template>
 
 <xsl:template match="x:scenario" as="element(xhtml:div)" mode="x:html-report">
-  <div id="{local-name()}-{generate-id()}">
+  <div id="{@id}">
     <h3>
       <xsl:for-each select="ancestor-or-self::x:scenario">
         <xsl:apply-templates select="x:label" mode="x:html-report" />
@@ -313,13 +313,18 @@
 </xsl:template>
 
 <xsl:template match="x:test" as="element(xhtml:div)" mode="x:html-report">
-  <div id="{local-name()}-{generate-id()}">
+  <div id="{@id}" class="xTestReport">
 
     <xsl:variable name="result" as="element(x:result)"
       select="if (x:result) then x:result else ../x:result" />
-    <h4>
+    <h4 class="xTestReportTitle">
       <xsl:apply-templates select="x:label" mode="x:html-report" />
     </h4>
+
+    <div class="xTestReportHint">
+      <a href="https://github.com/xspec/xspec/wiki/Understanding-Test-Results" target="_blank"
+        title="What does this report mean?">&#x2754;</a>
+    </div>
 
     <!-- True if the expectation is boolean (i.e. x:expect/@test was an xs:boolean at runtime.) -->
     <xsl:variable as="xs:boolean" name="boolean-test" select="not(x:result) and x:expect/@test" />
@@ -367,6 +372,12 @@
     </table>
 
   </div>
+</xsl:template>
+
+<xsl:template match="x:label" as="text()" mode="x:html-report">
+  <!-- TODO: Consider doing more whitespace normalization or normalizing
+    at an earlier stage (the compiler or the XML report) -->
+  <xsl:value-of select="x:right-trim(.)" />
 </xsl:template>
 
 <!-- Formats the Actual Result or the Expected Result in HTML -->
