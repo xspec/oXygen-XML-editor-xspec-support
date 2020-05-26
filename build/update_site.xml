@@ -4,8 +4,8 @@
 
     <xt:extension xmlns:xt="http://www.oxygenxml.com/ns/extension"
         id="com.oxygenxml.xspec.XSpecSupportPlugin">
-        <xt:location href="https://github.com/xspec/oXygen-XML-editor-xspec-support/releases/download/1.5.0/xspec.support-1.5.0-plugin.zip"/>
-        <xt:version>1.5.0</xt:version>
+        <xt:location href="https://github.com/xspec/oXygen-XML-editor-xspec-support/releases/download/1.6.0/xspec.support-1.6.0-plugin.zip"/>
+        <xt:version>1.6.0</xt:version>
         <xt:oxy_version>18.1+</xt:oxy_version>
         <xt:type>plugin</xt:type>
         <xt:author>Syncro Soft</xt:author>
@@ -102,8 +102,8 @@ SOFTWARE.
     
     <xt:extension xmlns:xt="http://www.oxygenxml.com/ns/extension"
         id="com.oxygenxml.xspec.XSpecSupportFramework">
-        <xt:location href="https://github.com/xspec/oXygen-XML-editor-xspec-support/releases/download/1.5.0/xspec.support-1.5.0-framework.zip"/>
-        <xt:version>1.5.0</xt:version>
+        <xt:location href="https://github.com/xspec/oXygen-XML-editor-xspec-support/releases/download/1.6.0/xspec.support-1.6.0-framework.zip"/>
+        <xt:version>1.6.0</xt:version>
         <xt:oxy_version>18.0+</xt:oxy_version>
         <xt:type>framework</xt:type>
         <xt:author>Alex Jitianu</xt:author>
