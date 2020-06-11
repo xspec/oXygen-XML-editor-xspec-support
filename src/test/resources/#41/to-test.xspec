@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<x:description xmlns:x="http://www.jenitennison.com/xslt/xspec"
+    xmlns:f="uri:some"
+    stylesheet="to-test.xsl"> 
+
+    <x:scenario label="template name code-to-code">
+        <x:call template="code-to-code">
+            <x:param name="value" select="f:gender/@value">
+                <f:gender value="female"/>
+            </x:param>
+            <x:param name="codeMap">
+                <map code="F" codeSystem="null" inValue="female" displayName="Vrouw"/>
+            </x:param>
+        </x:call>
+        <x:expect label="attributes" select="geslacht/@*">
+            <geslacht code="false" codeSystem="2.16.840.1.113883.5.1" displayName="Vrouw"/>
+        </x:expect>
+    </x:scenario>
+
+</x:description>

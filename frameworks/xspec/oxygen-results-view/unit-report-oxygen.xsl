@@ -188,11 +188,17 @@
                 <xsl:when test="@select and node()">
                     <!-- Applies the XPath filter to get the subset of interest. -->
                     <xsl:variable name="filtered">
-                        <xsl:variable name="expr" select="if (normalize-space(@select) = '/') then concat('.', @select, 'node()') else concat('.', @select)"/>
-                        <xsl:evaluate xpath="$expr" context-item="."/>
+                        <!-- #41 Put a wrapper in case the xpath returns attributes. -->
+                        <wrapper>
+                            <xsl:variable name="expr" select="if (normalize-space(@select) = '/') then concat('.', @select, 'node()') else concat('.', @select)"/>
+                            <xsl:evaluate xpath="$expr" context-item="."></xsl:evaluate>
+                        </wrapper>
                     </xsl:variable>
+                    <!-- #41 Check if the wrapper received any attributes. If it hasn't, process its contents. -->
+                    <xsl:variable name="toProcess" select="if (count($filtered/*/@*) > 0) then $filtered else $filtered/*/node()"/>
+                    
                     <!-- Convert to a version ready to be serialized. -->
-                    <xsl:apply-templates select="$filtered" mode="copy">
+                    <xsl:apply-templates select="$toProcess" mode="copy">
                         <xsl:with-param name="level" select="0"/>
                     </xsl:apply-templates>   
                 </xsl:when>

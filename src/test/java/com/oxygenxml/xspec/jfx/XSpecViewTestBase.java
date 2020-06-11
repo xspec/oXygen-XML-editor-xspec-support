@@ -32,6 +32,11 @@ import javafx.concurrent.Worker;
 import javafx.concurrent.Worker.State;
 import javafx.scene.web.WebEngine;
 import junit.extensions.jfcunit.JFCTestCase;
+import net.sf.saxon.s9api.Processor;
+import net.sf.saxon.s9api.XPathCompiler;
+import net.sf.saxon.s9api.XPathExecutable;
+import net.sf.saxon.s9api.XdmItem;
+import net.sf.saxon.s9api.XdmNode;
 import ro.sync.exml.workspace.api.editor.WSEditor;
 import ro.sync.exml.workspace.api.editor.documenttype.DocumentTypeInformation;
 import ro.sync.exml.workspace.api.standalone.StandalonePluginWorkspace;
@@ -421,6 +426,26 @@ public class XSpecViewTestBase extends JFCTestCase {
         .replaceAll("date=\".*\"", "date=\"XXX\"")
         .replaceAll("<\\?xml-stylesheet.*\\?>", "")
         .replaceAll("x:test id=\"[^\"]*\"", "x:test");
+  }
+  
+  /**
+   * Executes XPath.
+   * 
+   * @param resource Input.
+   * @param xpath XPath expression.
+   * 
+   * @return Result.
+   * 
+   * @throws Exception if it fails.
+   */
+  protected String executeXPath(File resource, String xpath) throws Exception {
+    Processor processor = new Processor(false);
+    XdmNode build = processor.newDocumentBuilder().build(resource);
+    XPathCompiler newXPathCompiler = processor.newXPathCompiler();
+    
+    XdmItem evaluateSingle = newXPathCompiler.evaluateSingle(xpath, build);
+    
+    return evaluateSingle.toString();
   }
 
 }
