@@ -16,6 +16,8 @@
     <xsl:param name="report-js-uri" select="
         resolve-uri('test-report.js')"/>
         
+    <xsl:param name="force-focus" as="xs:string?" />
+
     <xsl:output name="escaped" method="xml" omit-xml-declaration="yes" indent="yes"/>
     
     <xsl:output  method="html" omit-xml-declaration="yes" indent="yes" />
@@ -49,7 +51,12 @@
                 
             </head>
             <body>
-            	<xsl:apply-templates select="x:scenario"/>
+            	<xsl:apply-templates
+                    select="
+                        if ($force-focus) then
+                            descendant::x:scenario[contains-token($force-focus, @id)]
+                        else
+                            x:scenario"/>
             </body>
         </html>
     </xsl:template>

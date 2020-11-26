@@ -810,7 +810,7 @@
 									<String></String>
 								</field>
 								<field name="buildFilePath">
-									<String>oxygen-results-view/build_report.xml</String>
+									<String>build.xml</String>
 								</field>
 								<field name="ditaParams">
 									<list>
@@ -885,13 +885,36 @@
 										</antParameter>
 										<antParameter>
 											<field name="name">
-												<String>ext.xspec.compiler.xsl</String>
+												<String>xspec.xslt.compiler.xsl</String>
 											</field>
 											<field name="description">
-												<String>The XSLT that processes the XSPEC file into XSLT.</String>
+												<String>The stylesheet that processes the XSLT XSpec file into XSLT.</String>
 											</field>
 											<field name="value">
-												<String>${frameworkDir}/oxygen-results-view/generate-xspec-tests-oxygen.xsl</String>
+												<String>${frameworkDir}/oxygen-results-view/compile-xslt-tests-oxygen.xsl</String>
+											</field>
+											<field name="defaultValue">
+												<null/>
+											</field>
+											<field name="type">
+												<Integer>5</Integer>
+											</field>
+											<field name="possibleValues">
+												<null/>
+											</field>
+											<field name="possibleValuesDescriptions">
+												<null/>
+											</field>
+										</antParameter>
+										<antParameter>
+											<field name="name">
+												<String>xspec.compiler.saxon.config</String>
+											</field>
+											<field name="description">
+												<String></String>
+											</field>
+											<field name="value">
+												<String>${frameworkDir}/oxygen-results-view/saxon-config.xml</String>
 											</field>
 											<field name="defaultValue">
 												<null/>
@@ -1023,7 +1046,7 @@
 										</antParameter>
 										<antParameter>
 											<field name="name">
-												<String>xspec.template.name.entrypoint</String>
+												<String>xspec.force.focus</String>
 											</field>
 											<field name="description">
 												<String></String>
@@ -1209,6 +1232,7 @@
 										<String>${oxygenHome}/lib/*log4j*.jar</String>
 										<String>${oxygenHome}/lib/*xerces*.jar</String>
 										<String>${oxygenHome}/lib/guava-*.jar</String>
+										<String>${frameworkDir}/oxygen-results-view/saxon-extension.jar</String>
 									</String-array>
 								</field>
 							</antScenario>
