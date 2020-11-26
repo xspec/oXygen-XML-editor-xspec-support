@@ -298,7 +298,7 @@ public class XSpecViewTestBase extends JFCTestCase {
     antlauncherJar.append(antL.getAbsolutePath()).append(separator)
     .append(ant.getAbsolutePath());
 
-    // Build the classpath needed by the build_report.xml script.
+    // Build the classpath needed by the build.xml script.
     StringBuilder cl = new StringBuilder();
     File saxon = URLUtil.getCanonicalFileFromFileUrl(getClass().getClassLoader().getResource("cmd/saxon9ee.jar"));
     cl.append("-lib ").append(saxon.getAbsolutePath()).append(" ");
@@ -312,12 +312,11 @@ public class XSpecViewTestBase extends JFCTestCase {
     cl.append("-lib ").append(xmlApis.getAbsolutePath()).append(" ");
 
 
-    File compilerXSL = new File("frameworks/xspec/oxygen-results-view/generate-xspec-tests-oxygen.xsl");
-    File compilerXSLDriver = new File("frameworks/xspec/oxygen-results-view/compile-driver.xsl");
+    File compilerXSL = new File("frameworks/xspec/oxygen-results-view/compile-xslt-tests-oxygen.xsl");
     File reportXSL = new File("frameworks/xspec/oxygen-results-view/unit-report-oxygen.xsl");
     File xspecProjectDir = new File("frameworks/xspec/");
 
-    File buildFile = new File("frameworks/xspec/oxygen-results-view/build_report.xml");
+    File buildFile = new File("frameworks/xspec/build.xml");
 
     //    System.out.println("CLASSPATH: " + cl);
     //    System.out.println("ANT: " + antlauncherJar);
@@ -341,21 +340,20 @@ public class XSpecViewTestBase extends JFCTestCase {
     lines.add(buildFile.getAbsolutePath());
     lines.add("-Dclean.output.dir=false");
 
-    // Compile XSL.
-    lines.add("-Dext.xspec.compiler.xsl=" + compilerXSL.getAbsolutePath() );
-    // Driver XSL that is applied over the the compiled XSL.
-    lines.add("-Dcompile.xspec.xsl.driver=" + compilerXSLDriver.getAbsolutePath() );
+    // Compiler XSL.
+    lines.add("-Dxspec.xslt.compiler.xsl=" + compilerXSL.getAbsolutePath() );
     // Report formatter.
     lines.add("-Dxspec.html.reporter.xsl=" + reportXSL.getAbsolutePath() );
     // XSpec project dir.
     lines.add("-Dxspec.project.dir=" + xspecProjectDir.getAbsolutePath() );
     // Output file name.
     lines.add("-Dxspec.result.html=" + outputFile.getAbsolutePath() );
-    lines.add("-Dxspec.template.name.entrypoint=" + entryPoints);
+    // Focus-enforced scenario IDs.
+    lines.add("-Dxspec.force.focus=" + entryPoints);
     // XSpec to process.
     lines.add("-Dxspec.xml=" + xspecFile.getAbsolutePath() );
     // From tests we Run Saxon in HE mode so we need a config file that creates a HE configuration. 
-    lines.add("-Dxspec.saxon.config=" + URLUtil.getCanonicalFileFromFileUrl(saxonConfig).getAbsolutePath());
+    lines.add("-Dxspec.compiler.saxon.config=" + URLUtil.getCanonicalFileFromFileUrl(saxonConfig).getAbsolutePath());
     
     if (schematron) {
       lines.add("-Dtest.type=s");  
