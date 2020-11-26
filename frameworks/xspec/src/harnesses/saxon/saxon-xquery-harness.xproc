@@ -17,7 +17,7 @@
             name="saxon-xquery-harness"
             type="t:saxon-xquery-harness"
             version="1.0">
-	
+
    <p:documentation>
       <p>This pipeline executes an XSpec test suite with the Saxon embedded in Calabash.</p>
       <p><b>Primary input:</b> A XSpec test suite document.</p>
@@ -27,38 +27,29 @@
    </p:documentation>
 
    <p:serialization port="result" indent="true" method="xhtml"
-                    encoding="UTF-8" include-content-type="true"/>
+                    encoding="UTF-8" include-content-type="true"
+                    omit-xml-declaration="false" />
 
    <p:import href="../harness-lib.xpl"/>
 
    <t:parameters name="params"/>
 
    <p:group>
-      <p:variable name="xspec-home" select="
-          /c:param-set/c:param[@name eq 'xspec-home']/@value">
+      <p:variable name="xspec-home" select="/c:param-set/c:param[@name eq 'xspec-home']/@value">
          <p:pipe step="params" port="parameters"/>
       </p:variable>
-      <p:variable name="utils-library-at" select="
-          /c:param-set/c:param[@name eq 'utils-library-at']/@value">
+      <p:variable name="utils-library-at"
+         select="/c:param-set/c:param[@name eq 'utils-library-at']/@value">
          <p:pipe step="params" port="parameters"/>
       </p:variable>
-
-      <!-- either no at location hint, or resolved from xspec-home if packaging not supported -->
-      <p:variable name="utils-lib" select="
-          if ( $utils-library-at ) then
-            $utils-library-at
-          else if ( $xspec-home ) then
-            resolve-uri('src/compiler/generate-query-utils.xql', $xspec-home)
-          else
-            ''"/>
 
       <!-- compile the suite into a query -->
       <t:compile-xquery>
-         <p:with-param name="utils-library-at" select="$utils-lib"/>
+         <p:with-param name="utils-library-at" select="$utils-library-at" />
       </t:compile-xquery>
 
       <!-- escape the query as text -->
-      <p:escape-markup name="escape"/>
+      <t:escape-markup name="escape" />
 
       <!-- run it on saxon -->
       <p:xquery name="run">

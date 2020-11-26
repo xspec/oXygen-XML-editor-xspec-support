@@ -38,7 +38,8 @@
     No default value. This property is occasionally provided by the user. -->
 
   <!-- "catalog" property: Documented in Wiki. DO NOT RENAME.
-    File path (not URL) of XML catalog file -->
+    One or more XML catalog files. Separated by semicolons (;).
+    Value is either file path or URI. Must not mix file path and URI. -->
 
   <!-- File path of the original XSpec file specified by the user -->
   <property name="xspec.xspecfile.original" value="${xspec.xml}" />
@@ -145,12 +146,24 @@
     <istrue value="${xspec.is.schematron}" />
   </condition>
 
-  <!-- Catalog URL.
-    To work around a Saxon bug, it must be URL: https://saxonica.plan.io/issues/3025#note-8
-    To debug catalog resolution, -Dsaxon.custom.options=-t would help.
-    Oxygen 20 default transformation scenario sets catalog even when file does not exist. Hence
-    validate=false. -->
-  <makeurl property="xspec.catalog.url" file="${catalog}" validate="false" if:set="catalog" />
+  <!-- True if "catalog" property consists of URIs. Otherwise file paths. -->
+  <property name="catalog.is.uri" value="false" />
+
+  <!-- One or more XML catalog file paths (not URLs). Separated by semicolons (;) -->
+  <condition property="xspec.catalog.files"
+             value="${xspec.output.dir}/${xspec.xspecfile.name.without.ext}_catalog.xml"
+             else="${catalog}"
+             if:set="catalog">
+    <istrue value="${catalog.is.uri}" />
+  </condition>
+
+  <!-- True if a temporary catalog file needs to be generated -->
+  <condition property="xspec.generate.catalog" else="false">
+    <and>
+      <isset property="catalog" />
+      <istrue value="${catalog.is.uri}" />
+    </and>
+  </condition>
 
   <!-- File path of the compiled XSLT/XQuery file that finally runs the tests -->
   <property name="xspec.compiled.runner.without.ext" 
@@ -161,33 +174,42 @@
     <istrue value="${xspec.is.xquery}" />
   </condition>
 
-  <!-- Converts URL to file path -->
-  <taskdef name="makepath" classname="io.xspec.xspec.ant.taskdefs.MakePath"
-    classpath="${xspec.project.dir}/java" />
-
   <!-- Performs XSLT using Saxon with common parameters including catalog -->
   <macrodef name="saxon-xslt">
     <attribute name="in" />
     <attribute name="out" />
     <attribute name="style" />
+    <attribute name="ignore-catalog" default="false" />
 
     <element name="factory-elements" optional="true" />
     <element name="xslt-elements" optional="true" />
 
     <sequential>
+      <local name="enable-catalog" />
+      <condition property="enable-catalog" else="false">
+        <and>
+          <isfalse value="@{ignore-catalog}" />
+          <isset property="xspec.catalog.files" />
+        </and>
+      </condition>
+
       <xslt in="@{in}" out="@{out}" style="@{style}" force="true">
         <factory name="net.sf.saxon.TransformerFactoryImpl">
           <factory-elements />
+
+          <!-- Place <attribute> after <factory-elements/>, otherwise xspec.compiler.saxon.config
+            seems to reset preceding <attribute>. -->
+          <attribute name="http://saxon.sf.net/feature/xml-version"
+                     value="${xspec.xml.version}"
+                     if:set="xspec.xml.version" />
 
           <!-- For debugging -->
           <!--<attribute name="http://saxon.sf.net/feature/timing"
                      value="true"/>-->
         </factory>
 
-        <xmlcatalog if:set="catalog">
-          <catalogpath>
-            <pathelement location="${catalog}" />
-          </catalogpath>
+        <xmlcatalog if:true="${enable-catalog}">
+          <catalogpath path="${xspec.catalog.files}" />
         </xmlcatalog>
 
         <xslt-elements />
@@ -256,80 +278,56 @@
     </retry>
   </target>
 
-  <!-- Gets the file path (not URL) of the Schematron file -->
-  <target name="locate-schematron-file" if="${xspec.is.schematron}">
-    <xml-to-properties in="${xspec.xspecfile.original}" style="locate-schematron-uri.xsl" />
-    <makepath property="xspec.schematron.file" url="${xspec.schematron.uri}" />
-    <echo message="Path of Schematron file: ${xspec.schematron.file}"
-          level="info" />
-  </target>
+  <!-- Generates a temporary catalog file which references all URIs in "catalog" property -->
+  <target name="generate-catalog" if="${xspec.generate.catalog}">
+    <makeurl property="basedir.uri" file="${basedir}/" />
 
-  <!-- Sets up the preprocessors for Schematron -->
-  <target name="setup-schematron-preprocessor" if="${xspec.is.schematron}">
-    <!-- "xspec.schematron.preprocessor.step1" property: Documented in Wiki. DO NOT RENAME.
-      File path of the Step 1 preprocessor XSLT file -->
-    <property name="xspec.schematron.preprocessor.step1"
-              value="${xspec.project.dir}/src/schematron/iso-schematron/iso_dsdl_include.xsl" />
-
-    <!-- "xspec.schematron.preprocessor.step2" property: Documented in Wiki. DO NOT RENAME.
-      File path of the Step 2 preprocessor XSLT file -->
-    <property name="xspec.schematron.preprocessor.step2"
-              value="${xspec.project.dir}/src/schematron/iso-schematron/iso_abstract_expand.xsl" />
-
-    <!-- For Step 3: Wrap the actual preprocessor in order to inject parameters -->
-
-    <!-- File path of a temporary XSLT file which imports the actual preprocessor -->
-    <property name="xspec.schematron.preprocessor.step3.wrapper"
-              value="${xspec.output.dir}/${xspec.xspecfile.name.without.ext}-sch-step3-wrapper.xsl" />
-
-    <!-- "xspec.schematron.preprocessor.step3" property: Documented in Wiki. DO NOT RENAME.
-      File path of the actual Step 3 preprocessor XSLT file -->
-    <!-- "xspec.schematron.preprocessor.step3.url" property:
-      URL of the actual preprocessor -->
-    <makeurl property="xspec.schematron.preprocessor.step3.url"
-             file="${xspec.schematron.preprocessor.step3}"
-             if:set="xspec.schematron.preprocessor.step3" />
-
-    <!-- Generate the wrapper of the actual preprocessor -->
-    <saxon-xslt in="${xspec.xspecfile.original}"
-                out="${xspec.schematron.preprocessor.step3.wrapper}"
-                style="${xspec.project.dir}/src/schematron/generate-step3-wrapper.xsl">
+    <!-- @in doesn't matter -->
+    <saxon-xslt in="${ant.file}"
+                out="${xspec.catalog.files}"
+                style="${xspec.project.dir}/src/ant/generate-catalog.xsl"
+                ignore-catalog="true">
+      <factory-elements>
+        <attribute name="http://saxon.sf.net/feature/initialTemplate"
+                   value="{http://www.w3.org/1999/XSL/Transform}initial-template" />
+      </factory-elements>
       <xslt-elements>
-        <param name="ACTUAL-PREPROCESSOR-URI" expression="${xspec.schematron.preprocessor.step3.url}"
-               if="xspec.schematron.preprocessor.step3.url" />
+        <param name="CATALOG-URIS" expression="${catalog}" />
+        <param name="BASE-URI" expression="${basedir.uri}" />
       </xslt-elements>
     </saxon-xslt>
   </target>
 
   <!-- Converts Schematron into XSLT -->
   <target name="preprocess-schematron-xslt"
-          depends="locate-schematron-file, setup-schematron-preprocessor"
           if="${xspec.is.schematron}">
-    <!-- Location of the temporary files -->
-    <property name="xspec.schematron.preprocessed.step1"
-              value="${xspec.output.dir}/${xspec.xspecfile.name.without.ext}-step1.sch" />
-    <property name="xspec.schematron.preprocessed.step2"
-              value="${xspec.output.dir}/${xspec.xspecfile.name.without.ext}-step2.sch" />
+    <!-- URI of preprocessors -->
+    <makeurl property="xspec.schematron.preprocessor.step1.url"
+             file="${xspec.schematron.preprocessor.step1}"
+             if:set="xspec.schematron.preprocessor.step1" />
+    <makeurl property="xspec.schematron.preprocessor.step2.url"
+             file="${xspec.schematron.preprocessor.step2}"
+             if:set="xspec.schematron.preprocessor.step2" />
+    <makeurl property="xspec.schematron.preprocessor.step3.url"
+             file="${xspec.schematron.preprocessor.step3}"
+             if:set="xspec.schematron.preprocessor.step3" />
+
+    <!-- Location of the generated XSLT file -->
     <property name="xspec.schematron.preprocessed.xsl.file"
               value="${xspec.output.dir}/${xspec.xspecfile.name.without.ext}-sch-preprocessed.xsl" />
 
-    <echo message="STEP 1: Include modules"
-          level="info" />
-    <saxon-xslt in="${xspec.schematron.file}"
-                out="${xspec.schematron.preprocessed.step1}"
-                style="${xspec.schematron.preprocessor.step1}" />
-
-    <echo message="STEP 2: Expand abstracts"
-          level="info" />
-    <saxon-xslt in="${xspec.schematron.preprocessed.step1}"
-                out="${xspec.schematron.preprocessed.step2}"
-                style="${xspec.schematron.preprocessor.step2}" />
-
-    <echo message="STEP 3: Convert Schematron to XSLT"
-          level="info" />
-    <saxon-xslt in="${xspec.schematron.preprocessed.step2}"
+    <saxon-xslt in="${xspec.xspecfile.original}"
                 out="${xspec.schematron.preprocessed.xsl.file}"
-                style="${xspec.schematron.preprocessor.step3.wrapper}" />
+                style="${xspec.project.dir}/src/schematron/schut-to-xslt.xsl">
+      <xslt-elements>
+        <param name="STEP1-PREPROCESSOR-URI" expression="${xspec.schematron.preprocessor.step1.url}"
+          if:set="xspec.schematron.preprocessor.step1.url" />
+        <param name="STEP2-PREPROCESSOR-URI" expression="${xspec.schematron.preprocessor.step2.url}"
+          if:set="xspec.schematron.preprocessor.step2.url" />
+        <param name="STEP3-PREPROCESSOR-URI" expression="${xspec.schematron.preprocessor.step3.url}"
+          if:set="xspec.schematron.preprocessor.step3.url" />
+      </xslt-elements>
+    </saxon-xslt>
   </target>
 
   <!-- Converts Schematron XSpec into XSLT XSpec -->
@@ -349,21 +347,40 @@
   </target>
 
   <!-- Compiles the XSpec file into the test runner file written in XSLT or XQuery -->
-  <target name="compile" depends="init, preprocess-schematron-xspec">
-    <condition property="xspec.compiler.xsl.name"
-               value="generate-query-tests.xsl"
-               else="generate-xspec-tests.xsl">
+  <target name="compile" depends="init, generate-catalog, preprocess-schematron-xspec">
+    <property name="xspec.compiler.dir"
+              value="${xspec.project.dir}/src/compiler" />
+
+    <property name="xspec.xquery.compiler.xsl"
+              value="${xspec.compiler.dir}/compile-xquery-tests.xsl" />
+    <property name="xspec.xslt.compiler.xsl"
+              value="${xspec.compiler.dir}/compile-xslt-tests.xsl" />
+
+    <condition property="xspec.compiler.xsl"
+               value="${xspec.xquery.compiler.xsl}"
+               else="${xspec.xslt.compiler.xsl}">
       <istrue value="${xspec.is.xquery}" />
     </condition>
 
-    <property name="xspec.compiler.xsl"
-              value="${xspec.project.dir}/src/compiler/${xspec.compiler.xsl.name}" />
+    <property name="xspec.compiler.saxon.config.absolute"
+              location="${xspec.compiler.saxon.config}"
+              if:set="xspec.compiler.saxon.config" />
 
     <echo message="Compiling Tests..."
           level="info" />
     <saxon-xslt in="${xspec.xspecfile.preprocessed}"
                 out="${xspec.compiled.runner}"
-                style="${xspec.compiler.xsl}" />
+                style="${xspec.compiler.xsl}">
+      <factory-elements>
+        <attribute name="http://saxon.sf.net/feature/configuration-file"
+                   value="${xspec.compiler.saxon.config.absolute}"
+                   if:set="xspec.compiler.saxon.config.absolute" />
+      </factory-elements>
+      <xslt-elements>
+        <param name="force-focus" expression="${xspec.force.focus}"
+               if="xspec.force.focus" />
+      </xslt-elements>
+    </saxon-xslt>
   </target>
 
   <!-- Runs the compiled XSpec for XQuery -->
@@ -379,9 +396,10 @@
       </classpath>
 
       <arg line="${saxon.custom.options}" if:set="saxon.custom.options" />
-      <arg value="-catalog:${xspec.catalog.url}" if:set="catalog" />
+      <arg value="-catalog:${xspec.catalog.files}" if:set="xspec.catalog.files" />
       <arg value="-o:${xspec.result.xml}" />
       <arg value="-q:${xspec.compiled.runner}" />
+      <arg value="-xmlversion:${xspec.xml.version}" if:set="xspec.xml.version" />
     </java>
   </target>
 
@@ -401,6 +419,11 @@
     <property name="xspec.xspecfile.absolute"
               location="${xspec.xspecfile.original}"
               if:true="${xspec.coverage.enabled}" />
+
+    <!-- URL of XSpec repository root -->
+    <makeurl property="xspec.project.dir.url"
+             file="${xspec.project.dir}"
+             if:true="${xspec.coverage.enabled}" />
 
     <echo message="Collecting test coverage data..."
           level="info"
@@ -423,14 +446,18 @@
       <sysproperty key="xspec.coverage.xml"
                    value="${xspec.coverage.xml.absolute}"
                    if:true="${xspec.coverage.enabled}" />
+      <sysproperty key="xspec.home.uri"
+                   value="${xspec.project.dir.url}"
+                   if:true="${xspec.coverage.enabled}" />
       <sysproperty key="xspec.xspecfile"
                    value="${xspec.xspecfile.absolute}"
                    if:true="${xspec.coverage.enabled}" />
 
       <arg line="${saxon.custom.options}" if:set="saxon.custom.options" />
-      <arg value="-catalog:${xspec.catalog.url}" if:set="catalog" />
+      <arg value="-catalog:${xspec.catalog.files}" if:set="xspec.catalog.files" />
       <arg value="-it:{http://www.jenitennison.com/xslt/xspec}main" />
       <arg value="-o:${xspec.result.xml}" />
+      <arg value="-xmlversion:${xspec.xml.version}" if:set="xspec.xml.version" />
       <arg value="-xsl:${xspec.compiled.runner}" />
       <arg value="-T:com.jenitennison.xslt.tests.XSLTCoverageTraceListener"
            if:true="${xspec.coverage.enabled}" />
@@ -449,6 +476,8 @@
                 out="${xspec.result.html}"
                 style="${xspec.html.reporter.xsl}">
       <xslt-elements>
+        <param name="force-focus" expression="${xspec.force.focus}"
+               if="xspec.force.focus" />
         <param name="inline-css" expression="true" />
         <param name="report-css-uri" expression="${xspec.result.html.css.url}"
                if="xspec.result.html.css.url" />
