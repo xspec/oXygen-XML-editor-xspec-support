@@ -885,6 +885,29 @@
 										</antParameter>
 										<antParameter>
 											<field name="name">
+												<String>xspec.xquery.compiler.xsl</String>
+											</field>
+											<field name="description">
+												<String>The stylesheet that processes the XQuery XSpec file into XQuery.</String>
+											</field>
+											<field name="value">
+												<String>${frameworkDir}/oxygen-results-view/compile-xquery-tests-oxygen.xsl</String>
+											</field>
+											<field name="defaultValue">
+												<null/>
+											</field>
+											<field name="type">
+												<Integer>5</Integer>
+											</field>
+											<field name="possibleValues">
+												<null/>
+											</field>
+											<field name="possibleValuesDescriptions">
+												<null/>
+											</field>
+										</antParameter>
+										<antParameter>
+											<field name="name">
 												<String>xspec.xslt.compiler.xsl</String>
 											</field>
 											<field name="description">
