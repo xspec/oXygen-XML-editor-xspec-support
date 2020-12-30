@@ -4,12 +4,11 @@
                 xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
                 xmlns:xs="http://www.w3.org/2001/XMLSchema"
                 xmlns:x="http://www.jenitennison.com/xslt/xspec"
-                xmlns:test="http://www.jenitennison.com/xslt/unit-test"
-                xmlns:pkg="http://expath.org/ns/pkg"
+                xmlns:fmt="urn:x-xspec:reporter:format-utils"
                 xmlns:xhtml="http://www.w3.org/1999/xhtml"
                 xmlns:fn="http://www.w3.org/2005/xpath-functions"
                 xmlns:saxon="http://saxon.sf.net/"
-                exclude-result-prefixes="x xs test pkg xhtml fn xsl saxon">
+                exclude-result-prefixes="#all">
     
     <xsl:param name="report-css-uri" select="
         resolve-uri('test-report.css')"/>
@@ -17,15 +16,18 @@
     <xsl:param name="report-js-uri" select="
         resolve-uri('test-report.js')"/>
         
+    <xsl:param name="force-focus" as="xs:string?" />
+
     <xsl:output name="escaped" method="xml" omit-xml-declaration="yes" indent="yes"/>
     
     <xsl:output  method="html" omit-xml-declaration="yes" indent="yes" />
     
-    
-    <xsl:import href="../src/reporter/format-utils.xsl"/>
-    
-    <xsl:import href="../src/common/xspec-utils.xsl"/>
-    
+    <xsl:include href="../src/common/common-utils.xsl" />
+    <xsl:include href="../src/common/deep-equal.xsl" />
+    <xsl:include href="../src/common/namespace-utils.xsl" />
+    <xsl:include href="../src/common/parse-report.xsl" />
+    <xsl:include href="../src/common/wrap.xsl" />
+    <xsl:include href="../src/reporter/format-utils.xsl" />
     
     <!-- 
       
@@ -49,7 +51,12 @@
                 
             </head>
             <body>
-            	<xsl:apply-templates select="x:scenario"/>
+            	<xsl:apply-templates
+                    select="
+                        if ($force-focus) then
+                            descendant::x:scenario[contains-token($force-focus, @id)]
+                        else
+                            x:scenario"/>
             </body>
         </html>
     </xsl:template>
@@ -85,7 +92,7 @@
     <xsl:template match="x:test">
         <xsl:param name="prefix"/>
         
-        <xsl:variable name="id" select="generate-id()"/>
+        <xsl:variable name="id" select="@id"/>
         <div class="testcase" data-name="{xs:string(x:label/text())}">
             <xsl:variable name="status">
                 <xsl:choose>
@@ -125,15 +132,19 @@
     
     
     <xsl:template name="diff">
+        <xsl:context-item as="element(x:test)" use="required" />
+
         <xsl:variable name="result" as="element(x:result)"
-            select="if (x:result) then x:result else ../x:result" />
+            select="(x:result, parent::x:scenario/x:result)[1]" />
+        <xsl:variable as="xs:boolean" name="boolean-test" select="x:is-boolean-test(.)" />
+
         <table class="xspecResult">
             <thead>
                 <tr>
                     <th style="font-size:14px;">Result</th>
                     <th style="font-size:14px;">
                         <xsl:choose>
-                            <xsl:when test="x:result">Expecting</xsl:when>
+                            <xsl:when test="$boolean-test">Expecting</xsl:when>
                             <xsl:otherwise>Expected</xsl:otherwise>
                         </xsl:choose>
                     </th>
@@ -141,16 +152,23 @@
             </thead>
             <tbody>
                 <tr>
+                    <!-- Actual Result -->
                     <td>
                         <xsl:apply-templates select="$result" mode="x:format-result">
-                            <xsl:with-param name="result-to-compare-with" select="x:expect" />
+                            <xsl:with-param name="result-to-compare-with" select="x:expect[not($boolean-test)]" />
                         </xsl:apply-templates>
                     </td>
+
                     <td>
                         <xsl:choose>
-                            <xsl:when test="not(x:result) and x:expect/@test">
-                                <pre><xsl:value-of select="@test" /></pre>
+                            <!-- Boolean expectation -->
+                            <xsl:when test="$boolean-test">
+                                <pre>
+                                    <xsl:value-of select="x:test-attr(.)" />
+                                </pre>
                             </xsl:when>
+                            
+                            <!-- Expected Result -->
                             <xsl:otherwise>
                                 <xsl:apply-templates select="x:expect" mode="x:format-result">
                                     <xsl:with-param name="result-to-compare-with" select="$result" />
@@ -185,13 +203,13 @@
     <xsl:template match="x:expect | x:result" mode="serialize-result-for-diff">
         <xsl:variable name="tmp">
             <xsl:choose>
-                <xsl:when test="@select and node()">
+                <xsl:when test="@select and x:reported-content(.)/node()">
                     <!-- Applies the XPath filter to get the subset of interest. -->
                     <xsl:variable name="filtered">
                         <!-- #41 Put a wrapper in case the xpath returns attributes. -->
                         <wrapper>
-                            <xsl:variable name="expr" select="if (normalize-space(@select) = '/') then concat('.', @select, 'node()') else concat('.', @select)"/>
-                            <xsl:evaluate xpath="$expr" context-item="."></xsl:evaluate>
+                            <xsl:variable name="expr" select="if (normalize-space(@select) = '/self::document-node()') then './node()' else concat('.', @select)"/>
+                            <xsl:evaluate xpath="$expr" context-item="x:reported-content(.)"></xsl:evaluate>
                         </wrapper>
                     </xsl:variable>
                     <!-- #41 Check if the wrapper received any attributes. If it hasn't, process its contents. -->
@@ -202,8 +220,8 @@
                         <xsl:with-param name="level" select="0"/>
                     </xsl:apply-templates>   
                 </xsl:when>
-                <xsl:when test="node()">
-                    <xsl:apply-templates select="node()" mode="copy">
+                <xsl:when test="x:reported-content(.)/node()">
+                    <xsl:apply-templates select="x:reported-content(.)/node()" mode="copy">
                         <xsl:with-param name="level" select="0"/>
                     </xsl:apply-templates>
                 </xsl:when>
@@ -231,7 +249,7 @@
     </xsl:template>
     
     <!-- Wrapper for significant spaces. -->
-    <xsl:template match="test:ws" mode="copy">
+    <xsl:template match="x:ws" mode="copy">
       <xsl:analyze-string select="." regex="\s">
         <xsl:matching-substring>
           <xsl:choose>
@@ -276,11 +294,18 @@
         <xd:param name="xslt-version"></xd:param>
     </xd:doc>
     <!-- Formats the Actual Result or the Expected Result in HTML -->
-    <xsl:template match="element()" as="element()+" mode="x:format-result">
+    <xsl:template match="x:expect | x:result" as="element()+" mode="x:format-result">
         <xsl:param name="result-to-compare-with" as="element()?" required="yes" />
         
         <!-- True if this element represents Expected Result -->
         <xsl:variable name="expected" as="xs:boolean" select=". instance of element(x:expect)" />
+        
+        <!-- Dereference @href if any and redefine the variable with it -->
+        <xsl:variable name="result-to-compare-with" as="element()?"
+            select="
+                if ($result-to-compare-with/@href)
+                then exactly-one(document($result-to-compare-with/@href)/element())
+                else $result-to-compare-with" />
         
         <xsl:choose>
             <xsl:when test="@href or node() or (@select eq '/self::document-node()')">
@@ -291,7 +316,7 @@
                         <code>
                             <xsl:if test="exists($result-to-compare-with)">
                                 <xsl:attribute name="class" select="
-                                    test:comparison-html-class(
+                                    fmt:comparison-html-class(
                                     @select,
                                     $result-to-compare-with/@select,
                                     $expected,
@@ -306,25 +331,26 @@
                 
                 <xsl:choose>
                     <xsl:when test="@href">
-                        <p><a href="{@href}"><xsl:value-of select="x:format-uri(@href)" /></a></p>
+                        <p><a href="{@href}"><xsl:value-of select="fmt:format-uri(@href)" /></a></p>
                     </xsl:when>
                     <xsl:otherwise>
                         <xsl:variable name="indentation"
-                            select="string-length(substring-after(text()[1], '&#xA;'))" />
+                            select="
+                                x:reported-content(.)/text()[1]
+                                => substring-after('&#xA;')
+                                => string-length()" />
                         <pre>
             <xsl:choose>
               <!-- Serialize the result while performing comparison -->
               <xsl:when test="exists($result-to-compare-with)">
                 <xsl:variable name="nodes-to-compare-with" as="node()*"
-                  select="if ($result-to-compare-with/@href)
-                          then document($result-to-compare-with/@href)/node()
-                          else $result-to-compare-with/node()" />
-                <xsl:for-each select="node()">
-                  <xsl:variable name="significant-pos" as="xs:integer?" select="test:significant-position(.)" />
-                  <xsl:apply-templates select="." mode="test:serialize">
+                  select="x:reported-content($result-to-compare-with)/node()" />
+                <xsl:for-each select="x:reported-content(.)/node()">
+                  <xsl:variable name="significant-pos" as="xs:integer?" select="fmt:significant-position(.)" />
+                  <xsl:apply-templates select="." mode="fmt:serialize">
                     <xsl:with-param name="indentation" select="$indentation" tunnel="yes" />
                     <xsl:with-param name="perform-comparison" select="true()" tunnel="yes" />
-                    <xsl:with-param name="node-to-compare-with" select="$nodes-to-compare-with[test:significant-position(.) eq $significant-pos]" />
+                    <xsl:with-param name="node-to-compare-with" select="$nodes-to-compare-with[fmt:significant-position(.) eq $significant-pos]" />
                     <xsl:with-param name="expected" select="$expected" />
                   </xsl:apply-templates>
                 </xsl:for-each>
@@ -332,7 +358,7 @@
 
               <!-- Serialize the result without performing comparison -->
               <xsl:otherwise>
-                <xsl:apply-templates select="node()" mode="test:serialize">
+                <xsl:apply-templates select="x:reported-content(.)/node()" mode="fmt:serialize">
                   <xsl:with-param name="indentation" select="$indentation" tunnel="yes" />
                 </xsl:apply-templates>
               </xsl:otherwise>

@@ -37,15 +37,15 @@ public class SchematronXSpecTest extends XSpecViewTestBase {
         "    xmlns:xs=\"http://www.w3.org/2001/XMLSchema\"\n" + 
         "    exclude-result-prefixes=\"xs\"\n" + 
         "    version=\"2.0\">\n" + 
-        "    <xsl:output omit-xml-declaration=\"yes\"></xsl:output>\n" + 
+        "    <xsl:output method=\"text\"></xsl:output>\n" + 
         "    <!--\n" + 
         "         <xsl:template name=\"make-label\">\n" + 
         "        <xsl:attribute name=\"label\" select=\"string-join((@label, tokenize(local-name(),'-')[.=('report','assert','not','rule')], @id, @role, @location, @context, current()[@count]/string('count:'), @count), ' ')\"/>\n" + 
         "    </xsl:template>\n" + 
         "        -->\n" + 
         "    <xsl:template match=\"text()\"/>\n" + 
-        "    <xsl:template match=\"*:template[@name='make-label']/*:attribute[@name='label']\">\n" + 
-        "        <xsl:value-of select=\"@select\"/>\n" + 
+        "    <xsl:template match=\"xsl:template[@name='create-expect']/xsl:param[@name='label']\">\n" + 
+        "        <xsl:value-of select=\"normalize-space(@select)\"/>\n" + 
         "    </xsl:template>\n" + 
         "</xsl:stylesheet>"));
     Transformer transformer = new TransformerFactoryImpl().newTransformer(xslSource);
@@ -56,7 +56,7 @@ public class SchematronXSpecTest extends XSpecViewTestBase {
     
     assertEquals(
         "label generation Xpath changed. Please update it inside com.oxygenxml.xspec.jfx.bridge.Bridge.showTestAWT(String, String, String)",
-        "string-join((@label, tokenize(local-name(),'-')[.=('report','assert','not','rule')], @id, @role, @location, @context, current()[@count]/string('count:'), @count), ' ')", 
+        "( @label, tokenize(local-name(), '-')[. = ('report', 'assert', 'not', 'rule')], @id, @role, @location, @context, (@count ! ('count:', .)) ) => string-join(' ')", 
         writer.toString());
   }
   
@@ -86,126 +86,153 @@ public class SchematronXSpecTest extends XSpecViewTestBase {
     
     // demo-02
     
-    System.out.println("+++++ " + XSpecUtil.generateId("demo-02(0)"));
+    System.out.println("+++++ " + XSpecUtil.generateId("demo-02(1)"));
     
     assertEquals("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" + 
-        "<x:report xmlns:test=\"http://www.jenitennison.com/xslt/unit-test\"\n" + 
-        "          xmlns:xs=\"http://www.w3.org/2001/XMLSchema\"\n" + 
-        "          xmlns:svrl=\"http://purl.oclc.org/dsdl/svrl\"\n" + 
-        "          xmlns:x=\"http://www.jenitennison.com/xslt/xspec\"\n" +
-        "          stylesheet=\"" + schCompiledURL.toString() + "\"\n" + 
-        "          date=\"XXX\"\n" +
-        "          xspec=\"" + xspecURL.toExternalForm() + "\"\n" + 
-        "          schematron=\"" + schURL.toExternalForm() + "\">\n" + 
-        "   <x:scenario id=\"" + XSpecUtil.generateId("demo-02(0)") + "\"\n" + 
-        "               xspec=\"" + xspecModuleURL.toString() + "\">\n" + 
-        "      <x:label>demo-02</x:label>\n" + 
-        "      <x:context href=\"" + xmlURL.toString() + "\"/>\n" + 
-        "      <x:scenario id=\"" + XSpecUtil.generateId("demo-02(0) / article should have a title(0)") + "\"\n" + 
-        "                  xspec=\"" + xspecModuleURL.toString() + "\">\n" + 
-        "         <x:label>article should have a title</x:label>\n" + 
-        "         <x:result select=\"/element()\">\n" + 
-        "            <svrl:schematron-output xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\"\n" + 
-        "                                    xmlns:saxon=\"http://saxon.sf.net/\"\n" + 
-        "                                    xmlns:schold=\"http://www.ascc.net/xml/schematron\"\n" + 
-        "                                    xmlns:iso=\"http://purl.oclc.org/dsdl/schematron\"\n" + 
-        "                                    xmlns:xhtml=\"http://www.w3.org/1999/xhtml\"\n" + 
-        "                                    title=\"\"\n" + 
-        "                                    schemaVersion=\"\"><!--   \n" + 
+        "<report xmlns=\"http://www.jenitennison.com/xslt/xspec\"\n" +
+        "        xspec=\"" + xspecURL.toExternalForm() + "\"\n" + 
+        "        stylesheet=\"" + schCompiledURL.toString() + "\"\n" + 
+        "        schematron=\"" + schURL.toExternalForm() + "\"\n" + 
+        "        date=\"XXX\">\n" +
+        "   <scenario id=\"" + XSpecUtil.generateId("demo-01(0)") + "\"\n" + 
+        "             xspec=\"" + xspecURL.toString() + "\">\n" + 
+        "      <label>demo-01</label>\n" + 
+        "      <input-wrap xmlns=\"\">\n" + 
+        "         <x:context xmlns:x=\"http://www.jenitennison.com/xslt/xspec\"\n" + 
+        "                    href=\"" + xmlURL.toString() + "\"/>\n" + 
+        "      </input-wrap>\n" + 
+        "      <scenario id=\"" + XSpecUtil.generateId("demo-01(0) / article should have a title(0)") + "\"\n" + 
+        "                xspec=\"" + xspecURL.toString() + "\">\n" + 
+        "         <label>article should have a title</label>\n" + 
+        "         <result select=\"/element()\">\n" + 
+        "            <content-wrap xmlns=\"\">\n" + 
+        "               <svrl:schematron-output xmlns:svrl=\"http://purl.oclc.org/dsdl/svrl\"\n" + 
+        "                                       xmlns:xs=\"http://www.w3.org/2001/XMLSchema\"\n" + 
+        "                                       xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\"\n" + 
+        "                                       xmlns:saxon=\"http://saxon.sf.net/\"\n" + 
+        "                                       xmlns:schold=\"http://www.ascc.net/xml/schematron\"\n" + 
+        "                                       xmlns:iso=\"http://purl.oclc.org/dsdl/schematron\"\n" + 
+        "                                       xmlns:xhtml=\"http://www.w3.org/1999/xhtml\"\n" + 
+        "                                       title=\"\"\n" + 
+        "                                       schemaVersion=\"\"><!--   \n" + 
         "     \n" + 
         "     \n" + 
         "   -->\n" + 
-        "               <svrl:active-pattern document=\"" + xmlURL.toString() + "\"/>\n" + 
-        "               <svrl:fired-rule context=\"article\"/>\n" + 
-        "               <svrl:fired-rule context=\"section\"/>\n" + 
-        "               <svrl:fired-rule context=\"section\"/>\n" + 
-        "               <svrl:failed-assert test=\"title\" id=\"a002\" location=\"/article[1]/section[2]\">\n" + 
-        "                  <svrl:text>\n" + 
+        "                  <svrl:active-pattern document=\"" + xmlURL.toString() + "\"/>\n" + 
+        "                  <svrl:fired-rule context=\"article\"/>\n" + 
+        "                  <svrl:fired-rule context=\"section\"/>\n" + 
+        "                  <svrl:fired-rule context=\"section\"/>\n" + 
+        "                  <svrl:failed-assert test=\"title\" id=\"a002\" location=\"/article[1]/section[2]\">\n" + 
+        "                     <svrl:text>\n" + 
         "                section should have a title\n" + 
         "            </svrl:text>\n" + 
-        "               </svrl:failed-assert>\n" + 
-        "            </svrl:schematron-output>\n" + 
-        "         </x:result>\n" + 
-        "         <x:test successful=\"true\">\n" + 
-        "            <x:label>Some other thing not assert a001</x:label>\n" + 
-        "            <x:expect test=\"boolean(svrl:schematron-output[svrl:fired-rule]) and empty(svrl:schematron-output/svrl:failed-assert[(@id, preceding-sibling::svrl:fired-rule[1]/@id, preceding-sibling::svrl:active-pattern[1]/@id)[1] = 'a001'])\"\n" + 
-        "                      select=\"()\"/>\n" + 
-        "         </x:test>\n" + 
-        "      </x:scenario>\n" + 
-        "      <x:scenario id=\"" + XSpecUtil.generateId("demo-02(0) / section should have a title(1)") + "\"\n" + 
-        "                  xspec=\"" + xspecModuleURL.toString() + "\">\n" + 
-        "         <x:label>section should have a title</x:label>\n" + 
-        "         <x:result select=\"/element()\">\n" + 
-        "            <svrl:schematron-output xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\"\n" + 
-        "                                    xmlns:saxon=\"http://saxon.sf.net/\"\n" + 
-        "                                    xmlns:schold=\"http://www.ascc.net/xml/schematron\"\n" + 
-        "                                    xmlns:iso=\"http://purl.oclc.org/dsdl/schematron\"\n" + 
-        "                                    xmlns:xhtml=\"http://www.w3.org/1999/xhtml\"\n" + 
-        "                                    title=\"\"\n" + 
-        "                                    schemaVersion=\"\"><!--   \n" + 
+        "                  </svrl:failed-assert>\n" + 
+        "               </svrl:schematron-output>\n" + 
+        "            </content-wrap>\n" + 
+        "         </result>\n" + 
+        "         <test id=\"" + XSpecUtil.generateId("demo-01(0) / article should have a title(0)") + "-expect1\" successful=\"true\">\n" + 
+        "            <label>Some other thing not assert a001</label>\n" + 
+        "            <expect-test-wrap xmlns=\"\">\n" + 
+        "               <x:expect xmlns:x=\"http://www.jenitennison.com/xslt/xspec\"\n" + 
+        "                         test=\"Q{http://purl.oclc.org/dsdl/svrl}schematron-output[Q{http://purl.oclc.org/dsdl/svrl}fired-rule] and empty(Q{http://purl.oclc.org/dsdl/svrl}schematron-output/Q{http://purl.oclc.org/dsdl/svrl}failed-assert[(@id, preceding-sibling::Q{http://purl.oclc.org/dsdl/svrl}fired-rule[1]/@id, preceding-sibling::Q{http://purl.oclc.org/dsdl/svrl}active-pattern[1]/@id)[1] = 'a001'])\"/>\n" + 
+        "            </expect-test-wrap>\n" + 
+        "            <expect select=\"()\"/>\n" + 
+        "         </test>\n" + 
+        "      </scenario>\n" + 
+        "   </scenario>\n" + 
+        "   <scenario id=\"" + XSpecUtil.generateId("demo-02(1)") + "\"\n" + 
+        "             xspec=\"" + xspecModuleURL.toString() + "\">\n" + 
+        "      <label>demo-02</label>\n" + 
+        "      <input-wrap xmlns=\"\">\n" + 
+        "         <x:context xmlns:x=\"http://www.jenitennison.com/xslt/xspec\"\n" + 
+        "                    href=\"" + xmlURL.toString() + "\"/>\n" + 
+        "      </input-wrap>\n" + 
+        "      <scenario id=\"" + XSpecUtil.generateId("demo-02(1) / article should have a title(0)") + "\"\n" + 
+        "                xspec=\"" + xspecModuleURL.toString() + "\">\n" + 
+        "         <label>article should have a title</label>\n" + 
+        "         <result select=\"/element()\">\n" + 
+        "            <content-wrap xmlns=\"\">\n" + 
+        "               <svrl:schematron-output xmlns:svrl=\"http://purl.oclc.org/dsdl/svrl\"\n" + 
+        "                                       xmlns:xs=\"http://www.w3.org/2001/XMLSchema\"\n" + 
+        "                                       xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\"\n" + 
+        "                                       xmlns:saxon=\"http://saxon.sf.net/\"\n" + 
+        "                                       xmlns:schold=\"http://www.ascc.net/xml/schematron\"\n" + 
+        "                                       xmlns:iso=\"http://purl.oclc.org/dsdl/schematron\"\n" + 
+        "                                       xmlns:xhtml=\"http://www.w3.org/1999/xhtml\"\n" + 
+        "                                       title=\"\"\n" + 
+        "                                       schemaVersion=\"\"><!--   \n" + 
         "     \n" + 
         "     \n" + 
         "   -->\n" + 
-        "               <svrl:active-pattern document=\"" + xmlURL.toString() + "\"/>\n" + 
-        "               <svrl:fired-rule context=\"article\"/>\n" + 
-        "               <svrl:fired-rule context=\"section\"/>\n" + 
-        "               <svrl:fired-rule context=\"section\"/>\n" + 
-        "               <svrl:failed-assert test=\"title\" id=\"a002\" location=\"/article[1]/section[2]\">\n" + 
-        "                  <svrl:text>\n" + 
+        "                  <svrl:active-pattern document=\"" + xmlURL.toString() + "\"/>\n" + 
+        "                  <svrl:fired-rule context=\"article\"/>\n" + 
+        "                  <svrl:fired-rule context=\"section\"/>\n" + 
+        "                  <svrl:fired-rule context=\"section\"/>\n" + 
+        "                  <svrl:failed-assert test=\"title\" id=\"a002\" location=\"/article[1]/section[2]\">\n" + 
+        "                     <svrl:text>\n" + 
         "                section should have a title\n" + 
         "            </svrl:text>\n" + 
-        "               </svrl:failed-assert>\n" + 
-        "            </svrl:schematron-output>\n" + 
-        "         </x:result>\n" + 
-        "         <x:test successful=\"true\">\n" + 
-        "            <x:label>Do a thing not assert a002 /article[1]/section[1]</x:label>\n" + 
-        "            <x:expect test=\"boolean(svrl:schematron-output[svrl:fired-rule]) and empty(svrl:schematron-output/svrl:failed-assert[(@id, preceding-sibling::svrl:fired-rule[1]/@id, preceding-sibling::svrl:active-pattern[1]/@id)[1] = 'a002'][x:schematron-location-compare('/article[1]/section[1]', @location, preceding-sibling::svrl:ns-prefix-in-attribute-values)])\"\n" + 
-        "                      select=\"()\"/>\n" + 
-        "         </x:test>\n" + 
-        "         <x:test successful=\"true\">\n" + 
-        "            <x:label>Do something assert a002 /article[1]/section[2]</x:label>\n" + 
-        "            <x:expect test=\"exists(svrl:schematron-output/svrl:failed-assert[(@id, preceding-sibling::svrl:fired-rule[1]/@id, preceding-sibling::svrl:active-pattern[1]/@id)[1] = 'a002'][x:schematron-location-compare('/article[1]/section[2]', @location, preceding-sibling::svrl:ns-prefix-in-attribute-values)])\"\n" + 
-        "                      select=\"()\"/>\n" + 
-        "         </x:test>\n" + 
-        "      </x:scenario>\n" + 
-        "   </x:scenario>\n" + 
-        "   <x:scenario id=\"" + XSpecUtil.generateId("demo-01(1)") + "\"\n" + 
-        "               xspec=\"" + xspecURL.toString() + "\">\n" + 
-        "      <x:label>demo-01</x:label>\n" + 
-        "      <x:context href=\"" + xmlURL.toString() + "\"/>\n" + 
-        "      <x:scenario id=\"" + XSpecUtil.generateId("demo-01(1) / article should have a title(0)") + "\"\n" + 
-        "                  xspec=\"" + xspecURL.toString() + "\">\n" + 
-        "         <x:label>article should have a title</x:label>\n" + 
-        "         <x:result select=\"/element()\">\n" + 
-        "            <svrl:schematron-output xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\"\n" + 
-        "                                    xmlns:saxon=\"http://saxon.sf.net/\"\n" + 
-        "                                    xmlns:schold=\"http://www.ascc.net/xml/schematron\"\n" + 
-        "                                    xmlns:iso=\"http://purl.oclc.org/dsdl/schematron\"\n" + 
-        "                                    xmlns:xhtml=\"http://www.w3.org/1999/xhtml\"\n" + 
-        "                                    title=\"\"\n" + 
-        "                                    schemaVersion=\"\"><!--   \n" + 
+        "                  </svrl:failed-assert>\n" + 
+        "               </svrl:schematron-output>\n" + 
+        "            </content-wrap>\n" + 
+        "         </result>\n" + 
+        "         <test id=\"" + XSpecUtil.generateId("demo-02(1) / article should have a title(0)") + "-expect1\" successful=\"true\">\n" + 
+        "            <label>Some other thing not assert a001</label>\n" + 
+        "            <expect-test-wrap xmlns=\"\">\n" + 
+        "               <x:expect xmlns:x=\"http://www.jenitennison.com/xslt/xspec\"\n" + 
+        "                         test=\"Q{http://purl.oclc.org/dsdl/svrl}schematron-output[Q{http://purl.oclc.org/dsdl/svrl}fired-rule] and empty(Q{http://purl.oclc.org/dsdl/svrl}schematron-output/Q{http://purl.oclc.org/dsdl/svrl}failed-assert[(@id, preceding-sibling::Q{http://purl.oclc.org/dsdl/svrl}fired-rule[1]/@id, preceding-sibling::Q{http://purl.oclc.org/dsdl/svrl}active-pattern[1]/@id)[1] = 'a001'])\"/>\n" + 
+        "            </expect-test-wrap>\n" + 
+        "            <expect select=\"()\"/>\n" + 
+        "         </test>\n" + 
+        "      </scenario>\n" + 
+        "      <scenario id=\"" + XSpecUtil.generateId("demo-02(1) / section should have a title(1)") + "\"\n" + 
+        "                xspec=\"" + xspecModuleURL.toString() + "\">\n" + 
+        "         <label>section should have a title</label>\n" + 
+        "         <result select=\"/element()\">\n" + 
+        "            <content-wrap xmlns=\"\">\n" + 
+        "               <svrl:schematron-output xmlns:svrl=\"http://purl.oclc.org/dsdl/svrl\"\n" + 
+        "                                       xmlns:xs=\"http://www.w3.org/2001/XMLSchema\"\n" + 
+        "                                       xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\"\n" + 
+        "                                       xmlns:saxon=\"http://saxon.sf.net/\"\n" + 
+        "                                       xmlns:schold=\"http://www.ascc.net/xml/schematron\"\n" + 
+        "                                       xmlns:iso=\"http://purl.oclc.org/dsdl/schematron\"\n" + 
+        "                                       xmlns:xhtml=\"http://www.w3.org/1999/xhtml\"\n" + 
+        "                                       title=\"\"\n" + 
+        "                                       schemaVersion=\"\"><!--   \n" + 
         "     \n" + 
         "     \n" + 
         "   -->\n" + 
-        "               <svrl:active-pattern document=\"" + xmlURL.toString() + "\"/>\n" + 
-        "               <svrl:fired-rule context=\"article\"/>\n" + 
-        "               <svrl:fired-rule context=\"section\"/>\n" + 
-        "               <svrl:fired-rule context=\"section\"/>\n" + 
-        "               <svrl:failed-assert test=\"title\" id=\"a002\" location=\"/article[1]/section[2]\">\n" + 
-        "                  <svrl:text>\n" + 
+        "                  <svrl:active-pattern document=\"" + xmlURL.toString() + "\"/>\n" + 
+        "                  <svrl:fired-rule context=\"article\"/>\n" + 
+        "                  <svrl:fired-rule context=\"section\"/>\n" + 
+        "                  <svrl:fired-rule context=\"section\"/>\n" + 
+        "                  <svrl:failed-assert test=\"title\" id=\"a002\" location=\"/article[1]/section[2]\">\n" + 
+        "                     <svrl:text>\n" + 
         "                section should have a title\n" + 
         "            </svrl:text>\n" + 
-        "               </svrl:failed-assert>\n" + 
-        "            </svrl:schematron-output>\n" + 
-        "         </x:result>\n" + 
-        "         <x:test successful=\"true\">\n" + 
-        "            <x:label>Some other thing not assert a001</x:label>\n" + 
-        "            <x:expect test=\"boolean(svrl:schematron-output[svrl:fired-rule]) and empty(svrl:schematron-output/svrl:failed-assert[(@id, preceding-sibling::svrl:fired-rule[1]/@id, preceding-sibling::svrl:active-pattern[1]/@id)[1] = 'a001'])\"\n" + 
-        "                      select=\"()\"/>\n" + 
-        "         </x:test>\n" + 
-        "      </x:scenario>\n" + 
-        "   </x:scenario>\n" + 
-        "</x:report>",
+        "                  </svrl:failed-assert>\n" + 
+        "               </svrl:schematron-output>\n" + 
+        "            </content-wrap>\n" + 
+        "         </result>\n" + 
+        "         <test id=\"" + XSpecUtil.generateId("demo-02(1) / section should have a title(1)") + "-expect1\" successful=\"true\">\n" + 
+        "            <label>Do a thing not assert a002 /article[1]/section[1]</label>\n" + 
+        "            <expect-test-wrap xmlns=\"\">\n" + 
+        "               <x:expect xmlns:x=\"http://www.jenitennison.com/xslt/xspec\"\n" + 
+        "                         test=\"Q{http://purl.oclc.org/dsdl/svrl}schematron-output[Q{http://purl.oclc.org/dsdl/svrl}fired-rule] and empty(Q{http://purl.oclc.org/dsdl/svrl}schematron-output/Q{http://purl.oclc.org/dsdl/svrl}failed-assert[(@id, preceding-sibling::Q{http://purl.oclc.org/dsdl/svrl}fired-rule[1]/@id, preceding-sibling::Q{http://purl.oclc.org/dsdl/svrl}active-pattern[1]/@id)[1] = 'a002'][($Q{http://www.jenitennison.com/xslt/xspec}context/root()/(/article[1]/section[1]) treat as node()) is Q{http://www.jenitennison.com/xslt/xspec}select-node($Q{http://www.jenitennison.com/xslt/xspec}context/root(), @location, preceding-sibling::Q{http://purl.oclc.org/dsdl/svrl}ns-prefix-in-attribute-values, 3)])\"/>\n" + 
+        "            </expect-test-wrap>\n" + 
+        "            <expect select=\"()\"/>\n" + 
+        "         </test>\n" + 
+        "         <test id=\"" + XSpecUtil.generateId("demo-02(1) / section should have a title(1)") + "-expect2\" successful=\"true\">\n" + 
+        "            <label>Do something assert a002 /article[1]/section[2]</label>\n" + 
+        "            <expect-test-wrap xmlns=\"\">\n" + 
+        "               <x:expect xmlns:x=\"http://www.jenitennison.com/xslt/xspec\"\n" + 
+        "                         test=\"exists(Q{http://purl.oclc.org/dsdl/svrl}schematron-output/Q{http://purl.oclc.org/dsdl/svrl}failed-assert[(@id, preceding-sibling::Q{http://purl.oclc.org/dsdl/svrl}fired-rule[1]/@id, preceding-sibling::Q{http://purl.oclc.org/dsdl/svrl}active-pattern[1]/@id)[1] = 'a002'][($Q{http://www.jenitennison.com/xslt/xspec}context/root()/(/article[1]/section[2]) treat as node()) is Q{http://www.jenitennison.com/xslt/xspec}select-node($Q{http://www.jenitennison.com/xslt/xspec}context/root(), @location, preceding-sibling::Q{http://purl.oclc.org/dsdl/svrl}ns-prefix-in-attribute-values, 3)])\"/>\n" + 
+        "            </expect-test-wrap>\n" +
+        "            <expect select=\"()\"/>\n" + 
+        "         </test>\n" + 
+        "      </scenario>\n" + 
+        "   </scenario>\n" + 
+        "</report>",
         filterTestElementId(replaceAll));
     
     
@@ -225,6 +252,15 @@ public class SchematronXSpecTest extends XSpecViewTestBase {
         + "\"><script type=\"text/javascript\" src=\""
         + js.toURI().toURL().toString() + "\"></script></head>\n" + 
         "   <body>\n" + 
+        "      <div class=\"testsuite\" data-name=\"demo-01\" id=\"\" data-xspec=\"" + xspecURL.toString() + "\" data-tests=\"1\" data-failures=\"0\">\n" + 
+        "         <p style=\"margin:0px;\"><span>demo-01</span><span>&nbsp;</span><a class=\"button\" onclick=\"runScenario(this)\">Run</a></p>\n" + 
+        "         <div class=\"testsuite\" data-name=\"article should have a title\" id=\"\" data-xspec=\"" + xspecURL.toString() + "\" data-tests=\"1\" data-failures=\"0\">\n" + 
+        "            <p style=\"margin:0px;\"><span>article should have a title</span><span>&nbsp;</span><a class=\"button\" onclick=\"runScenario(this)\">Run</a></p>\n" + 
+        "            <div class=\"testcase\" data-name=\"Some other thing not assert a001\">\n" + 
+        "               <p class=\"passed\"><span class=\"test-passed\" onclick=\"toggleResult(this)\">Some other thing not assert a001</span><span>&nbsp;</span><a class=\"button\" onclick=\"showTest(this)\">Show</a></p>\n" + 
+        "            </div>\n" + 
+        "         </div>\n" + 
+        "      </div>\n" + 
         "      <div class=\"testsuite\" data-name=\"demo-02\" id=\"\" data-xspec=\"" + xspecModuleURL.toString()  + "\" data-tests=\"3\" data-failures=\"0\">\n" + 
         "         <p style=\"margin:0px;\"><span>demo-02</span><span>&nbsp;</span><a class=\"button\" onclick=\"runScenario(this)\">Run</a></p>\n" + 
         "         <div class=\"testsuite\" data-name=\"article should have a title\" id=\"\" data-xspec=\"" + xspecModuleURL.toString() + "\" data-tests=\"1\" data-failures=\"0\">\n" + 
@@ -240,15 +276,6 @@ public class SchematronXSpecTest extends XSpecViewTestBase {
         "            </div>\n" + 
         "            <div class=\"testcase\" data-name=\"Do something assert a002 /article[1]/section[2]\">\n" + 
         "               <p class=\"passed\"><span class=\"test-passed\" onclick=\"toggleResult(this)\">Do something assert a002 /article[1]/section[2]</span><span>&nbsp;</span><a class=\"button\" onclick=\"showTest(this)\">Show</a></p>\n" + 
-        "            </div>\n" + 
-        "         </div>\n" + 
-        "      </div>\n" + 
-        "      <div class=\"testsuite\" data-name=\"demo-01\" id=\"\" data-xspec=\"" + xspecURL.toString() + "\" data-tests=\"1\" data-failures=\"0\">\n" + 
-        "         <p style=\"margin:0px;\"><span>demo-01</span><span>&nbsp;</span><a class=\"button\" onclick=\"runScenario(this)\">Run</a></p>\n" + 
-        "         <div class=\"testsuite\" data-name=\"article should have a title\" id=\"\" data-xspec=\"" + xspecURL.toString() + "\" data-tests=\"1\" data-failures=\"0\">\n" + 
-        "            <p style=\"margin:0px;\"><span>article should have a title</span><span>&nbsp;</span><a class=\"button\" onclick=\"runScenario(this)\">Run</a></p>\n" + 
-        "            <div class=\"testcase\" data-name=\"Some other thing not assert a001\">\n" + 
-        "               <p class=\"passed\"><span class=\"test-passed\" onclick=\"toggleResult(this)\">Some other thing not assert a001</span><span>&nbsp;</span><a class=\"button\" onclick=\"showTest(this)\">Show</a></p>\n" + 
         "            </div>\n" + 
         "         </div>\n" + 
         "      </div>\n" + 

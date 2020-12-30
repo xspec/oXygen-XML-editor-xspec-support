@@ -1,102 +1,99 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<xsl:stylesheet version="2.0"
+<xsl:stylesheet version="3.0"
                 xmlns:x="http://www.jenitennison.com/xslt/xspec" 
                 xmlns:xs="http://www.w3.org/2001/XMLSchema" 
                 xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
                 exclude-result-prefixes="#all">
-    
-    <xsl:param name="stylesheet-uri" select="concat(x:description/@schematron, '.xsl')"/>
 
-    <xsl:include href="../common/xspec-utils.xsl"/>
+    <!--
+        $stylesheet-doc is for ../../bin/xspec.* who can pass a document node as a stylesheet
+        parameter but can not handle URI natively.
+        Those who can pass a URI as a stylesheet parameter natively will probably prefer
+        $stylesheet-uri.
+    -->
+    <xsl:param name="stylesheet-doc" as="document-node()?" />
 
-    <xsl:variable name="error" select="('error', 'fatal')"/>
-    <xsl:variable name="warn" select="('warn', 'warning')"/>
-    <xsl:variable name="info" select="('info', 'information')"/>
+    <xsl:param name="stylesheet-uri" as="xs:string" select="document-uri($stylesheet-doc)" />
 
-    <xsl:template match="@* | node() | document-node()" as="node()" priority="-2">
-        <xsl:call-template name="x:identity" />
+    <xsl:include href="../common/common-utils.xsl" />
+    <xsl:include href="../common/namespace-utils.xsl" />
+    <xsl:include href="../common/trim.xsl" />
+    <xsl:include href="../common/uqname-utils.xsl" />
+    <xsl:include href="../common/uri-utils.xsl" />
+    <xsl:include href="../common/user-content-utils.xsl" />
+    <xsl:include href="../compiler/base/resolve-import/resolve-import.xsl" />
+    <xsl:include href="../compiler/base/util/compiler-misc-utils.xsl" />
+    <xsl:include href="../compiler/base/util/compiler-yes-no-utils.xsl" />
+
+    <xsl:output indent="yes" />
+
+    <xsl:variable name="errors" as="xs:string+" select="'error', 'fatal'" />
+    <xsl:variable name="warns" as="xs:string+" select="'warn', 'warning'" />
+    <xsl:variable name="infos" as="xs:string+" select="'info', 'information'" />
+
+    <!--
+        mode="#default"
+    -->
+    <xsl:mode on-multiple-match="fail" on-no-match="fail" />
+
+    <xsl:template match="document-node(element(x:description))"
+        as="document-node(element(x:description))">
+        <!-- Similar to the default mode template in ../compiler/base/main.xsl -->
+
+        <!-- Resolve x:import and gather all the children of x:description -->
+        <xsl:variable name="specs" as="node()+" select="x:resolve-import(x:description)" />
+
+        <!-- Combine all the children of x:description into a single x:description -->
+        <xsl:document>
+            <xsl:for-each select="x:description">
+                <!-- @name must not have a prefix. @inherit-namespaces must be no. Otherwise
+                    the namespaces created for /x:description will pollute its descendants derived
+                    from the other trees. -->
+                <xsl:element name="{local-name()}" namespace="{namespace-uri()}"
+                    inherit-namespaces="no">
+                    <!-- Do not set all the attributes. Each imported x:description has its own set of
+                        attributes. Set only the attributes that are truly global over all the XSpec
+                        documents. -->
+
+                    <!-- Global Schematron attributes -->
+                    <xsl:attribute name="original-xspec" select="x:document-actual-uri(/)" />
+                    <xsl:attribute name="schematron" select="resolve-uri(@schematron, base-uri())" />
+
+                    <!-- Global XSLT attributes.
+                        @xslt-version can be set, because it has already been propagated from each
+                        imported x:description to its descendants in mode="x:gather-specs". -->
+                    <xsl:sequence select="@xslt-version" />
+                    <xsl:attribute name="stylesheet" select="$stylesheet-uri" />
+
+                    <xsl:sequence select="$specs" />
+                </xsl:element>
+            </xsl:for-each>
+        </xsl:document>
     </xsl:template>
-    
-    <xsl:template match="x:description[@schematron]">
-        <xsl:element name="x:description">
-            <!-- Place xsl:namespace before x:copy-namespaces(), otherwise Saxon 9.6 complains,
-                "Warning... Creating a namespace node here will fail if previous instructions create
-                any children" -->
-            <xsl:namespace name="svrl" select="'http://purl.oclc.org/dsdl/svrl'"/>
 
-            <!-- child::x:param may use namespaces -->
-            <xsl:sequence select="x:copy-namespaces(.)" />
-
-            <xsl:apply-templates select="@*[not(name() = ('stylesheet'))]"/>
-            <xsl:apply-templates select="node()"/>
-        </xsl:element>
-    </xsl:template>
-
-    <xsl:template match="x:description/@schematron">
-        <xsl:attribute name="xspec-original-location" select="x:resolve-xml-uri-with-catalog(document-uri(/))"/>
-        <xsl:attribute name="stylesheet" select="$stylesheet-uri"/>
-        <xsl:variable name="path" select="resolve-uri(string(), base-uri())"/>
-        <xsl:attribute name="schematron" select="$path"/>
-        <xsl:for-each select="doc($path)/sch:schema/sch:ns" xmlns:sch="http://purl.oclc.org/dsdl/schematron">
-            <xsl:namespace name="{./@prefix}" select="./@uri"/>
-        </xsl:for-each>
-    </xsl:template>
-
-    <xsl:template match="x:import">
-        <xsl:variable name="href" select="resolve-uri(@href, base-uri())"/>
-        <xsl:choose>
-            <xsl:when test="doc($href)//*[ 
-                self::x:expect-assert | self::x:expect-not-assert | 
-                self::x:expect-report | self::x:expect-not-report |
-                self::x:expect-valid | self::x:description[@schematron] ]">
-                <xsl:comment>BEGIN IMPORT "<xsl:value-of select="@href"/>"</xsl:comment>
-                <xsl:apply-templates select="doc($href)/x:description/node()">
-                    <xsl:with-param name="imported-uri" tunnel="yes"
-                        select="x:resolve-xml-uri-with-catalog($href)" />
-                </xsl:apply-templates>
-                <xsl:comment>END IMPORT "<xsl:value-of select="@href"/>"</xsl:comment>
-            </xsl:when>
-            <xsl:otherwise>
-                <xsl:next-match/>
-            </xsl:otherwise>
-        </xsl:choose>
-    </xsl:template>
-
-    <xsl:template match="x:scenario">
-        <xsl:param name="imported-uri" as="xs:anyURI?" tunnel="yes" />
-
-        <xsl:copy>
-            <xsl:if test="exists($imported-uri)">
-                <xsl:attribute name="xspec-original-location" select="$imported-uri" />
-            </xsl:if>
-            <xsl:apply-templates select="attribute() | node()" />
-        </xsl:copy>
-    </xsl:template>
+    <!--
+        mode="x:gather-specs"
+        Adds some templates to the included mode
+    -->
 
     <!-- Schematron skeleton implementation requires a document node -->
     <xsl:template match="x:context[not(@href)][
         parent::*/x:expect-assert | parent::*/x:expect-not-assert |
         parent::*/x:expect-report | parent::*/x:expect-not-report |
         parent::*/x:expect-valid | ancestor::x:description[@schematron] ]"
-        as="element(x:context)">
+        as="element(x:context)"
+        mode="x:gather-specs">
         <xsl:copy>
-            <xsl:apply-templates select="attribute()" />
+            <xsl:apply-templates select="attribute()" mode="#current" />
             <xsl:attribute name="select">
                 <xsl:choose>
                     <xsl:when test="@select">
-                        <xsl:text>if (test:wrappable-sequence((</xsl:text>
-                        <xsl:value-of select="@select" />
-                        <xsl:text>))) then test:wrap-nodes((</xsl:text>
-                        <xsl:value-of select="@select" />
-                        <xsl:text>)) else </xsl:text>
+                        <xsl:text expand-text="yes">if (({@select}) => {x:known-UQName('x:wrappable-sequence')}())</xsl:text>
+                        <xsl:text expand-text="yes"> then {x:known-UQName('x:wrap-nodes')}(({@select}))</xsl:text>
 
                         <!-- Some Schematron implementations might possibly be able to handle
                             non-document nodes. Just generate a warning and pass @select as is. -->
-                        <xsl:text>trace((</xsl:text>
-                        <xsl:value-of select="@select" />
-                        <xsl:text>), 'WARNING: Failed to wrap </xsl:text>
-                        <xsl:value-of select="name()" />
-                        <xsl:text>/@select')</xsl:text>
+                        <xsl:text expand-text="yes"> else trace(({@select}), 'WARNING: Failed to wrap {name()}/@select')</xsl:text>
                     </xsl:when>
 
                     <xsl:otherwise>
@@ -105,116 +102,131 @@
                 </xsl:choose>
             </xsl:attribute>
 
-            <xsl:apply-templates select="node()" />
+            <xsl:apply-templates select="node()" mode="#current" />
         </xsl:copy>
     </xsl:template>
-    
-    <xsl:template match="x:expect-assert">
-        <xsl:element name="x:expect">
-            <xsl:call-template name="make-label"/>
-            <xsl:attribute name="test">
-                <xsl:sequence select="if (@count) then 'count' else 'exists'"/>
-                <xsl:sequence select="'(svrl:schematron-output/svrl:failed-assert'"/>
-                <xsl:apply-templates select="@*" mode="make-predicate"/>
-                <xsl:sequence select="')'"/>
-                <xsl:sequence select="current()[@count]/concat(' eq ', @count)"/>
-            </xsl:attribute>
+
+    <xsl:template match="x:expect-assert" as="element(x:expect)" mode="x:gather-specs">
+        <xsl:call-template name="create-expect">
+            <xsl:with-param name="test">
+                <xsl:value-of select="if (@count) then 'count' else 'exists'" />
+                <xsl:text expand-text="yes">({x:known-UQName('svrl:schematron-output')}/{x:known-UQName('svrl:failed-assert')}</xsl:text>
+                <xsl:apply-templates select="@*" mode="make-predicate" />
+                <xsl:text>)</xsl:text>
+                <xsl:value-of select="@count ! (' eq ' || .)" />
+            </xsl:with-param>
+        </xsl:call-template>
+    </xsl:template>
+
+    <xsl:template match="x:expect-not-assert" as="element(x:expect)" mode="x:gather-specs">
+        <xsl:call-template name="create-expect">
+            <xsl:with-param name="test">
+                <xsl:text expand-text="yes">{x:known-UQName('svrl:schematron-output')}[{x:known-UQName('svrl:fired-rule')}] and empty({x:known-UQName('svrl:schematron-output')}/{x:known-UQName('svrl:failed-assert')}</xsl:text>
+                <xsl:apply-templates select="@*" mode="make-predicate" />
+                <xsl:text>)</xsl:text>
+            </xsl:with-param>
+        </xsl:call-template>
+    </xsl:template>
+
+    <xsl:template match="x:expect-report" as="element(x:expect)" mode="x:gather-specs">
+        <xsl:call-template name="create-expect">
+            <xsl:with-param name="test">
+                <xsl:value-of select="if (@count) then 'count' else 'exists'" />
+                <xsl:text expand-text="yes">({x:known-UQName('svrl:schematron-output')}/{x:known-UQName('svrl:successful-report')}</xsl:text>
+                <xsl:apply-templates select="@*" mode="make-predicate" />
+                <xsl:text>)</xsl:text>
+                <xsl:value-of select="@count ! (' eq ' || .)" />
+            </xsl:with-param>
+        </xsl:call-template>
+    </xsl:template>
+
+    <xsl:template match="x:expect-not-report" as="element(x:expect)" mode="x:gather-specs">
+        <xsl:call-template name="create-expect">
+            <xsl:with-param name="test">
+                <xsl:text expand-text="yes">{x:known-UQName('svrl:schematron-output')}[{x:known-UQName('svrl:fired-rule')}] and empty({x:known-UQName('svrl:schematron-output')}/{x:known-UQName('svrl:successful-report')}</xsl:text>
+                <xsl:apply-templates select="@*" mode="make-predicate" />
+                <xsl:text>)</xsl:text>
+            </xsl:with-param>
+        </xsl:call-template>
+    </xsl:template>
+
+    <xsl:template match="x:expect-valid" as="element(x:expect)" mode="x:gather-specs">
+        <xsl:variable name="bad-roles" as="xs:string"
+            select="
+                ($errors ! ($x:apos || . || $x:apos))
+                => string-join(', ')" />
+
+        <xsl:call-template name="create-expect">
+            <xsl:with-param name="label" select="'valid'"/>
+            <xsl:with-param name="test">
+                <xsl:text expand-text="yes">{x:known-UQName('svrl:schematron-output')}[{x:known-UQName('svrl:fired-rule')}] and empty({x:known-UQName('svrl:schematron-output')}/({x:known-UQName('svrl:failed-assert')} | {x:known-UQName('svrl:successful-report')})[empty(@role) or (lower-case(@role) = ({$bad-roles}))])</xsl:text>
+            </xsl:with-param>
+        </xsl:call-template>
+    </xsl:template>
+
+    <xsl:template match="x:expect-rule" as="element(x:expect)" mode="x:gather-specs">
+        <xsl:call-template name="create-expect">
+            <xsl:with-param name="test">
+                <xsl:value-of select="if (@count) then 'count' else 'exists'" />
+                <xsl:text expand-text="yes">({x:known-UQName('svrl:schematron-output')}/{x:known-UQName('svrl:fired-rule')}</xsl:text>
+                <xsl:apply-templates select="@*" mode="make-predicate" />
+                <xsl:text>)</xsl:text>
+                <xsl:value-of select="@count ! (' eq ' || .)" />
+            </xsl:with-param>
+        </xsl:call-template>
+    </xsl:template>
+
+    <!--
+        mode="make-predicate"
+    -->
+    <xsl:mode name="make-predicate" on-multiple-match="fail" on-no-match="fail" />
+
+    <xsl:template match="@location" as="text()" mode="make-predicate">
+        <xsl:text expand-text="yes">[(${x:known-UQName('x:context')}/root()/({.}) treat as node()) is {x:known-UQName('x:select-node')}(${x:known-UQName('x:context')}/root(), @location, preceding-sibling::{x:known-UQName('svrl:ns-prefix-in-attribute-values')}, {parent::element() => x:xslt-version()})]</xsl:text>
+    </xsl:template>
+
+    <xsl:template match="@id | @role" as="text()" mode="make-predicate">
+        <xsl:text expand-text="yes">[(@{local-name()}, preceding-sibling::{x:known-UQName('svrl:fired-rule')}[1]/@{local-name()}, preceding-sibling::{x:known-UQName('svrl:active-pattern')}[1]/@{local-name()})[1] = '{.}']</xsl:text>
+    </xsl:template>
+
+    <xsl:template match="@id[parent::x:expect-rule] | @context[parent::x:expect-rule]" as="text()"
+        mode="make-predicate">
+        <xsl:text expand-text="yes">[@{local-name()} = '{.}']</xsl:text>
+    </xsl:template>
+
+    <xsl:template match="@count | @label" as="empty-sequence()" mode="make-predicate" />
+
+    <!--
+        Named templates
+    -->
+
+    <xsl:template name="create-expect" as="element(x:expect)">
+        <xsl:context-item as="element()" use="required" />
+
+        <xsl:param name="label" as="xs:string"
+            select="
+                (
+                    @label,
+                    tokenize(local-name(), '-')[. = ('report', 'assert', 'not', 'rule')],
+                    @id,
+                    @role,
+                    @location,
+                    @context,
+                    (@count ! ('count:', .))
+                )
+                => string-join(' ')" />
+        <xsl:param name="test" as="xs:string" />
+
+        <!-- Use x:xspec-name() for the element name so that the namespace for the name of the
+            created element does not pollute the namespaces. -->
+        <xsl:element name="{x:xspec-name('expect', .)}" namespace="{namespace-uri()}">
+            <!-- @test may use namespace prefixes and/or the default namespace such as
+                xs:QName('foo') -->
+            <xsl:sequence select="x:copy-of-namespaces(.)" />
+
+            <xsl:attribute name="label" select="$label" />
+            <xsl:attribute name="test" select="$test" />
         </xsl:element>
     </xsl:template>
 
-    <xsl:template match="x:expect-not-assert">
-        <xsl:element name="x:expect">
-            <xsl:call-template name="make-label"/>
-            <xsl:attribute name="test">
-                <xsl:sequence select="'boolean(svrl:schematron-output[svrl:fired-rule]) and empty(svrl:schematron-output/svrl:failed-assert'"/>
-                <xsl:apply-templates select="@*" mode="make-predicate"/>
-                <xsl:sequence select="')'"/>
-            </xsl:attribute>
-        </xsl:element>
-    </xsl:template>
-
-    <xsl:template match="x:expect-report">
-        <xsl:element name="x:expect">
-            <xsl:call-template name="make-label"/>
-            <xsl:attribute name="test">
-                <xsl:sequence select="if (@count) then 'count' else 'exists'"/>
-                <xsl:sequence select="'(svrl:schematron-output/svrl:successful-report'"/>
-                <xsl:apply-templates select="@*" mode="make-predicate"/>
-                <xsl:sequence select="')'"/>
-                <xsl:sequence select="current()[@count]/concat(' eq ', @count)"/>
-            </xsl:attribute>
-        </xsl:element>
-    </xsl:template>
-
-
-    <xsl:template match="x:expect-not-report">
-        <xsl:element name="x:expect">
-            <xsl:call-template name="make-label"/>
-            <xsl:attribute name="test">
-                <xsl:sequence select="'boolean(svrl:schematron-output[svrl:fired-rule]) and empty(svrl:schematron-output/svrl:successful-report'"/>
-                <xsl:apply-templates select="@*" mode="make-predicate"/>
-                <xsl:sequence select="')'"/>
-            </xsl:attribute>
-        </xsl:element>
-    </xsl:template>
-
-    <xsl:template match="@location" mode="make-predicate">
-        <xsl:variable name="escaped" select="if (not(contains(., codepoints-to-string(39)))) then 
-            concat(codepoints-to-string(39), ., codepoints-to-string(39)) else 
-            concat('concat(', codepoints-to-string(39), replace(., codepoints-to-string(39), concat(codepoints-to-string(39), ', codepoints-to-string(39), ', codepoints-to-string(39))), codepoints-to-string(39), ')')"/>
-        <xsl:sequence select="concat('[x:schematron-location-compare(', $escaped, ', @location, preceding-sibling::svrl:ns-prefix-in-attribute-values)]')"/>
-    </xsl:template>
-
-    <xsl:template match="@id | @role" mode="make-predicate">
-        <xsl:sequence select="concat('[(@', local-name(.), 
-            ', preceding-sibling::svrl:fired-rule[1]/@',local-name(.), 
-            ', preceding-sibling::svrl:active-pattern[1]/@',local-name(.), 
-            ')[1] = ', codepoints-to-string(39), ., codepoints-to-string(39), ']')"/>
-    </xsl:template>
-    
-    <xsl:template match="@id[parent::x:expect-rule] | @context[parent::x:expect-rule]" mode="make-predicate">
-        <xsl:sequence select="concat('[@', local-name(.), 
-            ' = ', codepoints-to-string(39), ., codepoints-to-string(39), ']')"/>
-    </xsl:template>
-    
-    <xsl:template match="@count | @label" mode="make-predicate"/>
-    
-    <xsl:template name="make-label">
-        <xsl:context-item as="element()" use="required"
-            use-when="element-available('xsl:context-item')" />
-
-        <xsl:attribute name="label" select="string-join((@label, tokenize(local-name(),'-')[.=('report','assert','not','rule')], @id, @role, @location, @context, current()[@count]/string('count:'), @count), ' ')"/>
-    </xsl:template>
-
-    <xsl:template match="x:expect-valid">
-        <xsl:element name="x:expect">
-            <xsl:attribute name="label" select="'valid'"/>
-            <xsl:attribute name="test" select="concat(
-                'boolean(svrl:schematron-output[svrl:fired-rule]) and
-                not(boolean((svrl:schematron-output/svrl:failed-assert union svrl:schematron-output/svrl:successful-report)[
-                not(@role) or lower-case(@role) = (',
-                string-join(for $e in $error return concat(codepoints-to-string(39), $e, codepoints-to-string(39)), ','),
-                ')]))'
-                )"/>
-        </xsl:element>
-    </xsl:template>
-    
-    <xsl:template match="x:expect-rule">
-        <xsl:element name="x:expect">
-            <xsl:call-template name="make-label"/>
-            <xsl:attribute name="test">
-                <xsl:sequence select="if (@count) then 'count' else 'exists'"/>
-                <xsl:sequence select="'(svrl:schematron-output/svrl:fired-rule'"/>
-                <xsl:apply-templates select="@*" mode="make-predicate"/>
-                <xsl:sequence select="')'"/>
-                <xsl:sequence select="current()[@count]/concat(' eq ', @count)"/>
-            </xsl:attribute>
-        </xsl:element>
-    </xsl:template>
-    
-    <xsl:template match="x:*/@href" as="attribute(href)">
-        <xsl:attribute name="{local-name()}" namespace="{namespace-uri()}"
-            select="resolve-uri(., x:base-uri(.))" />
-    </xsl:template>
-    
 </xsl:stylesheet>

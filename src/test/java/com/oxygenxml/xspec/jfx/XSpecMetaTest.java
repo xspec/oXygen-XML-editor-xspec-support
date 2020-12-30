@@ -34,28 +34,29 @@ public class XSpecMetaTest extends XSpecViewTestBase {
     File xmlFormatOutput = new File(xspecFile.getParentFile(), "xspec/escape-for-regex-result.xml");
     String actualContent = read(xmlFormatOutput.toURI().toURL()).toString();
     assertEquals("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" + 
-        "<x:report xmlns:test=\"http://www.jenitennison.com/xslt/unit-test\"\n" + 
-        "          xmlns:xs=\"http://www.w3.org/2001/XMLSchema\"\n" + 
-        "          xmlns:x=\"http://www.jenitennison.com/xslt/xspec\"\n" + 
-        "          xmlns:functx=\"http://www.functx.com\"\n" + 
-        "          stylesheet=\"" + xslURL.toString() + "\"\n" + 
-        "          date=\"XXX\"\n" + 
-        "          xspec=\"" + xspecURL.toExternalForm() + "\">\n" + 
+        "<report xmlns=\"http://www.jenitennison.com/xslt/xspec\"\n" + 
+        "        xspec=\"" + xspecURL.toExternalForm() + "\"\n" + 
+        "        stylesheet=\"" + xslURL.toString() + "\"\n" + 
+        "        date=\"XXX\">\n" + 
         // The source attribute is present.
         // To ensure back mapping we need to remember in which file a scenario was defined.
-        "   <x:scenario id=\"" + firstID + "\"\n" + 
-            "               xspec=\"" + xspecURL.toString() + "\">\n" + 
-        "      <x:label>No escaping</x:label>\n" + 
-        "      <x:call function=\"functx:escape-for-regex\">\n" + 
-        "         <x:param select=\"'Hello'\"/>\n" + 
-        "      </x:call>\n" + 
-        "      <x:result select=\"'Hello'\"/>\n" + 
-        "      <x:test successful=\"true\">\n" + 
-        "         <x:label>Must not be escaped at all</x:label>\n" + 
-        "         <x:expect select=\"'Hello'\"/>\n" + 
-        "      </x:test>\n" + 
-        "   </x:scenario>\n" + 
-        "</x:report>", 
+        "   <scenario id=\"" + firstID + "\"\n" + 
+        "             xspec=\"" + xspecURL.toString() + "\">\n" + 
+        "      <label>No escaping</label>\n" + 
+        "      <input-wrap xmlns=\"\">\n" + 
+        "         <x:call xmlns:functx=\"http://www.functx.com\"\n" + 
+        "                 xmlns:x=\"http://www.jenitennison.com/xslt/xspec\"\n" + 
+        "                 function=\"functx:escape-for-regex\">\n" + 
+        "            <x:param select=\"'Hello'\"/>\n" + 
+        "         </x:call>\n" + 
+        "      </input-wrap>\n" + 
+        "      <result select=\"'Hello'\"/>\n" + 
+        "      <test id=\"" + firstID + "-expect1\" successful=\"true\">\n" + 
+        "         <label>Must not be escaped at all</label>\n" + 
+        "         <expect select=\"'Hello'\"/>\n" + 
+        "      </test>\n" + 
+        "   </scenario>\n" + 
+        "</report>", 
         filterAll(actualContent));
     
     
@@ -110,60 +111,74 @@ public class XSpecMetaTest extends XSpecViewTestBase {
     
     
     assertEquals("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" + 
-        "<x:report xmlns:test=\"http://www.jenitennison.com/xslt/unit-test\"\n" + 
-        "          xmlns:xs=\"http://www.w3.org/2001/XMLSchema\"\n" + 
-        "          xmlns:x=\"http://www.jenitennison.com/xslt/xspec\"\n" + 
-        "          xmlns:functx=\"http://www.functx.com\"\n" + 
-        "          stylesheet=\"" + xslURL.toString() + "\"\n" + 
-        "          date=\"XXX\"\n" +
-        "          xspec=\"" + xspecURL.toExternalForm() + "\">\n" + 
-        "   <x:scenario id=\"" + firstID + "\"\n" + 
-            "               xspec=\"" + xspecFile.toURI().toURL().toString() + "\">\n" + 
-        "      <x:label>When processing a list of phrases</x:label>\n" + 
-        "      <x:context>\n" + 
-        "         <phrases>\n" + 
-        "            <phrase>Hello!</phrase>\n" + 
-        "            <phrase>Goodbye!</phrase>\n" + 
-        "            <phrase>(So long!)</phrase>\n" + 
-        "         </phrases>\n" + 
-        "      </x:context>\n" + 
-        "      <x:result select=\"/element()\">\n" + 
-        "         <phrases>\n" + 
-        "            <phrase status=\"changed\">Hello!</phrase>\n" + 
-        "            <phrase status=\"changed\">Goodbye!</phrase>\n" + 
-        "            <phrase status=\"same\">\\(So long!\\)</phrase>\n" + 
-        "         </phrases>\n" + 
-        "      </x:result>\n" + 
-        "      <x:test successful=\"true\">\n" + 
-        "         <x:label>All phrase elements should remain</x:label>\n" + 
-        "         <x:expect test=\"count(phrases/phrase) = 3\" select=\"()\"/>\n" + 
-        "      </x:test>\n" + 
-        "      <x:test successful=\"false\">\n" + 
-        "         <x:label>Strings should be escaped and status attributes should be added. The 'status' attribute are not as expected, indicating a problem in the tested template.</x:label>\n" + 
-        "         <x:expect select=\"/element()\">\n" + 
+        "<report xmlns=\"http://www.jenitennison.com/xslt/xspec\"\n" + 
+        "        xspec=\"" + xspecURL.toExternalForm() + "\"\n" + 
+        "        stylesheet=\"" + xslURL.toString() + "\"\n" + 
+        "        date=\"XXX\">\n" +
+        "   <scenario id=\"" + firstID + "\"\n" + 
+        "             xspec=\"" + xspecFile.toURI().toURL().toString() + "\">\n" + 
+        "      <label>When processing a list of phrases</label>\n" + 
+        "      <input-wrap xmlns=\"\">\n" + 
+        "         <x:context xmlns:functx=\"http://www.functx.com\"\n" + 
+        "                    xmlns:x=\"http://www.jenitennison.com/xslt/xspec\">\n" + 
         "            <phrases>\n" + 
-        "               <phrase status=\"same\">Hello!</phrase>\n" + 
-        "               <phrase status=\"same\">Goodbye!</phrase>\n" + 
-        "               <phrase status=\"changed\">\\(So long!\\)</phrase>\n" + 
+        "               <phrase>Hello!</phrase>\n" + 
+        "               <phrase>Goodbye!</phrase>\n" + 
+        "               <phrase>(So long!)</phrase>\n" + 
         "            </phrases>\n" + 
-        "         </x:expect>\n" + 
-        "      </x:test>\n" + 
-        "   </x:scenario>\n" + 
+        "         </x:context>\n" + 
+        "      </input-wrap>\n" + 
+        "      <result select=\"/element()\">\n" + 
+        "         <content-wrap xmlns=\"\">\n" + 
+        "            <phrases xmlns:functx=\"http://www.functx.com\">\n" + 
+        "               <phrase status=\"changed\">Hello!</phrase>\n" + 
+        "               <phrase status=\"changed\">Goodbye!</phrase>\n" + 
+        "               <phrase status=\"same\">\\(So long!\\)</phrase>\n" + 
+        "            </phrases>\n" + 
+        "         </content-wrap>\n" + 
+        "      </result>\n" + 
+        "      <test id=\"" + firstID + "-expect1\" successful=\"true\">\n" + 
+        "         <label>All phrase elements should remain</label>\n" + 
+        "         <expect-test-wrap xmlns=\"\">\n" + 
+        "            <x:expect xmlns:functx=\"http://www.functx.com\"\n" + 
+        "                      xmlns:x=\"http://www.jenitennison.com/xslt/xspec\"\n" + 
+        "                      test=\"count(phrases/phrase) = 3\"/>\n" + 
+        "         </expect-test-wrap>\n" + 
+        "         <expect select=\"()\"/>\n" + 
+        "      </test>\n" + 
+        "      <test id=\"" + firstID + "-expect2\" successful=\"false\">\n" + 
+        "         <label>Strings should be escaped and status attributes should be added. The 'status' attribute are not as expected, indicating a problem in the tested template.</label>\n" + 
+        "         <expect select=\"/element()\">\n" + 
+        "            <content-wrap xmlns=\"\">\n" + 
+        "               <phrases xmlns:functx=\"http://www.functx.com\"\n" + 
+        "                        xmlns:x=\"http://www.jenitennison.com/xslt/xspec\">\n" + 
+        "                  <phrase status=\"same\">Hello!</phrase>\n" + 
+        "                  <phrase status=\"same\">Goodbye!</phrase>\n" + 
+        "                  <phrase status=\"changed\">\\(So long!\\)</phrase>\n" + 
+        "               </phrases>\n" + 
+        "            </content-wrap>\n" + 
+        "         </expect>\n" + 
+        "      </test>\n" + 
+        "   </scenario>\n" + 
         // The source attribute is present.
         // To ensure back mapping we need to remember in which file a scenario was defined.
-        "   <x:scenario id=\"" + secondID + "\"\n" + 
-            "               xspec=\"" + importedXSpecURL.toString() + "\">\n" + 
-        "      <x:label>No escaping</x:label>\n" + 
-        "      <x:call function=\"functx:escape-for-regex\">\n" + 
-        "         <x:param select=\"'Hello'\"/>\n" + 
-        "      </x:call>\n" + 
-        "      <x:result select=\"'Hello'\"/>\n" + 
-        "      <x:test successful=\"true\">\n" + 
-        "         <x:label>Must not be escaped at all</x:label>\n" + 
-        "         <x:expect select=\"'Hello'\"/>\n" + 
-        "      </x:test>\n" + 
-        "   </x:scenario>\n" + 
-        "</x:report>", 
+        "   <scenario id=\"" + secondID + "\"\n" + 
+        "             xspec=\"" + importedXSpecURL.toString() + "\">\n" + 
+        "      <label>No escaping</label>\n" + 
+        "      <input-wrap xmlns=\"\">\n" + 
+        "         <x:call xmlns:functx=\"http://www.functx.com\"\n" + 
+        "                 xmlns:x=\"http://www.jenitennison.com/xslt/xspec\"\n" + 
+        "                 function=\"functx:escape-for-regex\">\n" + 
+        "            <x:param select=\"'Hello'\"/>\n" + 
+        "         </x:call>\n" + 
+        "      </input-wrap>\n" + 
+        "      <result select=\"'Hello'\"/>\n" + 
+        "      <test id=\"" + secondID + "-expect1\" successful=\"true\">\n" + 
+        "         <label>Must not be escaped at all</label>\n" + 
+        "         <expect select=\"'Hello'\"/>\n" + 
+        "      </test>\n" + 
+        "   </scenario>\n" + 
+        "</report>", 
         filterAll(read(xmlFormatOutput.toURI().toURL()).toString()));
     
     
@@ -203,7 +218,7 @@ public class XSpecMetaTest extends XSpecViewTestBase {
         // A button to show the DIFF inside Oxygen's DIFF.
         + "<a class=\"button\" onclick=\"showDiff(this)\">Diff</a></p>\n" +
         // Q-DIFF data in HTML format.
-        "            <div class=\"failure\" id=\"d4e46\" style=\"display:none;\">\n" + 
+        "            <div class=\"failure\" id=\"" + firstID + "-expect2\" style=\"display:none;\">\n" + 
         "               <table class=\"xspecResult\">\n" + 
         "                  <thead>\n" + 
         "                     <tr>\n" + 
@@ -213,12 +228,13 @@ public class XSpecMetaTest extends XSpecViewTestBase {
         "                  </thead>\n" + 
         "                  <tbody>\n" + 
         "                     <tr>\n" + 
-        "                        <td><pre>&lt;<span class=\"inner-diff\">phrases</span> xmlns:functx=\"http://www.functx.com\"&gt;\n" + 
+        "                        <td><pre>&lt;<span class=\"inner-diff\">phrases</span> <span class=\"xmlns\">xmlns:functx=\"http://www.functx.com\"</span>&gt;\n" + 
         "   &lt;<span class=\"inner-diff\">phrase</span> <span class=\"inner-diff\">status</span>=<span class=\"diff\">\"changed\"</span>&gt;<span class=\"same\">Hello!</span>&lt;/phrase&gt;\n" + 
         "   &lt;<span class=\"inner-diff\">phrase</span> <span class=\"inner-diff\">status</span>=<span class=\"diff\">\"changed\"</span>&gt;<span class=\"same\">Goodbye!</span>&lt;/phrase&gt;\n" + 
         "   &lt;<span class=\"inner-diff\">phrase</span> <span class=\"inner-diff\">status</span>=<span class=\"diff\">\"same\"</span>&gt;<span class=\"same\">\\(So long!\\)</span>&lt;/phrase&gt;\n" + 
         "&lt;/phrases&gt;</pre></td>\n" + 
-        "                        <td><pre>&lt;<span class=\"inner-diff\">phrases</span> xmlns:functx=\"http://www.functx.com\"&gt;\n" + 
+        "                        <td><pre>&lt;<span class=\"inner-diff\">phrases</span> <span class=\"xmlns\">xmlns:functx=\"http://www.functx.com\"</span>\n" + 
+        "         <span class=\"xmlns trivial\">xmlns:x=\"http://www.jenitennison.com/xslt/xspec\"</span>&gt;\n" + 
         "   &lt;<span class=\"inner-diff\">phrase</span> <span class=\"inner-diff\">status</span>=<span class=\"diff\">\"same\"</span>&gt;<span class=\"same\">Hello!</span>&lt;/phrase&gt;\n" + 
         "   &lt;<span class=\"inner-diff\">phrase</span> <span class=\"inner-diff\">status</span>=<span class=\"diff\">\"same\"</span>&gt;<span class=\"same\">Goodbye!</span>&lt;/phrase&gt;\n" + 
         "   &lt;<span class=\"inner-diff\">phrase</span> <span class=\"inner-diff\">status</span>=<span class=\"diff\">\"changed\"</span>&gt;<span class=\"same\">\\(So long!\\)</span>&lt;/phrase&gt;\n" + 
@@ -273,38 +289,43 @@ public class XSpecMetaTest extends XSpecViewTestBase {
     String secondID = XSpecUtil.generateId("Test no.2(1)");
     
     assertEquals("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" + 
-        "<x:report xmlns:test=\"http://www.jenitennison.com/xslt/unit-test\"\n" + 
-        "          xmlns:xs=\"http://www.w3.org/2001/XMLSchema\"\n" + 
-        "          xmlns:x=\"http://www.jenitennison.com/xslt/xspec\"\n" + 
-        "          xmlns:functx=\"http://www.functx.com\"\n" + 
-        "          stylesheet=\"" + xslURL.toString() + "\"\n" + 
-        "          date=\"XXX\"\n" +
-        "          xspec=\"" + xspecURL.toExternalForm() + "\">\n" + 
-        "   <x:scenario id=\"" + firstID + "\"\n" + 
-            "               xspec=\"" + xspecURL.toString() + "\">\n" + 
-        "      <x:label>Test no.1</x:label>\n" + 
-        "      <x:call function=\"functx:escape-for-regex\">\n" + 
-        "         <x:param select=\"'Hello'\"/>\n" + 
-        "      </x:call>\n" + 
-        "      <x:result select=\"'Hello'\"/>\n" + 
-        "      <x:test successful=\"true\">\n" + 
-        "         <x:label>Must not be escaped at all</x:label>\n" + 
-        "         <x:expect select=\"'Hello'\"/>\n" + 
-        "      </x:test>\n" + 
-        "   </x:scenario>\n" + 
-        "   <x:scenario id=\"" + secondID + "\"\n" + 
-            "               xspec=\"" + xspecURL.toString() + "\">\n" + 
-        "      <x:label>Test no.2</x:label>\n" + 
-        "      <x:call function=\"functx:escape-for-regex\">\n" + 
-        "         <x:param select=\"'(Hello)'\"/>\n" + 
-        "      </x:call>\n" + 
-        "      <x:result select=\"'\\(Hello\\)'\"/>\n" + 
-        "      <x:test successful=\"true\">\n" + 
-        "         <x:label>Must not be escaped at all</x:label>\n" + 
-        "         <x:expect select=\"'\\(Hello\\)'\"/>\n" + 
-        "      </x:test>\n" + 
-        "   </x:scenario>\n" + 
-        "</x:report>", 
+        "<report xmlns=\"http://www.jenitennison.com/xslt/xspec\"\n" + 
+        "        xspec=\"" + xspecURL.toExternalForm() + "\"\n" + 
+        "        stylesheet=\"" + xslURL.toString() + "\"\n" + 
+        "        date=\"XXX\">\n" +
+        "   <scenario id=\"" + firstID + "\"\n" + 
+        "             xspec=\"" + xspecURL.toString() + "\">\n" + 
+        "      <label>Test no.1</label>\n" + 
+        "      <input-wrap xmlns=\"\">\n" + 
+        "         <x:call xmlns:functx=\"http://www.functx.com\"\n" + 
+        "                 xmlns:x=\"http://www.jenitennison.com/xslt/xspec\"\n" + 
+        "                 function=\"functx:escape-for-regex\">\n" + 
+        "            <x:param select=\"'Hello'\"/>\n" + 
+        "         </x:call>\n" + 
+        "      </input-wrap>\n" + 
+        "      <result select=\"'Hello'\"/>\n" + 
+        "      <test id=\"" + firstID + "-expect1\" successful=\"true\">\n" + 
+        "         <label>Must not be escaped at all</label>\n" + 
+        "         <expect select=\"'Hello'\"/>\n" + 
+        "      </test>\n" + 
+        "   </scenario>\n" + 
+        "   <scenario id=\"" + secondID + "\"\n" + 
+        "             xspec=\"" + xspecURL.toString() + "\">\n" + 
+        "      <label>Test no.2</label>\n" + 
+        "      <input-wrap xmlns=\"\">\n" + 
+        "         <x:call xmlns:functx=\"http://www.functx.com\"\n" + 
+        "                 xmlns:x=\"http://www.jenitennison.com/xslt/xspec\"\n" + 
+        "                 function=\"functx:escape-for-regex\">\n" + 
+        "            <x:param select=\"'(Hello)'\"/>\n" + 
+        "         </x:call>\n" + 
+        "      </input-wrap>\n" + 
+        "      <result select=\"'\\(Hello\\)'\"/>\n" + 
+        "      <test id=\"" + secondID + "-expect1\" successful=\"true\">\n" + 
+        "         <label>Must not be escaped at all</label>\n" + 
+        "         <expect select=\"'\\(Hello\\)'\"/>\n" + 
+        "      </test>\n" + 
+        "   </scenario>\n" + 
+        "</report>", 
         filterAll(read(xmlFormatOutput.toURI().toURL()).toString()));
     
     assertTrue(outputFile.exists());
@@ -337,6 +358,7 @@ public class XSpecMetaTest extends XSpecViewTestBase {
         "</html>", read(outputFile.toURI().toURL()).toString());
     
     // Assert the driver.
+    /*
     File compiledXSL = new File(xspecFile.getParentFile(), "xspec/driverTest-compiled-original.xsl");
     File driverXSL = new File(xspecFile.getParentFile(), "xspec/driverTest-compiled.xsl");
     
@@ -348,6 +370,7 @@ public class XSpecMetaTest extends XSpecViewTestBase {
         "   <xsl:import href=\"" + compiledXSL.toURI().toURL().toString() + "\"/>\n" + 
         "</xsl:stylesheet>", 
         read(driverXSL.toURI().toURL()).toString().replaceAll("\\\\", "/").replaceAll("<\\?xml-stylesheet.*\\?>", ""));
+    */
   }
 
   /**
@@ -357,6 +380,7 @@ public class XSpecMetaTest extends XSpecViewTestBase {
    */
   public void testRunSpecificScenarios_2() throws Exception {
     URL xspecURL = getClass().getClassLoader().getResource("meta/driverTest.xspec");
+    URL xslURL = getClass().getClassLoader().getResource("meta/escape-for-regex.xsl");
     File xspecFile = URLUtil.getCanonicalFileFromFileUrl(xspecURL);
     File outputFile = new File(xspecFile.getParentFile(), "driverTest-report.html");
     
@@ -369,41 +393,48 @@ public class XSpecMetaTest extends XSpecViewTestBase {
     File xmlFormatOutput = new File(xspecFile.getParentFile(), "xspec/driverTest-result.xml");
     
     assertEquals("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" + 
-        "<x:report xmlns:xs=\"http://www.w3.org/2001/XMLSchema\"\n" + 
-        "          xmlns:x=\"http://www.jenitennison.com/xslt/xspec\">\n" + 
-        "   <x:scenario xmlns:test=\"http://www.jenitennison.com/xslt/unit-test\"\n" + 
-        "               xmlns:functx=\"http://www.functx.com\"\n" + 
-        "               id=\"" + firstID + "\"\n" + 
-        "               xspec=\"" + xspecURL.toString() + "\">\n" + 
-        "      <x:label>Test no.1</x:label>\n" + 
-        "      <x:call function=\"functx:escape-for-regex\">\n" + 
-        "         <x:param select=\"'Hello'\"/>\n" + 
-        "      </x:call>\n" + 
-        "      <x:result select=\"'Hello'\"/>\n" + 
-        "      <x:test successful=\"true\">\n" + 
-        "         <x:label>Must not be escaped at all</x:label>\n" + 
-        "         <x:expect select=\"'Hello'\"/>\n" + 
-        "      </x:test>\n" + 
-        "   </x:scenario>\n" + 
-        "   <x:scenario xmlns:test=\"http://www.jenitennison.com/xslt/unit-test\"\n" + 
-        "               xmlns:functx=\"http://www.functx.com\"\n" + 
-        "               id=\"" + secondID + "\"\n" + 
-        "               xspec=\"" + xspecURL.toString() + "\">\n" + 
-        "      <x:label>Test no.2</x:label>\n" + 
-        "      <x:call function=\"functx:escape-for-regex\">\n" + 
-        "         <x:param select=\"'(Hello)'\"/>\n" + 
-        "      </x:call>\n" + 
-        "      <x:result select=\"'\\(Hello\\)'\"/>\n" + 
-        "      <x:test successful=\"true\">\n" + 
-        "         <x:label>Must not be escaped at all</x:label>\n" + 
-        "         <x:expect select=\"'\\(Hello\\)'\"/>\n" + 
-        "      </x:test>\n" + 
-        "   </x:scenario>\n" + 
-        "</x:report>", 
+        "<report xmlns=\"http://www.jenitennison.com/xslt/xspec\"\n" + 
+        "        xspec=\"" + xspecURL.toExternalForm() + "\"\n" + 
+        "        stylesheet=\"" + xslURL.toString() + "\"\n" + 
+        "        date=\"XXX\">\n" +
+        "   <scenario id=\"" + firstID + "\"\n" + 
+        "             xspec=\"" + xspecURL.toString() + "\">\n" + 
+        "      <label>Test no.1</label>\n" + 
+        "      <input-wrap xmlns=\"\">\n" + 
+        "         <x:call xmlns:functx=\"http://www.functx.com\"\n" + 
+        "                 xmlns:x=\"http://www.jenitennison.com/xslt/xspec\"\n" + 
+        "                 function=\"functx:escape-for-regex\">\n" + 
+        "            <x:param select=\"'Hello'\"/>\n" + 
+        "         </x:call>\n" + 
+        "      </input-wrap>\n" + 
+        "      <result select=\"'Hello'\"/>\n" + 
+        "      <test id=\"" + firstID + "-expect1\" successful=\"true\">\n" + 
+        "         <label>Must not be escaped at all</label>\n" + 
+        "         <expect select=\"'Hello'\"/>\n" + 
+        "      </test>\n" + 
+        "   </scenario>\n" + 
+        "   <scenario id=\"" + secondID + "\"\n" + 
+        "             xspec=\"" + xspecURL.toString() + "\">\n" + 
+        "      <label>Test no.2</label>\n" + 
+        "      <input-wrap xmlns=\"\">\n" + 
+        "         <x:call xmlns:functx=\"http://www.functx.com\"\n" + 
+        "                 xmlns:x=\"http://www.jenitennison.com/xslt/xspec\"\n" + 
+        "                 function=\"functx:escape-for-regex\">\n" + 
+        "            <x:param select=\"'(Hello)'\"/>\n" + 
+        "         </x:call>\n" + 
+        "      </input-wrap>\n" + 
+        "      <result select=\"'\\(Hello\\)'\"/>\n" + 
+        "      <test id=\"" + secondID + "-expect1\" successful=\"true\">\n" + 
+        "         <label>Must not be escaped at all</label>\n" + 
+        "         <expect select=\"'\\(Hello\\)'\"/>\n" + 
+        "      </test>\n" + 
+        "   </scenario>\n" + 
+        "</report>", 
         filterAll(read(xmlFormatOutput.toURI().toURL()).toString()));
     
         
     // Assert the driver.
+    /*
     File compiledXSL = new File(xspecFile.getParentFile(), "xspec/driverTest-compiled-original.xsl");
     File driverXSL = new File(xspecFile.getParentFile(), "xspec/driverTest-compiled.xsl");
     
@@ -424,5 +455,6 @@ public class XSpecMetaTest extends XSpecViewTestBase {
         "   </xsl:template>\n" + 
         "</xsl:stylesheet>", 
         read(driverXSL.toURI().toURL()).toString().replaceAll("\\\\", "/").replaceAll("<\\?xml-stylesheet.*\\?>", ""));
+    */
   }
 }

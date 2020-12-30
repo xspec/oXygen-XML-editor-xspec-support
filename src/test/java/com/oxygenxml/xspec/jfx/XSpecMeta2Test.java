@@ -35,26 +35,22 @@ public class XSpecMeta2Test extends XSpecViewTestBase {
     
     File xmlFormatOutput = new File(xspecFile.getParentFile(), "xspec/to-test-result.xml");
     
-    assertEquals("<x:result xmlns:test=\"http://www.jenitennison.com/xslt/unit-test\"\n" + 
-        "          xmlns:xs=\"http://www.w3.org/2001/XMLSchema\"\n" + 
-        "          xmlns:x=\"http://www.jenitennison.com/xslt/xspec\"\n" + 
-        "          xmlns:f=\"uri:some\"\n" + 
-        "          select=\"/*/@*\">\n" + 
-        "         <pseudo-attribute xmlns=\"http://www.jenitennison.com/xslt/xspec\" code=\"F\"/>\n" + 
-        "         <pseudo-attribute xmlns=\"http://www.jenitennison.com/xslt/xspec\" codeSystem=\"null\"/>\n" + 
-        "         <pseudo-attribute xmlns=\"http://www.jenitennison.com/xslt/xspec\" displayName=\"Vrouw\"/>\n" + 
-        "      </x:result>", executeXPath(xmlFormatOutput, "//*:result"));
-    
-    assertEquals("<x:expect xmlns:test=\"http://www.jenitennison.com/xslt/unit-test\"\n" + 
-        "          xmlns:xs=\"http://www.w3.org/2001/XMLSchema\"\n" + 
-        "          xmlns:x=\"http://www.jenitennison.com/xslt/xspec\"\n" + 
-        "          xmlns:f=\"uri:some\"\n" + 
-        "          select=\"/*/@*\">\n" + 
-        "            <pseudo-attribute xmlns=\"http://www.jenitennison.com/xslt/xspec\" code=\"false\"/>\n" + 
-        "            <pseudo-attribute xmlns=\"http://www.jenitennison.com/xslt/xspec\"\n" + 
-        "                     codeSystem=\"2.16.840.1.113883.5.1\"/>\n" + 
+    assertEquals("<result xmlns=\"http://www.jenitennison.com/xslt/xspec\" select=\"/*/@*\">\n" + 
+        "         <content-wrap xmlns=\"\">\n" + 
+        "            <pseudo-attribute xmlns=\"http://www.jenitennison.com/xslt/xspec\" code=\"F\"/>\n" + 
+        "            <pseudo-attribute xmlns=\"http://www.jenitennison.com/xslt/xspec\" codeSystem=\"null\"/>\n" + 
         "            <pseudo-attribute xmlns=\"http://www.jenitennison.com/xslt/xspec\" displayName=\"Vrouw\"/>\n" + 
-        "         </x:expect>", executeXPath(xmlFormatOutput, "//*:expect"));
+        "         </content-wrap>\n" + 
+        "      </result>", executeXPath(xmlFormatOutput, "//*:result"));
+    
+    assertEquals("<expect xmlns=\"http://www.jenitennison.com/xslt/xspec\" select=\"/*/@*\">\n" + 
+        "            <content-wrap xmlns=\"\">\n" + 
+        "               <pseudo-attribute xmlns=\"http://www.jenitennison.com/xslt/xspec\" code=\"false\"/>\n" + 
+        "               <pseudo-attribute xmlns=\"http://www.jenitennison.com/xslt/xspec\"\n" + 
+        "                        codeSystem=\"2.16.840.1.113883.5.1\"/>\n" + 
+        "               <pseudo-attribute xmlns=\"http://www.jenitennison.com/xslt/xspec\" displayName=\"Vrouw\"/>\n" + 
+        "            </content-wrap>\n" + 
+        "         </expect>", executeXPath(xmlFormatOutput, "//*:expect"));
     
     
     
