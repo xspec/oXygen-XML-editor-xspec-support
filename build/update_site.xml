@@ -4,9 +4,9 @@
 
     <xt:extension xmlns:xt="http://www.oxygenxml.com/ns/extension"
         id="com.oxygenxml.xspec.XSpecSupportPlugin">
-        <xt:location href="https://github.com/xspec/oXygen-XML-editor-xspec-support/releases/download/1.6.1/xspec.support-1.6.1-plugin.zip"/>
-        <xt:version>1.6.1</xt:version>
-        <xt:oxy_version>18.1+</xt:oxy_version>
+        <xt:location href="https://github.com/xspec/oXygen-XML-editor-xspec-support/releases/download/2.0.0/xspec.support-2.0.0-plugin.zip"/>
+        <xt:version>2.0.0</xt:version>
+        <xt:oxy_version>20.0+</xt:oxy_version>
         <xt:type>plugin</xt:type>
         <xt:author>Syncro Soft</xt:author>
         <xt:name>XSpec Helper view</xt:name>
@@ -41,7 +41,13 @@
                       <li>For a failed test, you can click on it to open the diff comparison between the expected and actual results.</li>
                   </ul>
               </div>
-                
+            <div>    
+                <h3>What's new in version 2.0.0</h3>
+                <ol>
+                    <li>Comes bundled with XSpec version 2.0.7.</li>
+                    <li>Supports running XSpec tests for XQuery files.</li>
+                </ol>
+            </div>    
             <div>    
                 <h3>What's new in version 1.5.0</h3>
                 <ol>
@@ -102,9 +108,9 @@ SOFTWARE.
     
     <xt:extension xmlns:xt="http://www.oxygenxml.com/ns/extension"
         id="com.oxygenxml.xspec.XSpecSupportFramework">
-        <xt:location href="https://github.com/xspec/oXygen-XML-editor-xspec-support/releases/download/1.6.1/xspec.support-1.6.1-framework.zip"/>
-        <xt:version>1.6.1</xt:version>
-        <xt:oxy_version>18.0+</xt:oxy_version>
+        <xt:location href="https://github.com/xspec/oXygen-XML-editor-xspec-support/releases/download/2.0.0/xspec.support-2.0.0-framework.zip"/>
+        <xt:version>2.0.0</xt:version>
+        <xt:oxy_version>20.0+</xt:oxy_version>
         <xt:type>framework</xt:type>
         <xt:author>Alex Jitianu</xt:author>
         <xt:name>XSpec Framework (required by the XSpec Helper view plugin)</xt:name>
