@@ -1255,7 +1255,7 @@
 										<String>${oxygenHome}/lib/*log4j*.jar</String>
 										<String>${oxygenHome}/lib/*xerces*.jar</String>
 										<String>${oxygenHome}/lib/guava-*.jar</String>
-										<String>${frameworkDir}/oxygen-results-view/saxon-extension.jar</String>
+										<String>${framework}/oxygen-results-view/saxon-extension.jar</String>
 									</String-array>
 								</field>
 							</antScenario>
