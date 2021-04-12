@@ -13,42 +13,46 @@
    <xsl:template name="x:compile-scenario" as="node()+">
       <xsl:context-item as="element(x:scenario)" use="required" />
 
-      <xsl:param name="pending"   as="node()?"              tunnel="yes" />
       <!-- No $apply for XQuery -->
-      <xsl:param name="context"   as="element(x:context)?"  tunnel="yes" />
-      <xsl:param name="call"      as="element(x:call)?"     tunnel="yes" />
+      <xsl:param name="call" as="element(x:call)?" required="yes" tunnel="yes" />
+      <xsl:param name="context" as="element(x:context)?" required="yes" tunnel="yes" />
+      <xsl:param name="reason-for-pending" as="xs:string?" required="yes" />
+      <xsl:param name="run-sut-now" as="xs:boolean" required="yes" />
 
-      <xsl:variable name="local-preceding-variables" as="element(x:variable)*"
-         select="x:call/preceding-sibling::x:variable" />
-      <xsl:variable name="pending-p" as="xs:boolean"
-         select="exists($pending) and empty(ancestor-or-self::*/@focus)" />
-      <xsl:variable name="run-sut-now" as="xs:boolean" select="not($pending-p) and x:expect" />
+      <xsl:variable name="local-preceding-vardecls" as="element(x:variable)*"
+         select="x:variable[following-sibling::x:call]" />
 
       <xsl:if test="$context">
-         <xsl:call-template name="x:error-compiling-scenario">
-            <xsl:with-param name="message" as="xs:string">
-               <xsl:text expand-text="yes">{name($context)} not supported for XQuery</xsl:text>
-            </xsl:with-param>
-         </xsl:call-template>
+         <xsl:message terminate="yes">
+            <xsl:call-template name="x:prefix-diag-message">
+               <xsl:with-param name="message" as="xs:string">
+                  <xsl:text expand-text="yes">{name($context)} not supported for XQuery</xsl:text>
+               </xsl:with-param>
+            </xsl:call-template>
+         </xsl:message>
       </xsl:if>
       <xsl:if test="$call/@template">
-         <xsl:call-template name="x:error-compiling-scenario">
-            <xsl:with-param name="message" as="xs:string">
-               <xsl:text expand-text="yes">{name($call)}/@template not supported for XQuery</xsl:text>
-            </xsl:with-param>
-         </xsl:call-template>
+         <xsl:message terminate="yes">
+            <xsl:call-template name="x:prefix-diag-message">
+               <xsl:with-param name="message" as="xs:string">
+                  <xsl:text expand-text="yes">{name($call)}/@template not supported for XQuery</xsl:text>
+               </xsl:with-param>
+            </xsl:call-template>
+         </xsl:message>
       </xsl:if>
       <xsl:if test="$run-sut-now">
          <xsl:call-template name="x:check-param-max-position" />
       </xsl:if>
       <xsl:if test="x:expect and empty($call)">
-         <xsl:call-template name="x:error-compiling-scenario">
-            <xsl:with-param name="message" as="xs:string">
-               <!-- Use x:xspec-name() for displaying the element names with the prefix preferred by
-                  the user -->
-               <xsl:text expand-text="yes">There are {x:xspec-name('expect', .)} but no {x:xspec-name('call', .)}</xsl:text>
-            </xsl:with-param>
-         </xsl:call-template>
+         <xsl:message terminate="yes">
+            <xsl:call-template name="x:prefix-diag-message">
+               <xsl:with-param name="message" as="xs:string">
+                  <!-- Use x:xspec-name() for displaying the element names with the prefix preferred by
+                     the user -->
+                  <xsl:text expand-text="yes">There are {x:xspec-name('expect', .)} but no {x:xspec-name('call', .)}</xsl:text>
+               </xsl:with-param>
+            </xsl:call-template>
+         </xsl:message>
       </xsl:if>
 
       <!--
@@ -59,8 +63,8 @@
       <xsl:text expand-text="yes">&#10;declare function local:{@id}(&#x0A;</xsl:text>
 
       <!-- Function parameters. Their order must be stable, because this is a function. -->
-      <xsl:for-each select="accumulator-before('stacked-variables-distinct-uqnames')">
-         <xsl:text expand-text="yes">${.}</xsl:text>
+      <xsl:for-each select="accumulator-before('stacked-vardecls-distinct-uqnames')">
+         <xsl:text expand-text="yes">${.} as item()*</xsl:text>
          <xsl:if test="position() ne last()">
             <xsl:text>,</xsl:text>
          </xsl:if>
@@ -72,11 +76,12 @@
       <!-- Start of the function body -->
       <xsl:text>{&#x0A;</xsl:text>
 
-      <!-- If there are variables before x:call, declare them here followed by "return". The other
-         local variables are declared in mode="local:invoke-compiled-scenarios-or-expects" in
+      <!-- If there are variable declarations before x:call, handle them here followed by "return".
+         The other local variable declarations are handled in
+         mode="local:invoke-compiled-scenarios-or-expects" in
          invoke-compiled-child-scenarios-or-expects.xsl. -->
-      <xsl:if test="exists($local-preceding-variables)">
-         <xsl:apply-templates select="$local-preceding-variables" mode="x:declare-variable" />
+      <xsl:if test="exists($local-preceding-vardecls)">
+         <xsl:apply-templates select="$local-preceding-vardecls" mode="x:declare-variable" />
          <xsl:text>return&#x0A;</xsl:text>
       </xsl:if>
 
@@ -88,14 +93,18 @@
       <xsl:call-template name="x:zero-or-more-node-constructors">
          <xsl:with-param name="nodes" as="node()+">
             <xsl:sequence select="@id, @xspec" />
-
-            <xsl:if test="$pending-p">
-               <xsl:sequence select="x:pending-attribute-from-pending-node($pending)" />
-            </xsl:if>
+            <xsl:sequence select="x:pending-attribute-from-reason($reason-for-pending)" />
 
             <xsl:sequence select="x:label(.)" />
          </xsl:with-param>
       </xsl:call-template>
+
+      <xsl:if test="$measure-time">
+         <xsl:text>,&#x0A;</xsl:text>
+         <xsl:call-template name="x:timestamp">
+            <xsl:with-param name="event" select="'start'" />
+         </xsl:call-template>
+      </xsl:if>
 
       <!-- Copy the input to the test result report XML -->
       <xsl:for-each select="x:call">
@@ -123,7 +132,7 @@
             <!-- Set up variables containing the parameter values -->
             <xsl:apply-templates select="$call/x:param" mode="x:declare-variable" />
 
-            <xsl:text expand-text="yes">let ${x:known-UQName('x:result')} := (&#x0A;</xsl:text>
+            <xsl:text expand-text="yes">let ${x:known-UQName('x:result')} as item()* := (&#x0A;</xsl:text>
             <xsl:call-template name="x:enter-sut">
                <xsl:with-param name="instruction" as="text()+">
                   <xsl:sequence select="x:function-call-text($call)" />
@@ -139,10 +148,18 @@
          </xsl:if>
 
          <xsl:call-template name="x:invoke-compiled-child-scenarios-or-expects">
+            <xsl:with-param name="handled-child-vardecls" select="$local-preceding-vardecls" />
             <xsl:with-param name="tunnel_variable-name-of-actual-result-report"
                select="$variable-name-of-actual-result-report" tunnel="yes" />
          </xsl:call-template>
       </xsl:sequence>
+
+      <xsl:if test="$measure-time">
+         <xsl:text>,&#x0A;</xsl:text>
+         <xsl:call-template name="x:timestamp">
+            <xsl:with-param name="event" select="'end'" />
+         </xsl:call-template>
+      </xsl:if>
 
       <!-- </x:scenario> -->
       <xsl:text>}&#x0A;</xsl:text>

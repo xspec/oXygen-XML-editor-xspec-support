@@ -37,7 +37,13 @@ description =
 		[ a:defaultValue = "import" ]
 		attribute run-as { "import" | "external" }?,
 		
-		(helper | global-param | import | scenario | pending | variable)+ }
+		## Set this true to report how long it took XSpec to run scenarios including some overhead
+		## of XSpec itself.
+		## Requires Saxon-PE or Saxon-EE.
+		[ a:defaultValue = "no" ]
+		attribute measure-time { boolean.datatype }?,
+		
+		(helper | global-param | import | scenario | pending-element | variable)+ }
 
 helper =
 	## The test runner will import this stylesheet (XSLT) or query (XQuery) module after importing
@@ -73,10 +79,10 @@ import =
 	## Importing is recursive and may be circular (although only one copy of a given
 	## imported document will actually be imported).
 	element import { common-attributes,
-	   ## The document URI (location) of the imported document.
-	   attribute href { xsd:anyURI } }
+	## The document URI (location) of the imported document.
+	attribute href { xsd:anyURI } }
 
-pending = 
+pending-element = 
 	## Anything that is within a <pending> element will remain untested, but will be
 	## reported as (eventual) desired behaviour. This is a good way of commenting out
 	## a set of behaviours that haven't been implemented yet, or scenarios whose
@@ -85,7 +91,18 @@ pending =
 	##
 	## An optional label attribute can be used to describe why the scenario or
 	## assertion should not be tested.
-	element pending { common-attributes, label?, (scenario | assertion | schematron-assertion)* }
+	element pending { common-attributes, label?, (scenario | assertion | schematron-expect)* }
+
+pending-attribute =
+	## Anything which has the @pending attribute will remain untested, but will be
+	## reported as (eventual) desired behaviour. This is a good way of commenting out
+	## a set of behaviours that haven't been implemented yet, or scenarios whose
+	## desired behaviour hasn't been determined, or tests for code that you're not
+	## currently working on, to make the testing process faster.
+	##
+	## The attribute value can be used to describe why the scenario or
+	## assertion should not be tested.
+	attribute pending { text }?
 
 scenario = 
 	## A scenario defines the environment in which a piece of processing takes place.
@@ -107,18 +124,15 @@ scenario =
 		  schematron-scenario ) }
 
 common-scenario-attributes = common-attributes,
-                        	## Anything which has the @pending attribute will remain untested, but will be
-                        	## reported as (eventual) desired behaviour. This is a good way of commenting out
-                        	## a set of behaviours that haven't been implemented yet, or scenarios whose
-                        	## desired behaviour hasn't been determined, or tests for code that you're not
-                        	## currently working on, to make the testing process faster.
-                        	##
-                        	## The attribute value can be used to describe why the scenario or
-                        	## assertion should not be tested.
-                             attribute pending { text }?,
+                             pending-attribute?,
+
                             ## If any scenario has a focus attribute, any scenarios without a focus 
-	                        ## attribute will be classed as pending.
+                            ## attribute will be classed as pending.
+                            ##
+                            ## The attribute value can be used to describe why you're focusing
+                            ## on that particular scenario.
                              attribute focus { text }?,
+
                             ## Controls whether to catch errors. Not useful in Schematron scenario.
                             ## The standard $err:* variables are collected in $x:result?err map. For example,
                             ## $x:result?err?code stores $err:code.
@@ -158,10 +172,10 @@ like =
 ## Child scenarios can override the parameters in the context, and can provide
 ## any missing values in the <context> (for example, if the context on the parent
 ## scenario doesn't provide a mode, that could be provided by the child scenario).
-matching-scenario = (variable*, context?, variable*),
+matching-scenario = (global-param | variable)*, context?, variable*,
                     like*,
-                    (pending | assertion | variable)*,
-                    (pending | 
+                    (pending-element | assertion | variable)*,
+                    (pending-element | 
                      element scenario { common-scenario-attributes, 
                                         label, matching-scenario })*
 
@@ -169,25 +183,24 @@ matching-scenario = (variable*, context?, variable*),
 ## <call> element defines the function call and the parameters passed to it
 ## and the <assertion> elements test the result of the function. Child scenarios
 ## can override the parameters in the function call.
-function-scenario = (variable*, function-call?, variable*),
+function-scenario = (global-param | variable)*, function-call?, variable*,
                     like*,
-                    (pending | assertion | variable)*,
-                    (pending | 
+                    (pending-element | assertion | variable)*,
+                    (pending-element | 
                      element scenario { common-scenario-attributes,
                                         label, function-scenario })*
-                      
+
 ## A named scenario is one based on a call to a named template. The <call>
 ## element defines the template call and the parameters passed to it and the
 ## <assertion> elements test the result of the template call. Child scenarios
 ## can override the parameters in the template call.
-named-scenario = (variable*, context?),
-                 (variable*, template-call?, variable*),
+named-scenario = (global-param | variable)*, context?, variable*, template-call?, variable*,
                  like*,
-                 (pending | assertion | variable)*,
-                 (pending | 
+                 (pending-element | assertion | variable)*,
+                 (pending-element | 
                   element scenario { common-scenario-attributes,
                                      label, named-scenario })*
-                   
+
 context = 
 	## The <context> element defines a context item, the mode in which templates
 	## are applied to it, and any parameters included in the apply templates.
@@ -220,9 +233,10 @@ template-call =
 	}
 
 global-param = 
-	## Global parameters are set globally, for the entire unit test suite. There's
-	## no way to set global parameters within a particular scenario (due to
-	## constraints on implementation).
+	## Global parameters as children of x:description apply to entire test suite.
+	## Global parameters within a scenario require /x:description/@run-as="external" (EXPERIMENTAL, subject to change).
+	## Global parameters within a Schematron scenario take effect only in the compiled XSLT, not while compiling Schematron to XSLT.
+	## XQuery tests do not support global parameters.
 	element param { common-attributes, name, static?, selection }
 
 static = 
@@ -266,7 +280,7 @@ assertion =
 	## assertion succeeds only if the item is equal to the one specified with the
 	## href and select attributes or content of the <expect> element.
 	element expect { common-attributes,
-		label, test?, selection }
+		label, pending-attribute?, test?, selection }
 
 test = attribute test { xpath }
 
@@ -282,14 +296,14 @@ text-element =
 	## Text in this element is not ignored even when it's whitespace-only.
 	element text { common-attributes, text }
 
-schematron-scenario = context?,
+schematron-scenario = global-param*, context?,
                     like*,
-                    (pending | schematron-assertion | assertion)*, 
-                    (pending | 
+                    (pending-element | schematron-expect | assertion)*, 
+                    (pending-element | 
                      element scenario { common-scenario-attributes, 
                                         label, schematron-scenario })*
 
-schematron-assertion =  
+schematron-expect =  
     expect-assert | expect-not-assert | 
     expect-report | expect-not-report | 
     expect-valid | expect-rule
@@ -309,18 +323,18 @@ expect-assert =
     ## The attributes id, role, and location can be used in combination to 
     ## identify a specific <assert>. 
     element expect-assert {
-    schematron-common-expect,
-    schematron-count-expect
-}
+        common-schematron-assert-report-expect-attributes,
+        schematron-expect-count-attribute
+    }
 expect-report = 
     ## In a Schematron test, verify that a <report> is thrown.
     ## 
     ## The attributes id, role, and location can be used in combination to 
     ## identify a specific <report>. 
     element expect-report {
-    schematron-common-expect,
-    schematron-count-expect
-}
+        common-schematron-assert-report-expect-attributes,
+        schematron-expect-count-attribute
+    }
 
 expect-not-assert = 
     ## In a Schematron test, verify that an <assert> is not thrown.
@@ -328,45 +342,51 @@ expect-not-assert =
     ## The attributes id, role, and location can be used in combination to 
     ## identify a specific <assert>. 
     element expect-not-assert {
-    schematron-common-expect
-}
+        common-schematron-assert-report-expect-attributes
+    }
 expect-not-report = 
     ## In a Schematron test, verify that a <report> is not thrown.
     ## 
     ## The attributes id, role, and location can be used in combination to 
     ## identify a specific <report>. 
     element expect-not-report {
-    schematron-common-expect
-}
+        common-schematron-assert-report-expect-attributes
+    }
 
 expect-rule = 
     ## In a Schematron test, verify that a <rule> is fired.
     element expect-rule {
-    ## Optional label to describe the expectation.
-    attribute label { text }?,
-    ## Identify a specific <rule> using its id attribute.
-    attribute id { xsd:NCName }?,
-    ## Match a specific context attribute value of a <rule>.
-    attribute context { text }?,
-    schematron-count-expect
-}
+        ## Optional label to describe the expectation.
+        attribute label { text }?,
 
-schematron-common-expect = 
+        ## Identify a specific <rule> using its id attribute.
+        attribute id { xsd:NCName }?,
+
+        ## Match a specific context attribute value of a <rule>.
+        attribute context { text }?,
+
+        schematron-expect-count-attribute
+    }
+
+common-schematron-assert-report-expect-attributes = 
     ## Optional label to describe the expectation.
     attribute label { text }?,
+
     ## Identify a specific <assert> or <report> using its id attribute or 
     ## the id attribute of the parent <rule>.
     attribute id { xsd:NCName }?,
+
     ## Match a specific role attribute value of an <assert> or <report> or 
     ## the parent <rule>. Role attribute values are often used to specify 
     ## 'error', 'fatal', 'warn', 'warning', 'info', 'information'.
     attribute role { text }?,
+
     ## XPath of a location in the context XML that the <assert> or <report> 
     ## is expected to find. Namespace prefixes that are defined in Schematron 
     ## using ns elements can be used.
     attribute location { xpath }?
 
-schematron-count-expect = 
+schematron-expect-count-attribute = 
     ## Number of times an <assert> or <report> is expected to be thrown.
     attribute count { xsd:nonNegativeInteger }?
 

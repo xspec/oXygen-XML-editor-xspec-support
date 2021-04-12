@@ -61,6 +61,11 @@
             </xsl:element>
          </xsl:if>
 
+         <!-- Absolute URI of .xsl file to be tested -->
+         <variable name="{x:known-UQName('x:stylesheet-uri')}" as="{x:known-UQName('xs:anyURI')}">
+            <xsl:value-of select="@stylesheet" />
+         </variable>
+
          <!-- Absolute URI of the master .xspec file (Original one if specified i.e. Schematron) -->
          <xsl:variable name="xspec-master-uri" as="xs:anyURI"
             select="(@original-xspec, $initial-document-actual-uri)[1] cast as xs:anyURI" />
@@ -68,8 +73,13 @@
             <xsl:value-of select="$xspec-master-uri" />
          </variable>
 
+         <!-- Let the compiled stylesheet know whether external or not -->
+         <variable name="{x:known-UQName('x:is-external')}" as="{x:known-UQName('xs:boolean')}"
+            select="{$is-external}()" />
+
          <!-- Compile global params and global variables. -->
-         <xsl:call-template name="x:compile-global-params-and-variables" />
+         <xsl:variable name="global-vardecls" as="element()*" select="x:param | x:variable" />
+         <xsl:apply-templates select="$global-vardecls" mode="x:declare-variable" />
 
          <xsl:if test="$is-external">
             <!-- If no $x:saxon-config is provided by global x:variable, declare a dummy one so that
@@ -158,9 +168,19 @@
                      <xsl:attribute name="select" select="'current-dateTime()'" />
                   </xsl:element>
 
+                  <xsl:call-template name="x:timestamp">
+                     <xsl:with-param name="event" select="'start'" />
+                  </xsl:call-template>
+
                   <!-- Generate invocations of the compiled top-level scenarios. -->
                   <xsl:text>&#10;            </xsl:text><xsl:comment> invoke each compiled top-level x:scenario </xsl:comment>
-                  <xsl:call-template name="x:invoke-compiled-child-scenarios-or-expects" />
+                  <xsl:call-template name="x:invoke-compiled-child-scenarios-or-expects">
+                     <xsl:with-param name="handled-child-vardecls" select="$global-vardecls" />
+                  </xsl:call-template>
+
+                  <xsl:call-template name="x:timestamp">
+                     <xsl:with-param name="event" select="'end'" />
+                  </xsl:call-template>
                </xsl:element>
             </xsl:element>
          </xsl:element>
@@ -179,7 +199,10 @@
    <xsl:include href="compile/compile-scenario.xsl" />
    <xsl:include href="declare-variable/declare-variable.xsl" />
    <xsl:include href="external/transform-options.xsl" />
+   <xsl:include href="initial-check/perform-initial-check.xsl" />
+   <xsl:include href="invoke-compiled/group-invocation.xsl" />
    <xsl:include href="invoke-compiled/invoke-compiled-current-scenario-or-expect.xsl" />
+   <xsl:include href="measure-time/timestamp.xsl" />
    <xsl:include href="node-constructor/node-constructor.xsl" />
    <xsl:include href="report/wrap-node-constructors-and-undeclare-default-ns.xsl" />
 

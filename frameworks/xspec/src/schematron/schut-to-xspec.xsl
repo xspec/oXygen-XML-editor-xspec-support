@@ -21,9 +21,9 @@
     <xsl:include href="../common/uqname-utils.xsl" />
     <xsl:include href="../common/uri-utils.xsl" />
     <xsl:include href="../common/user-content-utils.xsl" />
+    <xsl:include href="../common/yes-no-utils.xsl" />
     <xsl:include href="../compiler/base/resolve-import/resolve-import.xsl" />
     <xsl:include href="../compiler/base/util/compiler-misc-utils.xsl" />
-    <xsl:include href="../compiler/base/util/compiler-yes-no-utils.xsl" />
 
     <xsl:output indent="yes" />
 
@@ -55,6 +55,9 @@
                         attributes. Set only the attributes that are truly global over all the XSpec
                         documents. -->
 
+                    <!-- Global XSpec attributes -->
+                    <xsl:sequence select="@measure-time | @run-as" />
+
                     <!-- Global Schematron attributes -->
                     <xsl:attribute name="original-xspec" select="x:document-actual-uri(/)" />
                     <xsl:attribute name="schematron" select="resolve-uri(@schematron, base-uri())" />
@@ -76,7 +79,7 @@
         Adds some templates to the included mode
     -->
 
-    <!-- Schematron skeleton implementation requires a document node -->
+    <!-- The "skeleton" Schematron implementation requires a document node -->
     <xsl:template match="x:context[not(@href)][
         parent::*/x:expect-assert | parent::*/x:expect-not-assert |
         parent::*/x:expect-report | parent::*/x:expect-not-report |
@@ -215,7 +218,7 @@
                     (@count ! ('count:', .))
                 )
                 => string-join(' ')" />
-        <xsl:param name="test" as="xs:string" />
+        <xsl:param name="test" as="xs:string" required="yes" />
 
         <!-- Use x:xspec-name() for the element name so that the namespace for the name of the
             created element does not pollute the namespaces. -->

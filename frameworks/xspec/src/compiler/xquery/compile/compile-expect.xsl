@@ -14,16 +14,13 @@
    <xsl:template name="x:compile-expect" as="node()+">
       <xsl:context-item as="element(x:expect)" use="required" />
 
-      <xsl:param name="pending" as="node()?"                         tunnel="yes" />
+      <xsl:param name="call" as="element(x:call)?" required="yes" tunnel="yes" />
       <!-- No $context for XQuery -->
-      <xsl:param name="call"    as="element(x:call)?" required="yes" tunnel="yes" />
+      <xsl:param name="reason-for-pending" as="xs:string?" required="yes" />
 
       <!-- URIQualifiedNames of the parameters of the function being generated.
          Their order must be stable, because they are function parameters. -->
       <xsl:param name="param-uqnames" as="xs:string*" required="yes" />
-
-      <xsl:variable name="pending-p" as="xs:boolean"
-         select="exists($pending) and empty(ancestor::*/@focus)" />
 
       <!--
         declare function local:...($t:result as item()*)
@@ -32,7 +29,7 @@
       <xsl:text>&#10;(: generated from the x:expect element :)</xsl:text>
       <xsl:text expand-text="yes">&#10;declare function local:{@id}(&#x0A;</xsl:text>
       <xsl:for-each select="$param-uqnames">
-         <xsl:text expand-text="yes">${.}</xsl:text>
+         <xsl:text expand-text="yes">${.} as item()*</xsl:text>
          <xsl:if test="position() ne last()">
             <xsl:text>,</xsl:text>
          </xsl:if>
@@ -43,7 +40,7 @@
       <!-- Start of the function body -->
       <xsl:text>{&#x0A;</xsl:text>
 
-      <xsl:if test="not($pending-p)">
+      <xsl:if test="empty($reason-for-pending)">
          <!-- Set up the $local:expected variable -->
          <xsl:apply-templates select="." mode="x:declare-variable">
             <xsl:with-param name="comment" select="'expected result'" />
@@ -61,7 +58,7 @@
                <!-- $local:test-result
                   TODO: Evaluate @test in the context of $local:test-items, if
                     $local:test-items is a node -->
-               <xsl:text expand-text="yes">let $local:test-result as item()* (: evaluate the predicate :) := (&#x0A;</xsl:text>
+               <xsl:text>let $local:test-result as item()* (: evaluate the predicate :) := (&#x0A;</xsl:text>
                <xsl:text expand-text="yes">{x:disable-escaping(@test)}&#x0A;</xsl:text>
                <xsl:text>)&#x0A;</xsl:text>
 
@@ -109,15 +106,12 @@
       <xsl:call-template name="x:zero-or-more-node-constructors">
          <xsl:with-param name="nodes" as="node()+">
             <xsl:sequence select="@id" />
-
-            <xsl:if test="$pending-p">
-               <xsl:sequence select="x:pending-attribute-from-pending-node($pending)" />
-            </xsl:if>
+            <xsl:sequence select="x:pending-attribute-from-reason($reason-for-pending)" />
          </xsl:with-param>
       </xsl:call-template>
       <xsl:text>,&#x0A;</xsl:text>
 
-      <xsl:if test="not($pending-p)">
+      <xsl:if test="empty($reason-for-pending)">
          <!-- @successful must be evaluated at run time -->
          <xsl:text>attribute { QName('', 'successful') } { $local:successful },&#x0A;</xsl:text>
       </xsl:if>
@@ -125,7 +119,7 @@
       <xsl:apply-templates select="x:label(.)" mode="x:node-constructor" />
 
       <!-- Report -->
-      <xsl:if test="not($pending-p)">
+      <xsl:if test="empty($reason-for-pending)">
          <xsl:text>,&#x0A;</xsl:text>
 
          <xsl:if test="@test">

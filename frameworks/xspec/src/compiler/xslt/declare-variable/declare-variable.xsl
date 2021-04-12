@@ -6,50 +6,24 @@
                 version="3.0">
 
    <!--
-      mode="x:declare-variable"
       Generates XSLT variable declaration(s) from the current element.
       
-      This mode itself does not handle whitespace-only text nodes specially. To handle
-      whitespace-only text node in a special manner, the text node should be handled specially
-      before applying this mode and/or mode="x:node-constructor" should be overridden.
-      
-      This mode does not handle @static. It is just ignored. Enabling @static will create a usual
-      non-static parameter or variable.
+      This template does not handle @static. It is just ignored. Enabling @static will create a
+      usual non-static parameter or variable.
    -->
-   <xsl:mode name="x:declare-variable" on-multiple-match="fail" on-no-match="fail" />
+   <xsl:template name="x:declare-variable" as="element()+">
+      <xsl:context-item as="element()" use="required" />
 
-   <xsl:template match="element()" as="element()+" mode="x:declare-variable">
-      <!-- Reflects @pending or x:pending -->
-      <xsl:param name="pending" as="node()?" tunnel="yes" />
-
+      <xsl:param name="reason-for-pending" as="xs:string?" required="yes" />
       <xsl:param name="comment" as="xs:string?" />
+      <xsl:param name="uqname" as="xs:string" required="yes" />
+      <xsl:param name="exclude" as="element()*" required="yes" />
 
-      <!-- URIQualifiedName of the variable being declared -->
-      <xsl:variable name="uqname" as="xs:string" select="x:variable-UQName(.)" />
+      <!-- XSLT does not use this parameter -->
+      <xsl:param name="as-global" as="xs:boolean" />
 
-      <!-- True if the variable being declared is considered pending -->
-      <xsl:variable name="is-pending" as="xs:boolean"
-         select="self::x:variable
-            and not(empty($pending|ancestor::x:scenario/@pending) or exists(ancestor::*/@focus))" />
-
-      <!-- Child nodes to be excluded -->
-      <xsl:variable name="exclude" as="element()*"
-         select="self::x:context/x:param, self::x:expect/x:label" />
-
-      <!-- True if the variable should be declared as global -->
-      <xsl:variable name="is-global" as="xs:boolean" select="exists(parent::x:description)" />
-
-      <!-- True if the variable should be declared using xsl:param (not xsl:variable) -->
-      <xsl:variable name="is-param" as="xs:boolean" select="self::x:param and $is-global" />
-
-      <!-- URIQualifiedName of the temporary runtime variable which holds a document specified by
-         child::node() or @href -->
-      <xsl:variable name="temp-doc-uqname" as="xs:string?">
-         <xsl:if test="not($is-pending) and (node() or @href)">
-            <xsl:sequence
-               select="x:known-UQName('impl:' || local-name() || '-' || generate-id() || '-doc')" />
-         </xsl:if>
-      </xsl:variable>
+      <xsl:param name="as-param" as="xs:boolean" required="yes" />
+      <xsl:param name="temp-doc-uqname" as="xs:string?" required="yes" />
 
       <xsl:if test="$temp-doc-uqname">
          <xsl:element name="xsl:variable" namespace="{$x:xsl-namespace}">
@@ -72,7 +46,7 @@
          </xsl:element>
       </xsl:if>
 
-      <xsl:element name="xsl:{if ($is-param) then 'param' else 'variable'}"
+      <xsl:element name="xsl:{if ($as-param) then 'param' else 'variable'}"
          namespace="{$x:xsl-namespace}">
          <!-- @as or @select may use namespace prefixes. @select may use the default namespace such
             as xs:QName('foo'). -->
@@ -84,7 +58,7 @@
          <xsl:sequence select="@as" />
 
          <xsl:choose>
-            <xsl:when test="$is-pending">
+            <xsl:when test="exists($reason-for-pending)">
                <!-- Do not give variable a value, because the value specified
                   in test file might not be executable. Override data type, because
                   an empty sequence might not be valid for the type specified in test file. -->

@@ -1,10 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<xsl:stylesheet xmlns:local="urn:x-xspec:compiler:base:main:local"
-                xmlns:x="http://www.jenitennison.com/xslt/xspec"
+<xsl:stylesheet xmlns:x="http://www.jenitennison.com/xslt/xspec"
                 xmlns:xs="http://www.w3.org/2001/XMLSchema"
                 xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
                 exclude-result-prefixes="#all"
                 version="3.0">
+
+   <!--
+      Global context item
+   -->
+   <!-- Actually, xsl:global-context-item/@as is "document-node(element(x:description))".
+      "element(x:description)" is omitted in order to accept any source document and then reject it
+      with a proper error message if it's broken. (xspec/xspec#522) -->
+   <!-- Actually, xsl:global-context-item/@use is "required". It is downgraded to "optional" in
+      order to be compatible with XSPEC_HOME/test/compile-xslt-tests.xspec. -->
+   <xsl:global-context-item as="document-node()" use="optional" />
 
    <!--
       Global params
@@ -13,6 +22,8 @@
    <xsl:param name="force-focus" as="xs:string?" />
    <xsl:param name="is-external" as="xs:boolean"
       select="$initial-document/x:description/@run-as = 'external'" />
+   <xsl:param name="measure-time" as="xs:boolean"
+      select="$initial-document/x:description/@measure-time => x:yes-no-synonym(false())" />
 
    <!--
       Global variables
@@ -29,34 +40,34 @@
       select="x:document-actual-uri($initial-document)" />
 
    <!--
-      Accumulators for non-global x:variable
+      Accumulators for scenario-level variable declarations (x:param and x:variable)
    -->
 
-   <!-- Push and pop x:variable based on node identity -->
-   <xsl:accumulator name="local:stacked-variables" as="element(x:variable)*" initial-value="()">
-      <xsl:accumulator-rule match="x:scenario/x:variable"
+   <!-- Push and pop variable declaration elements based on node identity -->
+   <xsl:accumulator name="stacked-vardecls" as="element()*" initial-value="()">
+      <xsl:accumulator-rule match="x:scenario/x:param | x:scenario/x:variable"
          select="
-            (: Append this local variable :)
-            $value, self::x:variable" />
+            (: Append this scenario-level variable declaration element :)
+            $value, (self::x:param | self::x:variable)" />
       <xsl:accumulator-rule match="x:scenario" phase="end"
          select="
-            (: Remove variables declared as children of this scenario :)
-            $value except child::x:variable" />
+            (: Remove child variable declaration elements of this scenario :)
+            $value except (child::x:param | child::x:variable)" />
    </xsl:accumulator>
 
-   <!-- Push and pop distinct URIQualifiedName of x:variable -->
-   <xsl:accumulator name="stacked-variables-distinct-uqnames" as="xs:string*" initial-value="()">
+   <!-- Push and pop distinct URIQualifiedName of variable declarations (x:param and x:variable) -->
+   <xsl:accumulator name="stacked-vardecls-distinct-uqnames" as="xs:string*" initial-value="()">
       <!-- Use x:distinct-strings-stable() instead of fn:distinct-values(). The x:compile-scenario
          template for XQuery requires the order to be stable. -->
-      <xsl:accumulator-rule match="x:scenario/x:variable"
+      <xsl:accumulator-rule match="x:scenario/x:param | x:scenario/x:variable"
          select="
             x:distinct-strings-stable(
-               accumulator-before('local:stacked-variables') ! x:variable-UQName(.)
+               accumulator-before('stacked-vardecls') ! x:variable-UQName(.)
             )" />
       <xsl:accumulator-rule match="x:scenario" phase="end"
          select="
             x:distinct-strings-stable(
-               accumulator-after('local:stacked-variables') ! x:variable-UQName(.)
+               accumulator-after('stacked-vardecls') ! x:variable-UQName(.)
             )" />
    </xsl:accumulator>
 
@@ -67,7 +78,7 @@
 
    <!-- Actually, xsl:template/@match is "document-node(element(x:description))".
       "element(x:description)" is omitted in order to accept any source document and then reject it
-      with a proper error message if it's broken. -->
+      with a proper error message if it's broken. (xspec/xspec#522) -->
    <xsl:template match="document-node()" as="node()+">
       <xsl:call-template name="x:perform-initial-check" />
 
@@ -94,15 +105,15 @@
    <xsl:include href="../base/combine/combine.xsl" />
    <xsl:include href="../base/compile/compile-child-scenarios-or-expects.xsl" />
    <xsl:include href="../base/compile/compile-expect.xsl" />
-   <xsl:include href="../base/compile/compile-global-params-and-variables.xsl" />
    <xsl:include href="../base/compile/compile-scenario.xsl" />
-   <xsl:include href="../base/declare-variable/variable-uqname.xsl" />
+   <xsl:include href="../base/declare-variable/declare-variable.xsl" />
    <xsl:include href="../base/initial-check/perform-initial-check.xsl" />
+   <xsl:include href="../base/invoke-compiled/group-invocation.xsl" />
    <xsl:include href="../base/invoke-compiled/invoke-compiled-child-scenarios-or-expects.xsl" />
    <xsl:include href="../base/report/report-test-attribute.xsl" />
    <xsl:include href="../base/resolve-import/resolve-import.xsl" />
    <xsl:include href="../base/util/compiler-eqname-utils.xsl" />
    <xsl:include href="../base/util/compiler-misc-utils.xsl" />
-   <xsl:include href="../base/util/compiler-yes-no-utils.xsl" />
+   <xsl:include href="../base/util/compiler-pending-utils.xsl" />
 
 </xsl:stylesheet>

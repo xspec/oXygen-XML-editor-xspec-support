@@ -14,17 +14,16 @@
       <!-- Context item is x:description or x:scenario -->
       <xsl:context-item as="element()" use="required" />
 
-      <xsl:param name="pending" as="node()?" select="(.//@focus)[1]" tunnel="yes"/>
-
       <xsl:variable name="this" select="." as="element()"/>
       <xsl:if test="empty($this[self::x:description|self::x:scenario])">
-         <xsl:message terminate="yes"
-            select="'$this must be a description or a scenario, but is: ' || name()" />
+         <xsl:message terminate="yes">
+            <xsl:call-template name="x:prefix-diag-message">
+               <xsl:with-param name="message" select="'$this must be a description or a scenario'" />
+            </xsl:call-template>
+         </xsl:message>
       </xsl:if>
 
-      <xsl:apply-templates select="$this/element()" mode="local:compile-scenarios-or-expects">
-         <xsl:with-param name="pending" select="$pending" tunnel="yes"/>
-      </xsl:apply-templates>
+      <xsl:apply-templates select="$this/element()" mode="local:compile-scenarios-or-expects" />
    </xsl:template>
 
    <!--
@@ -35,31 +34,22 @@
       on-no-match="deep-skip" />
 
    <!--
-      At x:pending elements, we switch the $pending tunnel param value for children.
+      At x:pending elements, just move on to the children. Pending status and reason are accounted
+      for in descendant context.
    -->
    <xsl:template match="x:pending" as="node()+" mode="local:compile-scenarios-or-expects">
-      <xsl:apply-templates select="element()" mode="#current">
-         <xsl:with-param name="pending" select="x:label(.)" tunnel="yes"/>
-      </xsl:apply-templates>
+      <xsl:apply-templates select="element()" mode="#current" />
    </xsl:template>
 
    <!--
       Compile x:scenario.
    -->
    <xsl:template match="x:scenario" as="node()+" mode="local:compile-scenarios-or-expects">
-      <xsl:param name="pending" as="node()?" tunnel="yes" />
       <xsl:param name="apply" as="element(x:apply)?" tunnel="yes" />
-      <xsl:param name="call" as="element(x:call)?" tunnel="yes"/>
-      <xsl:param name="context" as="element(x:context)?" tunnel="yes"/>
+      <xsl:param name="call" as="element(x:call)?" tunnel="yes" />
+      <xsl:param name="context" as="element(x:context)?" tunnel="yes" />
 
-      <!-- The new $pending. -->
-      <xsl:variable name="new-pending" as="node()?" select="
-          if ( @focus ) then
-            ()
-          else if ( @pending ) then
-            @pending
-          else
-            $pending"/>
+      <xsl:variable name="reason-for-pending" as="xs:string?" select="x:reason-for-pending(.)" />
 
       <!-- The new apply. -->
       <xsl:variable name="new-apply" as="element(x:apply)?">
@@ -152,25 +142,33 @@
                $new-call[@function] ! local:param-dup-position-error-string(.)
             )[1]" />
       <xsl:if test="$dup-param-error-string">
-         <xsl:call-template name="x:error-compiling-scenario">
-            <xsl:with-param name="message" select="$dup-param-error-string" />
-         </xsl:call-template>
+         <xsl:message terminate="yes">
+            <xsl:call-template name="x:prefix-diag-message">
+               <xsl:with-param name="message" select="$dup-param-error-string" />
+            </xsl:call-template>
+         </xsl:message>
       </xsl:if>
 
       <!-- Check x:apply -->
       <!-- TODO: Remove this after implementing x:apply -->
       <xsl:if test="$new-apply">
          <xsl:message>
-            <xsl:text expand-text="yes">WARNING: The instruction {name($new-apply)} is not supported yet!</xsl:text>
+            <xsl:call-template name="x:prefix-diag-message">
+               <xsl:with-param name="level" select="'WARNING'" />
+               <xsl:with-param name="message">
+                  <xsl:text expand-text="yes">The instruction {name($new-apply)} is not supported yet!</xsl:text>
+               </xsl:with-param>
+            </xsl:call-template>
          </xsl:message>
       </xsl:if>
 
       <!-- Dispatch to a language-specific (XSLT or XQuery) worker template -->
       <xsl:call-template name="x:compile-scenario">
-         <xsl:with-param name="pending"   select="$new-pending" tunnel="yes"/>
-         <xsl:with-param name="apply"     select="$new-apply"   tunnel="yes"/>
-         <xsl:with-param name="call"      select="$new-call"    tunnel="yes"/>
-         <xsl:with-param name="context"   select="$new-context" tunnel="yes"/>
+         <xsl:with-param name="apply" select="$new-apply" tunnel="yes" />
+         <xsl:with-param name="call" select="$new-call" tunnel="yes" />
+         <xsl:with-param name="context" select="$new-context" tunnel="yes" />
+         <xsl:with-param name="reason-for-pending" select="$reason-for-pending" />
+         <xsl:with-param name="run-sut-now" select="empty($reason-for-pending) and x:expect" />
       </xsl:call-template>
    </xsl:template>
 
@@ -178,22 +176,22 @@
       Compile x:expect.
    -->
    <xsl:template match="x:expect" as="node()+" mode="local:compile-scenarios-or-expects">
-      <xsl:param name="pending" as="node()?" tunnel="yes" />
-      <xsl:param name="context" as="element(x:context)?" required="yes" tunnel="yes" />
       <xsl:param name="call" as="element(x:call)?" required="yes" tunnel="yes" />
+      <xsl:param name="context" as="element(x:context)?" required="yes" tunnel="yes" />
+
+      <xsl:variable name="reason-for-pending" as="xs:string?" select="x:reason-for-pending(.)" />
 
       <!-- Dispatch to a language-specific (XSLT or XQuery) worker template -->
       <xsl:call-template name="x:compile-expect">
-         <xsl:with-param name="pending" tunnel="yes" select="
-             ( $pending, ancestor::x:scenario/@pending )[1]"/>
-         <xsl:with-param name="context" tunnel="yes" select="$context"/>
-         <xsl:with-param name="call"    tunnel="yes" select="$call"/>
+         <xsl:with-param name="call" select="$call" tunnel="yes" />
+         <xsl:with-param name="context" select="$context" tunnel="yes" />
+         <xsl:with-param name="reason-for-pending" select="$reason-for-pending" />
          <xsl:with-param name="param-uqnames" as="xs:string*">
-            <xsl:if test="empty($pending|ancestor::x:scenario/@pending) or exists(ancestor::*/@focus)">
+            <xsl:if test="empty($reason-for-pending)">
                <xsl:sequence select="$context ! x:known-UQName('x:context')" />
                <xsl:sequence select="x:known-UQName('x:result')" />
             </xsl:if>
-            <xsl:sequence select="accumulator-before('stacked-variables-distinct-uqnames')" />
+            <xsl:sequence select="accumulator-before('stacked-vardecls-distinct-uqnames')" />
          </xsl:with-param>
       </xsl:call-template>
    </xsl:template>

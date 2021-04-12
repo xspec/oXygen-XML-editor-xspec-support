@@ -8,28 +8,39 @@
 
    <!--
       Generate invocation instructions of the compiled (child::x:scenario | child::x:expect), taking
-      x:pending into account. Recall that x:scenario and x:expect are compiled to an XSLT named
-      template or an XQuery function which must have the corresponding invocation instruction at
-      some point.
+      x:pending and variable declarations into account. Recall that x:scenario and x:expect are
+      compiled to an XSLT named template or an XQuery function which must have the corresponding
+      invocation instruction at some point.
    -->
    <xsl:template name="x:invoke-compiled-child-scenarios-or-expects" as="node()*">
       <!-- Context item is x:description or x:scenario -->
       <xsl:context-item as="element()" use="required" />
 
-      <!-- Default value of $pending does not affect compiler output but is here if needed in the
-         future -->
-      <xsl:param name="pending" select="(.//@focus)[1]" tunnel="yes" as="node()?"/>
+      <!-- (child::x:param | child::x:variable) that have been already handled while compiling
+         self::x:description in x:main template or while compiling self::x:scenario in
+         x:compile-scenario template. -->
+      <xsl:param name="handled-child-vardecls" as="element()*" required="yes" />
 
       <xsl:variable name="this" select="." as="element()"/>
       <xsl:if test="empty($this[self::x:description|self::x:scenario])">
-         <xsl:message terminate="yes"
-            select="'$this must be a description or a scenario, but is: ' || name()" />
+         <xsl:message terminate="yes">
+            <xsl:call-template name="x:prefix-diag-message">
+               <xsl:with-param name="message" select="'$this must be a description or a scenario'" />
+            </xsl:call-template>
+         </xsl:message>
       </xsl:if>
 
-      <xsl:apply-templates select="$this/element()"
-         mode="local:invoke-compiled-scenarios-or-expects">
-         <xsl:with-param name="pending" select="$pending" tunnel="yes"/>
-      </xsl:apply-templates>
+      <!-- Generate invocation instructions. Wrap them in a single document so that they have
+         adjacent relationship. -->
+      <xsl:variable name="invocation-doc" as="document-node()">
+         <xsl:document>
+            <xsl:apply-templates select="$this/element() except $handled-child-vardecls"
+               mode="local:invoke-compiled-scenarios-or-expects" />
+         </xsl:document>
+      </xsl:variable>
+
+      <!-- Group the invocation instructions -->
+      <xsl:apply-templates select="$invocation-doc" mode="x:group-invocation" />
    </xsl:template>
 
    <!--
@@ -39,12 +50,11 @@
       on-no-match="deep-skip" />
 
    <!--
-      At x:pending elements, we switch the $pending tunnel param value for children.
+      At x:pending elements, just move on to the children. Pending status and reason are accounted
+      for in descendant context.
    -->
    <xsl:template match="x:pending" as="node()+" mode="local:invoke-compiled-scenarios-or-expects">
-      <xsl:apply-templates select="element()" mode="#current">
-         <xsl:with-param name="pending" select="x:label(.)" tunnel="yes"/>
-      </xsl:apply-templates>
+      <xsl:apply-templates select="element()" mode="#current" />
    </xsl:template>
 
    <!--
@@ -54,7 +64,7 @@
       <!-- Dispatch to a language-specific (XSLT or XQuery) worker template -->
       <xsl:call-template name="x:invoke-compiled-current-scenario-or-expect">
          <xsl:with-param name="with-param-uqnames"
-            select="accumulator-before('stacked-variables-distinct-uqnames')" />
+            select="accumulator-before('stacked-vardecls-distinct-uqnames')" />
       </xsl:call-template>
    </xsl:template>
 
@@ -62,71 +72,26 @@
       Generate an invocation of the compiled x:expect
    -->
    <xsl:template match="x:expect" as="node()+" mode="local:invoke-compiled-scenarios-or-expects">
-      <xsl:param name="pending" as="node()?" tunnel="yes" />
-      <xsl:param name="context" as="element(x:context)?" tunnel="yes" />
+      <xsl:param name="context" as="element(x:context)?" required="yes" tunnel="yes" />
 
       <!-- Dispatch to a language-specific (XSLT or XQuery) worker template -->
       <xsl:call-template name="x:invoke-compiled-current-scenario-or-expect">
          <xsl:with-param name="with-param-uqnames" as="xs:string*">
-            <xsl:if test="empty($pending|ancestor::x:scenario/@pending) or exists(ancestor::*/@focus)">
+            <xsl:if test="x:reason-for-pending(.) => empty()">
                <xsl:sequence select="$context ! x:known-UQName('x:context')" />
                <xsl:sequence select="x:known-UQName('x:result')" />
             </xsl:if>
-            <xsl:sequence select="accumulator-before('stacked-variables-distinct-uqnames')" />
+            <xsl:sequence select="accumulator-before('stacked-vardecls-distinct-uqnames')" />
          </xsl:with-param>
       </xsl:call-template>
    </xsl:template>
 
    <!--
-      - Reject reserved variable names, whether they're global or not.
-      - Declare non-global variables if they are not preceding-siblings of x:call or x:context.
+      Declare variables
    -->
-   <xsl:template match="x:variable" as="node()*" mode="local:invoke-compiled-scenarios-or-expects">
-      <xsl:call-template name="local:detect-reserved-variable-name" />
-
-      <xsl:choose>
-         <xsl:when test="parent::x:description">
-            <!-- This global variable is declared in x:compile-global-params-and-variables template -->
-         </xsl:when>
-
-         <xsl:when test="following-sibling::x:call or following-sibling::x:context">
-            <!-- This variable is declared in x:compile-scenario template -->
-         </xsl:when>
-
-         <xsl:otherwise>
-            <!-- Declare now -->
-            <xsl:apply-templates select="." mode="x:declare-variable" />
-         </xsl:otherwise>
-      </xsl:choose>
-   </xsl:template>
-
-   <!--
-      Local templates
-   -->
-
-   <!-- Generate error message for user-defined usage of names in XSpec namespace. -->
-   <xsl:template name="local:detect-reserved-variable-name" as="empty-sequence()">
-      <xsl:context-item as="element(x:variable)" use="required" />
-
-      <xsl:variable name="qname" as="xs:QName"
-         select="x:resolve-EQName-ignoring-default-ns(@name, .)" />
-
-      <xsl:choose>
-         <xsl:when test="$is-external and ($qname eq xs:QName('x:saxon-config'))">
-            <!-- Allow it -->
-            <!--
-               TODO: Consider replacing this abusive <xsl:variable> with a dedicated element defined
-               in the XSpec schema, like <x:config type="saxon" href="..." />. A vendor-independent
-               element name would be better than a vendor-specific element name like <x:saxon-config>;
-               a vendor-specific attribute value seems more appropriate.
-            -->
-         </xsl:when>
-         <xsl:when test="namespace-uri-from-QName($qname) eq $x:xspec-namespace">
-            <xsl:message terminate="yes">
-               <xsl:text expand-text="yes">ERROR: User-defined XSpec variable, {@name}, must not use the XSpec namespace.</xsl:text>
-            </xsl:message>
-         </xsl:when>
-      </xsl:choose>
+   <xsl:template match="x:param | x:variable" as="node()+"
+      mode="local:invoke-compiled-scenarios-or-expects">
+      <xsl:apply-templates select="." mode="x:declare-variable" />
    </xsl:template>
 
 </xsl:stylesheet>
