@@ -15,15 +15,12 @@
    <xsl:template name="x:compile-expect" as="element(xsl:template)">
       <xsl:context-item as="element(x:expect)" use="required" />
 
-      <xsl:param name="pending" as="node()?" tunnel="yes" />
-      <xsl:param name="context" as="element(x:context)?" required="yes" tunnel="yes" />
       <xsl:param name="call" as="element(x:call)?" required="yes" tunnel="yes" />
+      <xsl:param name="context" as="element(x:context)?" required="yes" tunnel="yes" />
+      <xsl:param name="reason-for-pending" as="xs:string?" required="yes" />
 
       <!-- URIQualifiedNames of the (required) parameters of the template being generated -->
       <xsl:param name="param-uqnames" as="xs:string*" required="yes" />
-
-      <xsl:variable name="pending-p" as="xs:boolean"
-         select="exists($pending) and empty(ancestor::*/@focus)" />
 
       <xsl:element name="xsl:template" namespace="{$x:xsl-namespace}">
          <xsl:attribute name="name" select="x:known-UQName('x:' || @id)" />
@@ -34,20 +31,20 @@
          </xsl:element>
 
          <xsl:for-each select="$param-uqnames">
-            <param name="{.}" required="yes" />
+            <param name="{.}" as="item()*" required="yes" />
          </xsl:for-each>
 
          <message>
-            <xsl:if test="$pending-p">
+            <xsl:if test="exists($reason-for-pending)">
                <xsl:text>PENDING: </xsl:text>
-               <xsl:if test="normalize-space($pending)">
-                  <xsl:text expand-text="yes">({normalize-space($pending)}) </xsl:text>
-               </xsl:if>
+               <xsl:for-each select="normalize-space($reason-for-pending)[.]">
+                  <xsl:text expand-text="yes">({.}) </xsl:text>
+               </xsl:for-each>
             </xsl:if>
             <xsl:value-of select="x:label(.) => normalize-space()" />
          </message>
 
-         <xsl:if test="not($pending-p)">
+         <xsl:if test="empty($reason-for-pending)">
             <xsl:variable name="xslt-version" as="xs:decimal" select="x:xslt-version(.)" />
 
             <!-- Set up the $impl:expected variable -->
@@ -61,7 +58,7 @@
 
             <xsl:choose>
                <xsl:when test="@test">
-                  <xsl:comment> wrap $x:result into a doc node if possible </xsl:comment>
+                  <xsl:comment> wrap $x:result into a document node if possible </xsl:comment>
                   <!-- This variable declaration could be moved from here (the
                      template generated from x:expect) to the template
                      generated from x:scenario. It depends only on
@@ -83,7 +80,7 @@
                      </choose>
                   </variable>
 
-                  <xsl:comment> evaluate the predicate with $x:result as context node if $x:result is a single node; if not, just evaluate the predicate </xsl:comment>
+                  <xsl:comment> evaluate the predicate with $x:result (or its wrapper document node) as context item if it is a single item; if not, evaluate the predicate without context item </xsl:comment>
                   <variable name="{x:known-UQName('impl:test-result')}" as="item()*">
                      <choose>
                         <when test="count(${x:known-UQName('impl:test-items')}) eq 1">
@@ -168,13 +165,11 @@
 
             <xsl:variable name="test-element-attributes" as="attribute()+">
                <xsl:sequence select="@id" />
-               <xsl:if test="$pending-p">
-                  <xsl:sequence select="x:pending-attribute-from-pending-node($pending)" />
-               </xsl:if>
+               <xsl:sequence select="x:pending-attribute-from-reason($reason-for-pending)" />
             </xsl:variable>
             <xsl:apply-templates select="$test-element-attributes" mode="x:node-constructor" />
 
-            <xsl:if test="not($pending-p)">
+            <xsl:if test="empty($reason-for-pending)">
                <!-- @successful must be evaluated at run time -->
                <xsl:element name="xsl:attribute" namespace="{$x:xsl-namespace}">
                   <xsl:attribute name="name" select="'successful'" />
@@ -186,7 +181,7 @@
             <xsl:apply-templates select="x:label(.)" mode="x:node-constructor" />
 
             <!-- Report -->
-            <xsl:if test="not($pending-p)">
+            <xsl:if test="empty($reason-for-pending)">
                <xsl:if test="@test">
                   <xsl:call-template name="x:report-test-attribute" />
 

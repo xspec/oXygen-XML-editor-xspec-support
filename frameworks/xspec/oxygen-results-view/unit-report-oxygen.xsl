@@ -8,6 +8,7 @@
                 xmlns:xhtml="http://www.w3.org/1999/xhtml"
                 xmlns:fn="http://www.w3.org/2005/xpath-functions"
                 xmlns:saxon="http://saxon.sf.net/"
+                xmlns:svrl="http://purl.oclc.org/dsdl/svrl"
                 exclude-result-prefixes="#all">
     
     <xsl:param name="report-css-uri" select="
@@ -334,12 +335,23 @@
                         <p><a href="{@href}"><xsl:value-of select="fmt:format-uri(@href)" /></a></p>
                     </xsl:when>
                     <xsl:otherwise>
-                        <xsl:variable name="indentation"
+                        <xsl:variable name="indentation" as="xs:integer"
                             select="
                                 x:reported-content(.)/text()[1]
                                 => substring-after('&#xA;')
                                 => string-length()" />
                         <pre>
+            <xsl:if test="
+                  /x:report/@schematron
+                  and not($expected)
+                  and empty($result-to-compare-with)
+                  and (@select eq '/element()')
+                  and (count(x:reported-content(.)/element()) eq 1)
+                  and x:reported-content(.)/svrl:schematron-output">
+               <!-- Schematron result SVRL -->
+               <xsl:attribute name="class" select="'svrl'" />
+            </xsl:if>
+
             <xsl:choose>
               <!-- Serialize the result while performing comparison -->
               <xsl:when test="exists($result-to-compare-with)">

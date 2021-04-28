@@ -45,6 +45,9 @@
 				<xsl:when test="$prefix eq 'rep'">
 					<xsl:sequence select="$x:rep-namespace" />
 				</xsl:when>
+				<xsl:when test="$prefix eq 'saxon'">
+					<xsl:sequence select="$x:saxon-namespace" />
+				</xsl:when>
 				<xsl:when test="$prefix eq 'svrl'">
 					<xsl:sequence select="'http://purl.oclc.org/dsdl/svrl'" />
 				</xsl:when>
@@ -61,6 +64,25 @@
 		</xsl:variable>
 
 		<xsl:sequence select="x:UQName($namespace, $local-name)" />
+	</xsl:function>
+
+	<!--
+		Returns URIQualifiedName of QName
+	-->
+	<xsl:function as="xs:string" name="x:UQName-from-QName">
+		<xsl:param as="xs:QName" name="qname" />
+
+		<xsl:sequence
+			select="$qname ! x:UQName(namespace-uri-from-QName(.), local-name-from-QName(.))" />
+	</xsl:function>
+
+	<!--
+		URIQualifiedName version of fn:node-name()
+	-->
+	<xsl:function as="xs:string?" name="x:node-UQName">
+		<xsl:param as="node()" name="node" />
+
+		<xsl:sequence select="node-name($node) ! x:UQName-from-QName(.)" />
 	</xsl:function>
 
 </xsl:stylesheet>

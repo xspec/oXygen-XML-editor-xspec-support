@@ -11,6 +11,7 @@
                 xmlns="http://www.w3.org/1999/xhtml"
                 xmlns:fmt="urn:x-xspec:reporter:format-utils"
                 xmlns:pkg="http://expath.org/ns/pkg"
+                xmlns:svrl="http://purl.oclc.org/dsdl/svrl"
                 xmlns:x="http://www.jenitennison.com/xslt/xspec"
                 xmlns:xhtml="http://www.w3.org/1999/xhtml"
                 xmlns:xs="http://www.w3.org/2001/XMLSchema"
@@ -34,17 +35,17 @@
    <!-- @use-character-maps for inline CSS -->
    <xsl:output method="xhtml" use-character-maps="fmt:disable-escaping" />
 
-   <!-- Returns formatted output for $pending -->
+   <!-- Returns formatted output created from @pending -->
    <xsl:function name="x:pending-callback" as="node()*">
-      <xsl:param name="pending" as="xs:string?"/>
+      <xsl:param name="pending-attribute" as="attribute(pending)?"/>
 
-      <xsl:if test="$pending">
+      <xsl:for-each select="normalize-space($pending-attribute)[.]">
          <xsl:text>(</xsl:text>
          <strong>
-            <xsl:value-of select="$pending" />
+            <xsl:value-of select="." />
          </strong>
          <xsl:text>) </xsl:text>
-      </xsl:if>
+      </xsl:for-each>
    </xsl:function>
 
    <!-- Returns formatted output for separator between scenarios -->
@@ -61,12 +62,12 @@
    <xsl:template name="x:format-top-level-scenario" as="element(xhtml:div)">
       <xsl:context-item as="element(x:scenario)" use="required" />
 
-      <xsl:variable name="pending" as="xs:boolean"
+      <xsl:variable name="is-pending" as="xs:boolean"
          select="exists(@pending)" />
       <xsl:variable name="any-failure" as="xs:boolean"
          select="exists(x:test[x:is-failed-test(.)])" />
       <div id="top_{@id}">
-         <h2 class="{if ($pending) then 'pending' else if ($any-failure) then 'failed' else 'successful'}">
+         <h2 class="{if ($is-pending) then 'pending' else if ($any-failure) then 'failed' else 'successful'}">
             <xsl:sequence select="x:pending-callback(@pending)"/>
             <xsl:apply-templates select="x:label" mode="x:html-report" />
             <span class="scenario-totals">
@@ -82,7 +83,7 @@
                <col style="width:25%" />
             </colgroup>
             <tbody>
-               <tr class="{if ($pending) then 'pending' else if ($any-failure) then 'failed' else 'successful'}">
+               <tr class="{if ($is-pending) then 'pending' else if ($any-failure) then 'failed' else 'successful'}">
                   <th>
                      <xsl:sequence select="x:pending-callback(@pending)"/>
                      <xsl:apply-templates select="x:label" mode="x:html-report" />
@@ -96,7 +97,7 @@
                </tr>
                <xsl:apply-templates select="x:test" mode="x:html-summary" />
                <xsl:for-each select=".//x:scenario[x:test]">
-                  <xsl:variable name="pending" as="xs:boolean"
+                  <xsl:variable name="is-pending" as="xs:boolean"
                      select="exists(@pending)" />
                   <xsl:variable name="any-failure" as="xs:boolean"
                      select="exists(x:test[x:is-failed-test(.)])" />
@@ -108,8 +109,9 @@
                         </xsl:if>
                      </xsl:for-each>
                   </xsl:variable>
-                  <tr class="{if ($pending) then 'pending' else if ($any-failure) then 'failed' else 'successful'}">
+                  <tr class="{if ($is-pending) then 'pending' else if ($any-failure) then 'failed' else 'successful'}">
                      <th>
+                        <xsl:call-template name="x:report-elapsed" />
                         <xsl:sequence select="x:pending-callback(@pending)"/>
                         <xsl:choose>
                            <xsl:when test="$any-failure">
@@ -182,10 +184,7 @@
    <xsl:function name="x:top-level-scenario-needs-format" as="xs:boolean">
       <xsl:param name="scenario-elem" as="element(x:scenario)" />
 
-      <xsl:sequence select="$scenario-elem/(
-            empty(@pending)
-            or exists(x:descendant-tests(.)[not(x:is-pending-test(.))])
-         )"/>
+      <xsl:sequence select="$scenario-elem ! (empty(@pending) or exists(x:descendant-tests(.)))" />
    </xsl:function>
 
    <!--
@@ -264,6 +263,11 @@
       <p>
          <xsl:text expand-text="yes">Tested: {format-dateTime(@date, '[D] [MNn] [Y] at [H01]:[m01]')}</xsl:text>
       </p>
+      <xsl:where-populated>
+         <p>
+            <xsl:call-template name="x:report-elapsed" />
+         </p>
+      </xsl:where-populated>
       <h2>Contents</h2>
       <table class="xspec">
          <colgroup>
@@ -285,12 +289,13 @@
          </thead>
          <tbody>
             <xsl:for-each select="x:scenario">
-               <xsl:variable name="pending" as="xs:boolean"
+               <xsl:variable name="is-pending" as="xs:boolean"
                   select="exists(@pending)" />
                <xsl:variable name="any-failure" as="xs:boolean"
                   select="exists(x:descendant-failed-tests(.))" />
-               <tr class="{if ($pending) then 'pending' else if ($any-failure) then 'failed' else 'successful'}">
+               <tr class="{if ($is-pending) then 'pending' else if ($any-failure) then 'failed' else 'successful'}">
                   <th>
+                     <xsl:call-template name="x:report-elapsed" />
                      <xsl:sequence select="x:pending-callback(@pending)"/>
                      <a>
                         <xsl:if test="x:top-level-scenario-needs-format(.)">
@@ -449,6 +454,17 @@
                         => substring-after('&#xA;')
                         => string-length()" />
                   <pre>
+                     <xsl:if test="
+                           /x:report/@schematron
+                           and not($expected)
+                           and empty($result-to-compare-with)
+                           and (@select eq '/element()')
+                           and (count(x:reported-content(.)/element()) eq 1)
+                           and x:reported-content(.)/svrl:schematron-output">
+                        <!-- Schematron result SVRL -->
+                        <xsl:attribute name="class" select="'svrl'" />
+                     </xsl:if>
+
                      <xsl:choose>
                         <!-- Serialize the result while performing comparison -->
                         <xsl:when test="exists($result-to-compare-with)">
@@ -490,29 +506,52 @@
       <xsl:param name="tests" as="element(x:test)*" required="yes" />
       <xsl:param name="insert-labels" as="xs:boolean" select="false()" />
 
-      <xsl:if test="$tests">
-         <xsl:variable name="components" as="xs:string+">
-            <xsl:for-each select="x:test-stats($tests)">
-               <xsl:sequence
-                  select="
-                     (@label[$insert-labels], @count)
-                     => string-join(': ')" />
-            </xsl:for-each>
-         </xsl:variable>
-         <xsl:value-of select="$components" separator="{if ($insert-labels) then ' / ' else '/'}" />
+      <xsl:variable name="full-stats" as="element(stat)+" select="x:test-stats($tests)" />
+
+      <!-- If $tests is empty, take only 'total' stat. (Its count is zero.) -->
+      <xsl:variable name="compressed-stats" as="element(stat)+"
+         select="$full-stats[exists($tests) or (@label eq 'total')]"/>
+
+      <xsl:variable name="components" as="xs:string+">
+         <xsl:for-each select="$compressed-stats">
+            <xsl:sequence select="(@label[$insert-labels], @count) => string-join(': ')" />
+         </xsl:for-each>
+      </xsl:variable>
+      <xsl:value-of select="$components" separator="{if ($insert-labels) then ' / ' else '/'}" />
+   </xsl:template>
+
+   <xsl:template name="x:report-elapsed" as="element(xhtml:span)?">
+      <!-- Context item is x:report or x:scenario -->
+      <xsl:context-item as="element()" use="required" />
+
+      <xsl:if test="x:timestamp">
+         <xsl:variable name="elapsed" as="xs:dayTimeDuration" select="
+               xs:dateTimeStamp(x:timestamp[@event eq 'end']/@at)
+               - xs:dateTimeStamp(x:timestamp[@event eq 'start']/@at)" />
+         <span class="elapsed">
+            <xsl:if test="self::x:scenario">(</xsl:if>
+            <xsl:text>Elapsed: </xsl:text>
+            <span class="elapsed-num">
+               <xsl:value-of select="($elapsed div xs:dayTimeDuration('PT1S')) * 1000" />
+            </span>
+            <xsl:text> ms</xsl:text>
+            <xsl:if test="self::x:scenario">
+               <xsl:text>) </xsl:text>
+            </xsl:if>
+         </span>
       </xsl:if>
    </xsl:template>
 
    <xsl:function name="x:test-stats" as="element(stat)+" xmlns="">
       <xsl:param name="tests" as="element(x:test)*" />
 
-      <xsl:variable name="passed" as="element(x:test)*" select="$tests[x:is-passed-test(.)]" />
-      <xsl:variable name="pending" as="element(x:test)*" select="$tests[x:is-pending-test(.)]" />
-      <xsl:variable name="failed" as="element(x:test)*" select="$tests[x:is-failed-test(.)]" />
+      <xsl:variable name="passed-tests" as="element(x:test)*" select="$tests[x:is-passed-test(.)]" />
+      <xsl:variable name="pending-tests" as="element(x:test)*" select="$tests[x:is-pending-test(.)]" />
+      <xsl:variable name="failed-tests" as="element(x:test)*" select="$tests[x:is-failed-test(.)]" />
 
-      <stat label="passed" count="{count($passed)}" />
-      <stat label="pending" count="{count($pending)}" />
-      <stat label="failed" count="{count($failed)}" />
+      <stat label="passed" count="{count($passed-tests)}" />
+      <stat label="pending" count="{count($pending-tests)}" />
+      <stat label="failed" count="{count($failed-tests)}" />
       <stat label="total" count="{count($tests)}" />
    </xsl:function>
 
