@@ -16,7 +16,7 @@
     <xsl:param name="stylesheet-uri" as="xs:string" select="document-uri($stylesheet-doc)" />
 
     <xsl:include href="../common/common-utils.xsl" />
-    <xsl:include href="../common/namespace-utils.xsl" />
+    <xsl:include href="../common/namespace-vars.xsl" />
     <xsl:include href="../common/trim.xsl" />
     <xsl:include href="../common/uqname-utils.xsl" />
     <xsl:include href="../common/uri-utils.xsl" />
@@ -65,7 +65,7 @@
                     <!-- Global XSLT attributes.
                         @xslt-version can be set, because it has already been propagated from each
                         imported x:description to its descendants in mode="x:gather-specs". -->
-                    <xsl:sequence select="@xslt-version" />
+                    <xsl:sequence select="@result-file-threshold | @threads | @xslt-version" />
                     <xsl:attribute name="stylesheet" select="$stylesheet-uri" />
 
                     <xsl:sequence select="$specs" />
@@ -185,25 +185,53 @@
     <xsl:mode name="make-predicate" on-multiple-match="fail" on-no-match="fail" />
 
     <xsl:template match="@location" as="text()" mode="make-predicate">
-        <xsl:text expand-text="yes">[(${x:known-UQName('x:context')}/root()/({.}) treat as node()) is {x:known-UQName('x:select-node')}(${x:known-UQName('x:context')}/root(), @location, preceding-sibling::{x:known-UQName('svrl:ns-prefix-in-attribute-values')}, {parent::element() => x:xslt-version()})]</xsl:text>
+        <xsl:value-of expand-text="yes">
+            <xsl:text>[</xsl:text>
+
+            <xsl:text>${x:known-UQName('x:context')}/root()/({.})</xsl:text>
+            <xsl:text> => </xsl:text>
+            <xsl:text>{x:known-UQName('x:node-or-error')}</xsl:text>
+            <xsl:text>(</xsl:text>
+            <xsl:text>{x:quote-with-apos(.)}, </xsl:text>
+            <xsl:text>'{parent::element() => name()}/@{name()}'</xsl:text>
+            <xsl:text>)</xsl:text>
+
+            <xsl:text> is </xsl:text>
+
+            <xsl:text>{x:known-UQName('x:select-node')}</xsl:text>
+            <xsl:text>(</xsl:text>
+            <xsl:text>${x:known-UQName('x:context')}/root(), </xsl:text>
+            <xsl:text>@location, </xsl:text>
+            <xsl:text>preceding-sibling::{x:known-UQName('svrl:ns-prefix-in-attribute-values')}, </xsl:text>
+            <xsl:text>{parent::element() => x:xslt-version()}</xsl:text>
+            <xsl:text>)</xsl:text>
+            <xsl:text> => </xsl:text>
+            <xsl:text>{x:known-UQName('x:node-or-error')}</xsl:text>
+            <xsl:text>(</xsl:text>
+            <xsl:text>@location, </xsl:text>
+            <xsl:text>name() || '/@location'</xsl:text>
+            <xsl:text>)</xsl:text>
+
+            <xsl:text>]</xsl:text>
+        </xsl:value-of>
     </xsl:template>
 
     <xsl:template match="@id | @role" as="text()" mode="make-predicate">
         <xsl:text expand-text="yes">[(@{local-name()}, preceding-sibling::{x:known-UQName('svrl:fired-rule')}[1]/@{local-name()}, preceding-sibling::{x:known-UQName('svrl:active-pattern')}[1]/@{local-name()})[1] = '{.}']</xsl:text>
     </xsl:template>
 
-    <xsl:template match="@id[parent::x:expect-rule] | @context[parent::x:expect-rule]" as="text()"
-        mode="make-predicate">
+    <xsl:template match="(@id | @context)[parent::x:expect-rule]" as="text()" mode="make-predicate">
         <xsl:text expand-text="yes">[@{local-name()} = '{.}']</xsl:text>
     </xsl:template>
 
-    <xsl:template match="@count | @label" as="empty-sequence()" mode="make-predicate" />
+    <xsl:template match="@count | @label | @pending" as="empty-sequence()" mode="make-predicate" />
 
     <!--
         Named templates
     -->
 
     <xsl:template name="create-expect" as="element(x:expect)">
+        <!-- Context item is a Schematron-specific x:expect-* element -->
         <xsl:context-item as="element()" use="required" />
 
         <xsl:param name="label" as="xs:string"
@@ -227,6 +255,7 @@
                 xs:QName('foo') -->
             <xsl:sequence select="x:copy-of-namespaces(.)" />
 
+            <xsl:sequence select="@pending" />
             <xsl:attribute name="label" select="$label" />
             <xsl:attribute name="test" select="$test" />
         </xsl:element>

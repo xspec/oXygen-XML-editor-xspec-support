@@ -13,7 +13,6 @@
    <xsl:template name="x:compile-scenario" as="node()+">
       <xsl:context-item as="element(x:scenario)" use="required" />
 
-      <!-- No $apply for XQuery -->
       <xsl:param name="call" as="element(x:call)?" required="yes" tunnel="yes" />
       <xsl:param name="context" as="element(x:context)?" required="yes" tunnel="yes" />
       <xsl:param name="reason-for-pending" as="xs:string?" required="yes" />
@@ -80,10 +79,13 @@
          The other local variable declarations are handled in
          mode="local:invoke-compiled-scenarios-or-expects" in
          invoke-compiled-child-scenarios-or-expects.xsl. -->
-      <xsl:if test="exists($local-preceding-vardecls)">
-         <xsl:apply-templates select="$local-preceding-vardecls" mode="x:declare-variable" />
-         <xsl:text>return&#x0A;</xsl:text>
-      </xsl:if>
+      <xsl:sequence>
+         <xsl:apply-templates select="$local-preceding-vardecls[x:reason-for-pending(.) => empty()]"
+            mode="x:declare-variable" />
+         <xsl:on-non-empty>
+            <xsl:text>return&#x0A;</xsl:text>
+         </xsl:on-non-empty>
+      </xsl:sequence>
 
       <!-- <x:scenario> -->
       <xsl:text>element { </xsl:text>
@@ -141,7 +143,11 @@
             </xsl:call-template>
             <xsl:text>)&#x0A;</xsl:text>
 
-            <xsl:text expand-text="yes">let ${$variable-name-of-actual-result-report} := {x:known-UQName('rep:report-sequence')}(${x:known-UQName('x:result')}, 'result')&#x0A;</xsl:text>
+            <xsl:text expand-text="yes">let ${$variable-name-of-actual-result-report} := </xsl:text>
+            <xsl:call-template name="x:call-report-sequence">
+               <xsl:with-param name="sequence-variable-eqname" select="x:known-UQName('x:result')" />
+            </xsl:call-template>
+            <xsl:text>&#x0A;</xsl:text>
 
             <xsl:text>&#x0A;</xsl:text>
             <xsl:text>(: invoke each compiled x:expect :)&#x0A;</xsl:text>

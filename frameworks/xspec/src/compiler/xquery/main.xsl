@@ -133,9 +133,14 @@
 
       <!-- Generate invocations of the compiled top-level scenarios. -->
       <xsl:text>(: invoke each compiled top-level x:scenario :)&#x0A;</xsl:text>
-      <xsl:call-template name="x:invoke-compiled-child-scenarios-or-expects">
-         <xsl:with-param name="handled-child-vardecls" select="$global-vardecls" />
-      </xsl:call-template>
+      <xsl:sequence>
+         <xsl:call-template name="x:invoke-compiled-child-scenarios-or-expects">
+            <xsl:with-param name="handled-child-vardecls" select="$global-vardecls" />
+         </xsl:call-template>
+         <xsl:on-empty>
+            <xsl:text>()&#x0A;</xsl:text>
+         </xsl:on-empty>
+      </xsl:sequence>
 
       <xsl:if test="$measure-time">
          <xsl:text>,&#x0A;</xsl:text>
@@ -163,7 +168,7 @@
    <xsl:include href="invoke-compiled/invoke-compiled-current-scenario-or-expect.xsl" />
    <xsl:include href="measure-time/timestamp.xsl" />
    <xsl:include href="node-constructor/node-constructor.xsl" />
-   <xsl:include href="report/wrap-node-constructors-and-undeclare-default-ns.xsl" />
+   <xsl:include href="report/report-utils.xsl" />
    <xsl:include href="serialize/disable-escaping.xsl" />
 
 </xsl:stylesheet>
