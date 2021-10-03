@@ -25,7 +25,7 @@
     
     <xsl:include href="../src/common/common-utils.xsl" />
     <xsl:include href="../src/common/deep-equal.xsl" />
-    <xsl:include href="../src/common/namespace-utils.xsl" />
+    <xsl:include href="../src/common/namespace-vars.xsl" />
     <xsl:include href="../src/common/parse-report.xsl" />
     <xsl:include href="../src/common/wrap.xsl" />
     <xsl:include href="../src/reporter/format-utils.xsl" />
