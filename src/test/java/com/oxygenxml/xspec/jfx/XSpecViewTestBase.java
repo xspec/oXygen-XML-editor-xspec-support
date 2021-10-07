@@ -352,8 +352,10 @@ public class XSpecViewTestBase extends JFCTestCase {
     lines.add("-Dxspec.force.focus=" + entryPoints);
     // XSpec to process.
     lines.add("-Dxspec.xml=" + xspecFile.getAbsolutePath() );
-    // From tests we Run Saxon in HE mode so we need a config file that creates a HE configuration. 
+    // At compile time, we run Saxon with an extension function so we need a config file that defines extensionFunction. 
     lines.add("-Dxspec.compiler.saxon.config=" + URLUtil.getCanonicalFileFromFileUrl(saxonConfig).getAbsolutePath());
+    // At run time, we run Saxon in HE mode so we need a config file that creates a HE configuration. 
+    lines.add("-Dsaxon.custom.options=-config:" + URLUtil.getCanonicalFileFromFileUrl(saxonConfig).getAbsolutePath());
     
     if (schematron) {
       lines.add("-Dtest.type=s");  
