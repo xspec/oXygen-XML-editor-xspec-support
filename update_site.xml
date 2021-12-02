@@ -112,7 +112,7 @@ SOFTWARE.
         <xt:version>${project.version}</xt:version>
         <xt:oxy_version>20.0+</xt:oxy_version>
         <xt:type>framework</xt:type>
-        <xt:author>Alex Jitianu</xt:author>
+        <xt:author>Syncro Soft</xt:author>
         <xt:name>XSpec Framework (required by the XSpec Helper view plugin)</xt:name>
         <xt:description><html xmlns="http://www.w3.org/1999/xhtml">
             <head>
