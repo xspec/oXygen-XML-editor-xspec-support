@@ -41,6 +41,12 @@
                       <li>For a failed test, you can click on it to open the diff comparison between the expected and actual results.</li>
                   </ul>
               </div>
+              <div>    
+                <h3>What's new in version 2.2.4</h3>
+                <ol>
+                    <li>Comes bundled with XSpec version 2.2.4.</li>
+                </ol>
+            </div>  
             <div>    
                 <h3>What's new in version 2.0.0</h3>
                 <ol>
