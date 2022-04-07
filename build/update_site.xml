@@ -4,8 +4,8 @@
 
     <xt:extension xmlns:xt="http://www.oxygenxml.com/ns/extension"
         id="com.oxygenxml.xspec.XSpecSupportPlugin">
-        <xt:location href="https://github.com/xspec/oXygen-XML-editor-xspec-support/releases/download/2.2.4/xspec.support-2.2.4-plugin.zip"/>
-        <xt:version>2.2.4</xt:version>
+        <xt:location href="https://github.com/xspec/oXygen-XML-editor-xspec-support/releases/download/2.2.5/xspec.support-2.2.5-plugin.zip"/>
+        <xt:version>2.2.5</xt:version>
         <xt:oxy_version>20.0+</xt:oxy_version>
         <xt:type>plugin</xt:type>
         <xt:author>Syncro Soft</xt:author>
@@ -41,6 +41,12 @@
                       <li>For a failed test, you can click on it to open the diff comparison between the expected and actual results.</li>
                   </ul>
               </div>
+              <div>    
+                <h3>What's new in version 2.2.5</h3>
+                <ol>
+                    <li>Fixed some classpath issues that made it crash in Oxygen version 24.1.</li>
+                </ol>
+            </div>  
               <div>    
                 <h3>What's new in version 2.2.4</h3>
                 <ol>
@@ -114,8 +120,8 @@ SOFTWARE.
     
     <xt:extension xmlns:xt="http://www.oxygenxml.com/ns/extension"
         id="com.oxygenxml.xspec.XSpecSupportFramework">
-        <xt:location href="https://github.com/xspec/oXygen-XML-editor-xspec-support/releases/download/2.2.4/xspec.support-2.2.4-framework.zip"/>
-        <xt:version>2.2.4</xt:version>
+        <xt:location href="https://github.com/xspec/oXygen-XML-editor-xspec-support/releases/download/2.2.5/xspec.support-2.2.5-framework.zip"/>
+        <xt:version>2.2.5</xt:version>
         <xt:oxy_version>20.0+</xt:oxy_version>
         <xt:type>framework</xt:type>
         <xt:author>Syncro Soft</xt:author>
