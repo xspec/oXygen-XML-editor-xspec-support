@@ -38,7 +38,7 @@ public class GenerateIDExtensionFunction extends net.sf.saxon.lib.ExtensionFunct
 
         String arg = arguments[0].head().getStringValue();
         
-        return new StringValue(generateId(arg));
+        return StringValue.makeStringValue(generateId(arg));
       }
     };
   }
