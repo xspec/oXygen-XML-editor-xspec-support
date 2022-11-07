@@ -42,6 +42,12 @@
                   </ul>
               </div>
               <div>    
+                <h3>What's new in version 2.2.6</h3>
+                <ol>
+                    <li>Fixed Saxon 11 classpath issues and API changes that made it crash in Oxygen version 25.0.</li>
+                </ol>
+            </div>  
+              <div>    
                 <h3>What's new in version 2.2.5</h3>
                 <ol>
                     <li>Fixed some classpath issues that made it crash in Oxygen version 24.1.</li>
