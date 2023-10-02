@@ -5,6 +5,22 @@
                 exclude-result-prefixes="#all"
                 version="3.0">
 
+   <!-- Push and pop explicit reasons for code to be pending. -->
+   <xsl:accumulator name="stacked-explicit-pending" as="xs:string*" initial-value="()">
+      <!-- Start phase: Prepend string value of @pending, x:pending/@label,
+         or x:pending/x:label to stack. Prepending instead of appending
+         makes LIFO behavior convenient via tail() function. -->
+      <xsl:accumulator-rule match="(x:scenario | x:expect)[@pending]" phase="start"
+         select="@pending, $value" />
+      <xsl:accumulator-rule match="x:pending" phase="start"
+         select="x:label(.), $value" />
+
+      <!-- End phase: Remove newest string from stack. -->
+      <xsl:accumulator-rule match="(x:scenario | x:expect)[@pending] | x:pending" phase="end"
+         select="tail($value)" />
+   </xsl:accumulator>
+
+
    <!--
       Returns a string that describes why the given element is pending. The string comes from
       either an explicit reason (@pending or x:pending's label) or an implicit reason (@focus), in
@@ -32,10 +48,8 @@
 
             <xsl:otherwise>
                <!-- The nearest explicit reason (@pending or x:pending's label) -->
-               <xsl:variable name="explicit-reason" as="xs:string?" select="
-                     ancestor-or-self::element()[self::x:pending or (self::x:expect | self::x:scenario)[@pending]][1]
-                     /(if (self::x:pending) then x:label(.) else @pending)
-                     /string()" />
+               <xsl:variable name="explicit-reason" as="xs:string?"
+                  select="accumulator-before('stacked-explicit-pending')[1]" />
 
                <!-- The first (in document order) implicit reason (@focus) -->
                <xsl:variable name="implicit-reason" as="xs:string?">
