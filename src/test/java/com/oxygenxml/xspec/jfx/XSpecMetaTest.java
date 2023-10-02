@@ -70,7 +70,8 @@ public class XSpecMetaTest extends XSpecViewTestBase {
     assertEquals(
         "<html>\n" + 
         "   <head>\n" + 
-        "      <meta http-equiv=\"Content-Type\" content=\"text/html; charset=UTF-8\"><link rel=\"stylesheet\" type=\"text/css\" href=\"" + css.toURI().toURL().toString()
+        "      <meta http-equiv=\"Content-Type\" content=\"text/html; charset=UTF-8\">\n" + 
+        "      <link rel=\"stylesheet\" type=\"text/css\" href=\"" + css.toURI().toURL().toString()
         + "\"><script type=\"text/javascript\" src=\""
         + js.toURI().toURL().toString() + "\"></script></head>\n" + 
         "   <body>\n" + 
@@ -192,7 +193,8 @@ public class XSpecMetaTest extends XSpecViewTestBase {
     assertEquals(
         "<html>\n" + 
         "   <head>\n" + 
-        "      <meta http-equiv=\"Content-Type\" content=\"text/html; charset=UTF-8\"><link rel=\"stylesheet\" type=\"text/css\" href=\"" + css.toURI().toURL().toString() + "\">"
+        "      <meta http-equiv=\"Content-Type\" content=\"text/html; charset=UTF-8\">\n" + 
+        "      <link rel=\"stylesheet\" type=\"text/css\" href=\"" + css.toURI().toURL().toString() + "\">"
             + "<script type=\"text/javascript\" src=\"" + js.toURI().toURL().toString() + "\"></script></head>\n" + 
         "   <body>\n" + 
         "      <div class=\"testsuite\" "
@@ -228,23 +230,27 @@ public class XSpecMetaTest extends XSpecViewTestBase {
         "                  </thead>\n" + 
         "                  <tbody>\n" + 
         "                     <tr>\n" + 
-        "                        <td><pre>&lt;<span class=\"inner-diff\">phrases</span> <span class=\"xmlns\">xmlns:functx=\"http://www.functx.com\"</span>&gt;\n" + 
+        "                        <td>\n" + 
+        "                           <pre>&lt;<span class=\"inner-diff\">phrases</span> <span class=\"xmlns\">xmlns:functx=\"http://www.functx.com\"</span>&gt;\n" + 
         "   &lt;<span class=\"inner-diff\">phrase</span> <span class=\"inner-diff\">status</span>=<span class=\"diff\">\"changed\"</span>&gt;<span class=\"same\">Hello!</span>&lt;/phrase&gt;\n" + 
         "   &lt;<span class=\"inner-diff\">phrase</span> <span class=\"inner-diff\">status</span>=<span class=\"diff\">\"changed\"</span>&gt;<span class=\"same\">Goodbye!</span>&lt;/phrase&gt;\n" + 
         "   &lt;<span class=\"inner-diff\">phrase</span> <span class=\"inner-diff\">status</span>=<span class=\"diff\">\"same\"</span>&gt;<span class=\"same\">\\(So long!\\)</span>&lt;/phrase&gt;\n" + 
-        "&lt;/phrases&gt;</pre></td>\n" + 
-        "                        <td><pre>&lt;<span class=\"inner-diff\">phrases</span> <span class=\"xmlns\">xmlns:functx=\"http://www.functx.com\"</span>\n" + 
+        "&lt;/phrases&gt;</pre>\n" + 
+        "                        </td>\n" + 
+        "                        <td>\n" + 
+        "                           <pre>&lt;<span class=\"inner-diff\">phrases</span> <span class=\"xmlns\">xmlns:functx=\"http://www.functx.com\"</span>\n" + 
         "         <span class=\"xmlns trivial\">xmlns:x=\"http://www.jenitennison.com/xslt/xspec\"</span>&gt;\n" + 
         "   &lt;<span class=\"inner-diff\">phrase</span> <span class=\"inner-diff\">status</span>=<span class=\"diff\">\"same\"</span>&gt;<span class=\"same\">Hello!</span>&lt;/phrase&gt;\n" + 
         "   &lt;<span class=\"inner-diff\">phrase</span> <span class=\"inner-diff\">status</span>=<span class=\"diff\">\"same\"</span>&gt;<span class=\"same\">Goodbye!</span>&lt;/phrase&gt;\n" + 
         "   &lt;<span class=\"inner-diff\">phrase</span> <span class=\"inner-diff\">status</span>=<span class=\"diff\">\"changed\"</span>&gt;<span class=\"same\">\\(So long!\\)</span>&lt;/phrase&gt;\n" + 
-        "&lt;/phrases&gt;</pre></td>\n" + 
+        "&lt;/phrases&gt;</pre>\n" + 
+        "                        </td>\n" + 
         "                     </tr>\n" + 
         "                  </tbody>\n" + 
         "               </table>\n" + 
-        "            </div>"
+        "            </div>\n" + 
         // DATA for the Oxygen DIFF.
-        + "<pre class=\"embeded.diff.data\" style=\"display:none;\"><div class=\"embeded.diff.result\" style=\"white-space:pre;\">&lt;phrases&gt;\n" + 
+        "            <pre class=\"embeded.diff.data\" style=\"display:none;\"><div class=\"embeded.diff.result\" style=\"white-space:pre;\">&lt;phrases&gt;\n" + 
         "   &lt;phrase status=\"changed\"&gt;Hello!&lt;/phrase&gt;\n" + 
         "   &lt;phrase status=\"changed\"&gt;Goodbye!&lt;/phrase&gt;\n" + 
         "   &lt;phrase status=\"same\"&gt;\\(So long!\\)&lt;/phrase&gt;\n" + 
@@ -252,7 +258,8 @@ public class XSpecMetaTest extends XSpecViewTestBase {
         "   &lt;phrase status=\"same\"&gt;Hello!&lt;/phrase&gt;\n" + 
         "   &lt;phrase status=\"same\"&gt;Goodbye!&lt;/phrase&gt;\n" + 
         "   &lt;phrase status=\"changed\"&gt;\\(So long!\\)&lt;/phrase&gt;\n" + 
-        "&lt;/phrases&gt;</div></pre></div>\n" + 
+        "&lt;/phrases&gt;</div></pre>\n" + 
+        "         </div>\n" + 
         "      </div>\n" + 
         "      <div class=\"testsuite\" data-name=\"No escaping\" id=\"" + secondID +  "\" data-xspec=\""
         + importedXSpecURL.toString()
@@ -337,7 +344,8 @@ public class XSpecMetaTest extends XSpecViewTestBase {
     assertEquals(
         "<html>\n" + 
         "   <head>\n" + 
-        "      <meta http-equiv=\"Content-Type\" content=\"text/html; charset=UTF-8\"><link rel=\"stylesheet\" type=\"text/css\" href=\"" + css.toURI().toURL().toString() + "\"><script type=\"text/javascript\" src=\"" + js.toURI().toURL().toString()
+        "      <meta http-equiv=\"Content-Type\" content=\"text/html; charset=UTF-8\">\n" + 
+        "      <link rel=\"stylesheet\" type=\"text/css\" href=\"" + css.toURI().toURL().toString() + "\"><script type=\"text/javascript\" src=\"" + js.toURI().toURL().toString()
             + "\"></script></head>\n" + 
         "   <body>\n" + 
         "      <div class=\"testsuite\" data-name=\"Test no.1\" id=\"" + firstID + "\" data-xspec=\"" + xspecURL.toString()
