@@ -1,6 +1,6 @@
 package com.oxygenxml.xspec.protocol;
 
-import ro.sync.exml.editor.ContentTypes;
+import ro.sync.diff.api.DiffContentTypes;
 
 /**
  * Stores a fragment together with its content type.

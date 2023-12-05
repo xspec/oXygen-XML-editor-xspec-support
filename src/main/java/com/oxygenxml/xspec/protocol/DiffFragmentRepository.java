@@ -10,7 +10,7 @@ import java.util.Map;
 
 import org.apache.log4j.Logger;
 
-import ro.sync.exml.editor.ContentTypes;
+import ro.sync.diff.api.DiffContentTypes;
 import ro.sync.exml.workspace.api.PluginWorkspaceProvider;
 import ro.sync.util.URLUtil;
 
@@ -121,7 +121,7 @@ public class DiffFragmentRepository {
       logger.error(e, e);
     }
     
-    return isXML ? ContentTypes.XML_CONTENT_TYPE : ContentTypes.PLAIN_TEXT_CONTENT_TYPE;
+    return isXML ? DiffContentTypes.XML_CONTENT_TYPE : DiffContentTypes.PLAIN_TEXT_CONTENT_TYPE;
   }
   
   /**
@@ -206,7 +206,7 @@ public class DiffFragmentRepository {
     DiffFragment diffFragment = cache.get(key);
     StringBuilder b = new StringBuilder(protocol);
     b.append(":/").append(host).append("/").append(key).append(".");
-    if (diffFragment.getContentType().equals(ContentTypes.XML_CONTENT_TYPE)) {
+    if (diffFragment.getContentType().equals(DiffContentTypes.XML_CONTENT_TYPE)) {
       b.append("xml");
     } else {
       b.append("txt");

@@ -803,9 +803,9 @@
 										<String>${oxygenHome}/lib/logback-classic-*.jar</String>
 										<String>${oxygenHome}/lib/logback-core-*.jar</String>
 										<String>${oxygenHome}/lib/log4j-over-slf4j-*.jar</String>
-                                        <String>${oxygenHome}/lib/log4j-to-slf4j-*.jar</String>
-                                        <String>${oxygenHome}/lib/log4j-api-*.jar</String>
-                                        <String>${oxygenHome}/lib/log4j.jar</String>
+										<String>${oxygenHome}/lib/log4j-to-slf4j-*.jar</String>
+										<String>${oxygenHome}/lib/log4j-api-*.jar</String>
+										<String>${oxygenHome}/lib/log4j.jar</String>
 										<String>${oxygenHome}/lib/*xerces*.jar</String>
 										<String>${oxygenHome}/lib/guava-*.jar</String>
 									</String-array>
@@ -1268,9 +1268,9 @@
 										<String>${oxygenHome}/lib/logback-classic-*.jar</String>
 										<String>${oxygenHome}/lib/logback-core-*.jar</String>
 										<String>${oxygenHome}/lib/log4j-over-slf4j-*.jar</String>
-                                        <String>${oxygenHome}/lib/log4j-to-slf4j-*.jar</String>
-                                        <String>${oxygenHome}/lib/log4j-api-*.jar</String>
-                                        <String>${oxygenHome}/lib/log4j.jar</String>
+										<String>${oxygenHome}/lib/log4j-to-slf4j-*.jar</String>
+										<String>${oxygenHome}/lib/log4j-api-*.jar</String>
+										<String>${oxygenHome}/lib/log4j.jar</String>
 										<String>${oxygenHome}/lib/*xerces*.jar</String>
 										<String>${oxygenHome}/lib/guava-*.jar</String>
 										<String>${framework}/oxygen-results-view/saxon-extension.jar</String>

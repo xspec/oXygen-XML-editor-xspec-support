@@ -88,7 +88,7 @@ public class SchematronXSpecTest extends XSpecViewTestBase {
     
     System.out.println("+++++ " + XSpecUtil.generateId("demo-02(1)"));
     
-    assertEquals("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" + 
+    assertEquals("<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\n" + 
         "<report xmlns=\"http://www.jenitennison.com/xslt/xspec\"\n" +
         "        xspec=\"" + xspecURL.toExternalForm() + "\"\n" + 
         "        stylesheet=\"" + schCompiledURL.toString() + "\"\n" + 
@@ -248,7 +248,8 @@ public class SchematronXSpecTest extends XSpecViewTestBase {
     assertEquals(
         "<html>\n" + 
         "   <head>\n" + 
-        "      <meta http-equiv=\"Content-Type\" content=\"text/html; charset=UTF-8\"><link rel=\"stylesheet\" type=\"text/css\" href=\"" + css.toURI().toURL().toString()
+        "      <meta http-equiv=\"Content-Type\" content=\"text/html; charset=UTF-8\">\n" + 
+        "      <link rel=\"stylesheet\" type=\"text/css\" href=\"" + css.toURI().toURL().toString()
         + "\"><script type=\"text/javascript\" src=\""
         + js.toURI().toURL().toString() + "\"></script></head>\n" + 
         "   <body>\n" + 
