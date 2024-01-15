@@ -1,4 +1,4 @@
-<xt:extensions xmlns:xt="http://www.oxygenxml.com/ns/extension" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.oxygenxml.com/ns/extension http://www.oxygenxml.com/ns/extension/extensions.xsd"><link type="text/css" rel="stylesheet" id="dark-mode-custom-link"/><link type="text/css" rel="stylesheet" id="dark-mode-general-link"/><style lang="en" type="text/css" id="dark-mode-custom-style"/><style lang="en" type="text/css" id="dark-mode-native-style"/><style lang="en" type="text/css" id="dark-mode-native-sheet"/>
+<xt:extensions xmlns:xt="http://www.oxygenxml.com/ns/extension" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.oxygenxml.com/ns/extension http://www.oxygenxml.com/ns/extension/extensions.xsd">
 
     <xt:extension xmlns:xt="http://www.oxygenxml.com/ns/extension" id="com.oxygenxml.xspec.XSpecSupportPlugin">
         <xt:location href="https://github.com/xspec/oXygen-XML-editor-xspec-support/releases/download/2.3.2/xspec.support-2.3.2-plugin.zip"/>
