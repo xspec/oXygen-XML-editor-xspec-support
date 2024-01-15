@@ -1,12 +1,9 @@
-<xt:extensions xmlns:xt="http://www.oxygenxml.com/ns/extension"
-    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xsi:schemaLocation="http://www.oxygenxml.com/ns/extension http://www.oxygenxml.com/ns/extension/extensions.xsd">
+<xt:extensions xmlns:xt="http://www.oxygenxml.com/ns/extension" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.oxygenxml.com/ns/extension http://www.oxygenxml.com/ns/extension/extensions.xsd"><link type="text/css" rel="stylesheet" id="dark-mode-custom-link"/><link type="text/css" rel="stylesheet" id="dark-mode-general-link"/><style lang="en" type="text/css" id="dark-mode-custom-style"/><style lang="en" type="text/css" id="dark-mode-native-style"/><style lang="en" type="text/css" id="dark-mode-native-sheet"/>
 
-    <xt:extension xmlns:xt="http://www.oxygenxml.com/ns/extension"
-        id="com.oxygenxml.xspec.XSpecSupportPlugin">
-        <xt:location href="https://github.com/xspec/oXygen-XML-editor-xspec-support/releases/download/2.2.6/xspec.support-2.2.6-plugin.zip"/>
-        <xt:version>2.2.6</xt:version>
-        <xt:oxy_version>20.0+</xt:oxy_version>
+    <xt:extension xmlns:xt="http://www.oxygenxml.com/ns/extension" id="com.oxygenxml.xspec.XSpecSupportPlugin">
+        <xt:location href="https://github.com/xspec/oXygen-XML-editor-xspec-support/releases/download/2.3.2/xspec.support-2.3.2-plugin.zip"/>
+        <xt:version>2.3.2</xt:version>
+        <xt:oxy_version>22.0+</xt:oxy_version>
         <xt:type>plugin</xt:type>
         <xt:author>Syncro Soft</xt:author>
         <xt:name>XSpec Helper view</xt:name>
@@ -17,7 +14,7 @@
             <body>
             	<div>
 			<p>This add-on contributes an <b>XSpec Test Results</b> view that provides the ability to run XSpec test scenarios and view the results directly in Oxygen. To use the new view, after installation, open an XSpec file and click the <b>Run XSpec test scenarios</b> button on the toolbar.</p>
-                    <p style="color:red">This plugin also requires the <b>XSpec Framework</b>. Please install them both.</p>
+                    <p style="">This plugin also requires the <b>XSpec Framework</b>. Please install them both.</p>
   	        </div>
                 
               <div>
@@ -41,6 +38,13 @@
                       <li>For a failed test, you can click on it to open the diff comparison between the expected and actual results.</li>
                   </ul>
               </div>
+               <div>    
+                   <h3>What's new in version 2.3.2</h3>
+                   <ol>
+                       <li>Comes bundled with XSpec version 2.3.2.</li>
+                       <li>Updated Saxon references to work for Oxygen 26, which now includes Saxon 12.</li>
+                   </ol>
+               </div>  
               <div>    
                 <h3>What's new in version 2.2.6</h3>
                 <ol>
@@ -124,11 +128,10 @@ SOFTWARE.
 ]]></xt:license>
     </xt:extension>
     
-    <xt:extension xmlns:xt="http://www.oxygenxml.com/ns/extension"
-        id="com.oxygenxml.xspec.XSpecSupportFramework">
-        <xt:location href="https://github.com/xspec/oXygen-XML-editor-xspec-support/releases/download/2.2.6/xspec.support-2.2.6-framework.zip"/>
-        <xt:version>2.2.6</xt:version>
-        <xt:oxy_version>20.0+</xt:oxy_version>
+    <xt:extension xmlns:xt="http://www.oxygenxml.com/ns/extension" id="com.oxygenxml.xspec.XSpecSupportFramework">
+        <xt:location href="https://github.com/xspec/oXygen-XML-editor-xspec-support/releases/download/2.3.2/xspec.support-2.3.2-framework.zip"/>
+        <xt:version>2.3.2</xt:version>
+        <xt:oxy_version>22.0+</xt:oxy_version>
         <xt:type>framework</xt:type>
         <xt:author>Syncro Soft</xt:author>
         <xt:name>XSpec Framework (required by the XSpec Helper view plugin)</xt:name>
@@ -138,7 +141,7 @@ SOFTWARE.
             </head>
             <body>
                 <div>
-                    <p style="color:red">This framework is required for the <b>XSpec Helper view</b> plugin. Both add-ons must be installed.</p>
+                    <p style="">This framework is required for the <b>XSpec Helper view</b> plugin. Both add-ons must be installed.</p>
                     <p>This add-on constributes a customized version of Oxygen's built-in XSpec framework. The <b>XSpec Helper view</b> add-on uses this framework for XSpec test scenarios.</p>
                 </div>
             </body>
