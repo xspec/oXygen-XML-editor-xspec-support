@@ -20,7 +20,7 @@
 	</repositories>
 	
 	<properties>
-      <openjfx.version>11</openjfx.version>
+      <openjfx.version>17.0.10</openjfx.version>
     </properties>
 	
 	<dependencies>
