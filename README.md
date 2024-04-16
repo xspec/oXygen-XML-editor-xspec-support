@@ -10,7 +10,7 @@ Install as Add-On
 1. In Oxygen, go to **Help->Install new add-ons** to open an add-on selection dialog box.
 2. Enter or paste https://raw.githubusercontent.com/xspec/oXygen-XML-editor-xspec-support/master/build/update_site.xml in the **Show add-ons from** field.
 3. Select the **XSpec Helper View** and **XSpec Framework** add-ons (both are required) and click Next.
-4. Select the **I accept all terms of the end user license agreement** option and click **Finish**.
+4. Select the **I accept all terms of the end user license agreement** option and click **Install**.
 5. Restart the application.
 
 Alternative Installation Method
