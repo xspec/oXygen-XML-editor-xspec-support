@@ -24,7 +24,7 @@ How to Use It
 -----------
 
 1. Inside Oxygen XML Editor/Developer, open an XSpec file.
-2. Click the **XSpec Run** button on the toolbar.
+2. Click the **Run XSpec test scenarios** button on the toolbar.
 
 **Result**: An **XSpec Test Results** view will be opened. 
 
@@ -33,7 +33,7 @@ How to Use It
 
 #### What you can do inside the "XSpec Test Results" view:
 
-- For each test, there is a **Show** action that selects the coresponding test in the editor.
+- For each test, there is a **Show** action that selects the corresponding test in the editor.
 - For each scenario, there is a **Run** action that just runs that particular scenario.
 - For a failed test, you can click on it to open the diff comparison between the expected and actual results.
  
