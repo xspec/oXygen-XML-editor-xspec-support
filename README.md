@@ -10,7 +10,7 @@ Install as Add-On
 1. In Oxygen, go to **Help->Install new add-ons** to open an add-on selection dialog box.
 2. Enter or paste https://raw.githubusercontent.com/xspec/oXygen-XML-editor-xspec-support/master/build/update_site.xml in the **Show add-ons from** field.
 3. Select the **XSpec Helper View** and **XSpec Framework** add-ons (both are required) and click Next.
-4. Select the **I accept all terms of the end user license agreement** option and click **Finish**.
+4. Select the **I accept all terms of the end user license agreement** option and click **Install**.
 5. Restart the application.
 
 Alternative Installation Method
@@ -24,7 +24,7 @@ How to Use It
 -----------
 
 1. Inside Oxygen XML Editor/Developer, open an XSpec file.
-2. Click the **XSpec Run** button on the toolbar.
+2. Click the **Run XSpec test scenarios** button on the toolbar.
 
 **Result**: An **XSpec Test Results** view will be opened. 
 
@@ -33,7 +33,7 @@ How to Use It
 
 #### What you can do inside the "XSpec Test Results" view:
 
-- For each test, there is a **Show** action that selects the coresponding test in the editor.
+- For each test, there is a **Show** action that selects the corresponding test in the editor.
 - For each scenario, there is a **Run** action that just runs that particular scenario.
 - For a failed test, you can click on it to open the diff comparison between the expected and actual results.
  
