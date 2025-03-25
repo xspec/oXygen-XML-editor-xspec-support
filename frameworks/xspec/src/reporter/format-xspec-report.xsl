@@ -31,6 +31,7 @@
    <xsl:param name="force-focus" as="xs:string?" />
    <xsl:param name="inline-css" as="xs:string" select="false() cast as xs:string" />
    <xsl:param name="report-css-uri" as="xs:string?" />
+   <!-- See also report-theme parameter, which is defined in format-utils.xsl -->
 
    <!-- @use-character-maps for inline CSS -->
    <xsl:output method="xhtml" use-character-maps="fmt:disable-escaping" />
@@ -168,7 +169,7 @@
             </xsl:call-template>
             <xsl:call-template name="x:html-head-callback"/>
          </head>
-         <body>
+         <body id="testReport">
             <h1>Test Report</h1>
             <xsl:apply-templates select="." mode="x:html-report"/>
          </body>
@@ -276,7 +277,7 @@
             <tr>
                <th/>
                <xsl:for-each select="x:descendant-tests(.) => x:test-stats()">
-                  <th class="totals">
+                  <th class="totals{if (@label eq 'failed') then ' emphasis' else ''}">
                      <xsl:text expand-text="yes">{@label}:&#xA0;{@count}</xsl:text>
                   </th>
                </xsl:for-each>
