@@ -86,7 +86,7 @@
     -->
 
     <!-- The "skeleton" Schematron implementation requires a document node -->
-    <xsl:template match="x:context[not(@href)][
+    <xsl:template match="x:context[
         parent::*/x:expect-assert | parent::*/x:expect-not-assert |
         parent::*/x:expect-report | parent::*/x:expect-not-report |
         parent::*/x:expect-valid | ancestor::x:description[@schematron] ]"
@@ -94,6 +94,7 @@
         mode="x:gather-specs">
         <xsl:copy>
             <xsl:apply-templates select="attribute()" mode="#current" />
+            <xsl:where-populated>
             <xsl:attribute name="select">
                 <xsl:choose>
                     <xsl:when test="@select">
@@ -105,11 +106,15 @@
                         <xsl:text expand-text="yes"> else trace(({@select}), 'WARNING: Failed to wrap {name()}/@select')</xsl:text>
                     </xsl:when>
 
-                    <xsl:otherwise>
+                        <xsl:when test="not(@href)">
                         <xsl:text>self::document-node()</xsl:text>
-                    </xsl:otherwise>
+                        </xsl:when>
+
+                        <!-- If x:context has @href but no @select, no need to construct @select in output,
+                            so xsl:otherwise is omitted and xsl:where-populated produces nothing. -->
                 </xsl:choose>
             </xsl:attribute>
+            </xsl:where-populated>
 
             <xsl:apply-templates select="node()" mode="#current" />
         </xsl:copy>
@@ -237,14 +242,12 @@
     <xsl:template match="x:expect-assert | x:expect-report" as="text()" mode="make-text-predicate">
         <xsl:variable name="x-expect-text-content-wrapped" as="xs:string"
             select="normalize-space(.) => x:quote-with-apos()"/>
-        <!-- Note: Skeleton uses svrl:text for main message and no svrl:text for diagnostics.
-            SchXslt uses svrl:text for main message and inside svrl:diagnostic-reference.
-            If XSpec stops supporting skeleton implementation of Schematron, we can
-            potentially simplify the left side of the '=' expression to
-            (descendant::{x:known-UQName('svrl:text')}) ! normalize-space(.)
-        -->
         <xsl:text expand-text="yes">[
-            ({x:known-UQName('svrl:text')}, {x:known-UQName('svrl:diagnostic-reference')}) ! normalize-space(.)
+            (
+            {x:known-UQName('svrl:text')},
+            {x:known-UQName('svrl:diagnostic-reference')},
+            {x:known-UQName('svrl:property-reference')}
+            ) ! normalize-space(.)
             = {$x-expect-text-content-wrapped}
             ]</xsl:text>
     </xsl:template>
