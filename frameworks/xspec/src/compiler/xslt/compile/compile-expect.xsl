@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <xsl:stylesheet xmlns="http://www.w3.org/1999/XSL/TransformAlias"
+                xmlns:wrap="urn:x-xspec:common:wrap"
                 xmlns:x="http://www.jenitennison.com/xslt/xspec"
                 xmlns:xs="http://www.w3.org/2001/XMLSchema"
                 xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
@@ -54,6 +55,11 @@
             <xsl:variable name="deep-equal-flags" as="xs:string"
                select="$x:apos || '1'[$xslt-version eq 1] || $x:apos" />
 
+            <xsl:comment> flag if @result-type is present but $x:result is not the right type </xsl:comment>
+            <variable name="{x:known-UQName('impl:result-type-mismatch')}"
+               as="{x:known-UQName('xs:boolean')}"
+               select="{x:result-type-mismatch-condition(.)}"/>
+
             <xsl:choose>
                <xsl:when test="@test">
                   <xsl:comment> wrap $x:result into a document node if possible </xsl:comment>
@@ -69,8 +75,8 @@
                            Have to experiment a bit to see if that really is the case.
                            TODO: To remove. Use directly $x:result instead. (expath/xspec#14) -->
                         <when
-                           test="exists(${x:known-UQName('x:result')}) and {x:known-UQName('x:wrappable-sequence')}(${x:known-UQName('x:result')})">
-                           <sequence select="{x:known-UQName('x:wrap-nodes')}(${x:known-UQName('x:result')})" />
+                           test="exists(${x:known-UQName('x:result')}) and {x:known-UQName('wrap:wrappable-sequence')}(${x:known-UQName('x:result')})">
+                           <sequence select="{x:known-UQName('wrap:wrap-nodes')}(${x:known-UQName('x:result')})" />
                         </when>
                         <otherwise>
                            <sequence select="${x:known-UQName('x:result')}" />
@@ -81,6 +87,9 @@
                   <xsl:comment> evaluate the predicate with $x:result (or its wrapper document node) as context item if it is a single item; if not, evaluate the predicate without context item </xsl:comment>
                   <variable name="{x:known-UQName('impl:test-result')}" as="item()*">
                      <choose>
+                        <when test="${x:known-UQName('impl:result-type-mismatch')}">
+                           <xsl:comment>In case of data type mismatch, do not process @test</xsl:comment>
+                        </when>
                         <when test="count(${x:known-UQName('impl:test-items')}) eq 1">
                            <for-each select="${x:known-UQName('impl:test-items')}">
                               <xsl:element name="xsl:sequence" namespace="{$x:xsl-namespace}">
@@ -113,6 +122,9 @@
                   <xsl:comment> did the test pass? </xsl:comment>
                   <variable name="{x:known-UQName('impl:successful')}" as="{x:known-UQName('xs:boolean')}">
                      <choose>
+                        <when test="${x:known-UQName('impl:result-type-mismatch')}">
+                           <sequence select="false()"/>
+                        </when>
                         <when test="${x:known-UQName('impl:boolean-test')}">
                            <xsl:choose>
                               <xsl:when test="x:has-comparison(.)">
@@ -145,7 +157,8 @@
 
                <xsl:otherwise>
                   <variable name="{x:known-UQName('impl:successful')}" as="{x:known-UQName('xs:boolean')}"
-                     select="{x:known-UQName('deq:deep-equal')}(${x:variable-UQName(.)}, ${x:known-UQName('x:result')}, {$deep-equal-flags})" />
+                     select="not(${x:known-UQName('impl:result-type-mismatch')}) and
+                     {x:known-UQName('deq:deep-equal')}(${x:variable-UQName(.)}, ${x:known-UQName('x:result')}, {$deep-equal-flags})" />
                </xsl:otherwise>
             </xsl:choose>
 
@@ -180,17 +193,35 @@
 
             <!-- Report -->
             <xsl:if test="empty($reason-for-pending)">
-               <xsl:if test="@test">
-                  <xsl:call-template name="x:report-test-attribute" />
-
-                  <if test="not(${x:known-UQName('impl:boolean-test')})">
-                     <xsl:call-template name="x:call-report-sequence">
-                        <xsl:with-param name="sequence-variable-eqname"
-                           select="x:known-UQName('impl:test-result')" />
+               <!-- Record data the report will need, based on outcomes fully known only at run time. -->
+               <choose>
+                  <when test="${x:known-UQName('impl:result-type-mismatch')}">
+                     <!-- For failure due to data type mismatch, record the "instance of" expression. -->
+                     <xsl:call-template name="x:report-test-attribute">
+                        <xsl:with-param name="attribute-local-name" select="'result-type'"/>
                      </xsl:call-template>
-                  </if>
-               </xsl:if>
-
+                  </when>
+                  <xsl:if test="exists(@test)">
+                     <when test="${x:known-UQName('impl:boolean-test')}">
+                        <!-- For failure due to boolean x:expect/@test, record @test. -->
+                        <xsl:call-template name="x:report-test-attribute" />
+                     </when>
+                     <when test="not(${x:known-UQName('impl:boolean-test')})">
+                        <!-- For failure due to non-boolean x:expect/@test, record @test and the result
+                        of evaluating @test against $x:result. -->
+                        <xsl:call-template name="x:report-test-attribute" />
+                        <xsl:call-template name="x:call-report-sequence">
+                           <xsl:with-param name="sequence-variable-eqname"
+                              select="x:known-UQName('impl:test-result')" />
+                        </xsl:call-template>
+                     </when>
+                  </xsl:if>
+                  <otherwise>
+                     <!-- If there is no data type mismatch and no x:expect/@test,
+                     there is nothing else to record here. -->
+                  </otherwise>
+               </choose>
+               <!-- For all x:expect syntaxes/outcomes, record the expected result in the result XML file -->
                <xsl:call-template name="x:call-report-sequence">
                   <xsl:with-param name="sequence-variable-eqname" select="x:variable-UQName(.)" />
                   <xsl:with-param name="report-name" select="local-name()" />

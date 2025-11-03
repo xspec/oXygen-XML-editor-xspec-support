@@ -300,7 +300,7 @@ public class XSpecViewTestBase extends JFCTestCase {
 
     // Build the classpath needed by the build.xml script.
     StringBuilder cl = new StringBuilder();
-    File saxon = URLUtil.getCanonicalFileFromFileUrl(getClass().getClassLoader().getResource("cmd/saxon9ee.jar"));
+    File saxon = URLUtil.getCanonicalFileFromFileUrl(getClass().getClassLoader().getResource("cmd/saxon-ee-10.6.jar"));
     cl.append("-lib ").append(saxon.getAbsolutePath()).append(" ");
     File extSaxon = new File("frameworks/xspec/oxygen-results-view/saxon-extension.jar");
     cl.append("-lib ").append(extSaxon.getAbsolutePath()).append(" ");

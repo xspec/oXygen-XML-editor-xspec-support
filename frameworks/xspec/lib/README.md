@@ -1,3 +1,8 @@
-## [`iso-schematron`](iso-schematron/)
+## [`schxslt`](schxslt/)
 
-Taken from `https://github.com/Schematron/schematron/tree/2020-10-01/trunk/schematron/code`.
+Taken from `schxslt-*-xslt-only.zip` found in [SchXslt releases](https://github.com/schxslt/schxslt/releases).
+
+## [`XQS`](XQS/)
+
+Downloaded ZIP-file from https://github.com/AndrewSales/XQS/releases
+and deleted examples/, presentations/, and test/ directories.

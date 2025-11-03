@@ -122,10 +122,10 @@
             </xsl:element>
 
             <xsl:text>&#10;      </xsl:text><xsl:comment> info message </xsl:comment>
-            <!-- Message content must be constructed at run time -->
+            <!-- system-property() must be retrieved at run time -->
             <message>
                <text>
-                  <xsl:text>Testing with </xsl:text>
+                  <xsl:text expand-text="yes">Testing with </xsl:text>
                </text>
                <value-of select="system-property('{x:known-UQName('xsl:product-name')}')" />
                <text>
@@ -138,28 +138,9 @@
             <!-- Use xsl:result-document/@format to avoid clashes with <xsl:output> in the stylesheet
                being tested which would otherwise govern the output of the report XML. -->
             <xsl:element name="xsl:result-document" namespace="{$x:xsl-namespace}">
-               <xsl:choose>
-                  <xsl:when test="$x:saxon-version lt x:pack-version((9, 9, 1, 1))">
-                     <!-- Workaround for a Saxon bug: https://saxonica.plan.io/issues/4093 -->
-
-                     <!-- Create a temp XSpec namespace node, because non-zero-length XSpec prefix
-                        is not always available here. Any non-zero-length non-xsl prefix will do,
-                        because the temp namespace node is only for the xsl:result-document element -->
-                     <xsl:variable name="temp-prefix" as="xs:string"
-                        select="'workaround-for-saxon-bug-4093'" />
-                     <xsl:namespace name="{$temp-prefix}" select="$x:xspec-namespace" />
-
-                     <xsl:attribute name="format"
-                        select="$temp-prefix || ':xml-report-serialization-parameters'" />
-                  </xsl:when>
-
-                  <xsl:otherwise>
-                     <!-- Escape curly braces because @format is AVT -->
-                     <xsl:attribute name="format"
-                        select="'Q{{' || $x:xspec-namespace || '}}xml-report-serialization-parameters'" />
-                  </xsl:otherwise>
-               </xsl:choose>
-
+               <!-- Escape curly braces because @format is AVT -->
+               <xsl:attribute name="format"
+                  select="'Q{{' || $x:xspec-namespace || '}}xml-report-serialization-parameters'" />
                <xsl:element name="xsl:element" namespace="{$x:xsl-namespace}">
                   <xsl:attribute name="name" select="'report'" />
                   <xsl:attribute name="namespace" select="$x:xspec-namespace" />
