@@ -13,7 +13,8 @@ import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.UIManager;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
@@ -50,10 +51,12 @@ public class SwingBrowserPanel extends JPanel {
    * Minimum page loading time.
    */
   private static final int PAGE_LOADING_TIME = 200;
+
   /**
    * Logger for logging.
    */
-  private static final Logger logger = Logger.getLogger(SwingBrowserPanel.class.getName());
+  private static final Logger logger = LoggerFactory.getLogger(SwingBrowserPanel.class.getName());
+
   /**
    * The Web engine used to render the pages.
    */

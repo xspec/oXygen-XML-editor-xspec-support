@@ -58,8 +58,8 @@ public class GenerateIDExtensionFunctionTest extends TestCase {
 //      }
 //    });
     
-    newInstance.setAttribute(
-        net.sf.saxon.lib.FeatureKeys.MESSAGE_EMITTER_CLASS, SaxonMessageEmitter.class.getName());
+//    newInstance.setAttribute(
+//        net.sf.saxon.lib.FeatureKeys.MESSAGE_EMITTER_CLASS, SaxonMessageEmitter.class.getName());
     
     Source source = new SAXSource(new InputSource(xslURL.toString()));
     Transformer transformer = newInstance.newTransformer(source);

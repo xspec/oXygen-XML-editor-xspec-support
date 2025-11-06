@@ -68,7 +68,8 @@ public class XSpecMetaTest extends XSpecViewTestBase {
     
     
     assertEquals(
-        "<html>\n" + 
+        "<!DOCTYPE HTML>\n"
+        + "<html>\n" + 
         "   <head>\n" + 
         "      <meta http-equiv=\"Content-Type\" content=\"text/html; charset=UTF-8\">\n" + 
         "      <link rel=\"stylesheet\" type=\"text/css\" href=\"" + css.toURI().toURL().toString()
@@ -191,7 +192,8 @@ public class XSpecMetaTest extends XSpecViewTestBase {
     
     
     assertEquals(
-        "<html>\n" + 
+        "<!DOCTYPE HTML>\n"
+        + "<html>\n" + 
         "   <head>\n" + 
         "      <meta http-equiv=\"Content-Type\" content=\"text/html; charset=UTF-8\">\n" + 
         "      <link rel=\"stylesheet\" type=\"text/css\" href=\"" + css.toURI().toURL().toString() + "\">"
@@ -342,7 +344,7 @@ public class XSpecMetaTest extends XSpecViewTestBase {
     File js = new File("frameworks/xspec/oxygen-results-view/test-report.js");
     
     assertEquals(
-        "<html>\n" + 
+        "<!DOCTYPE HTML>\n<html>\n" + 
         "   <head>\n" + 
         "      <meta http-equiv=\"Content-Type\" content=\"text/html; charset=UTF-8\">\n" + 
         "      <link rel=\"stylesheet\" type=\"text/css\" href=\"" + css.toURI().toURL().toString() + "\"><script type=\"text/javascript\" src=\"" + js.toURI().toURL().toString()

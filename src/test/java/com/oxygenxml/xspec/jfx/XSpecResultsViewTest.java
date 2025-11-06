@@ -53,7 +53,9 @@ public class XSpecResultsViewTest extends XSpecViewTestBase {
   protected void tearDown() throws Exception {
     super.tearDown();
     
-    frame.setVisible(false);
+    if (frame != null) {
+      frame.setVisible(false);
+    }
   }
 
   /**

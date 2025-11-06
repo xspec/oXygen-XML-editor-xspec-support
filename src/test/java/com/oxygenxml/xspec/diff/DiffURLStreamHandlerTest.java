@@ -1,12 +1,12 @@
 package com.oxygenxml.xspec.diff;
 
+import static org.junit.Assert.assertEquals;
+
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.URL;
 import java.net.URLStreamHandler;
 import java.net.URLStreamHandlerFactory;
-
-import org.apache.log4j.Logger;
 
 import com.oxygenxml.xspec.protocol.DiffFragmentRepository;
 import com.oxygenxml.xspec.protocol.DiffURLStreamHandler;
@@ -15,11 +15,6 @@ import junit.framework.TestCase;
 
 public class DiffURLStreamHandlerTest extends TestCase {
   
-  /**
-   * Logger for logging.
-   */
-  private static final Logger logger = Logger.getLogger(DiffURLStreamHandlerTest.class.getName());
-
 
   /**
    * Installs the GIT protocol that we use to identify certain file versions.
@@ -40,7 +35,7 @@ public class DiffURLStreamHandlerTest extends TestCase {
     });
     } catch (Throwable t) {
       if (!t.getMessage().contains("factory already defined")) {
-        logger.info(t, t);
+        t.printStackTrace();
       }
     } 
   }

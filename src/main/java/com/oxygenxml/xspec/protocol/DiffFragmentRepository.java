@@ -8,10 +8,11 @@ import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+import ro.sync.basic.contenttypes.ContentTypes;
 import ro.sync.diff.api.DiffContentTypes;
-import ro.sync.exml.workspace.api.PluginWorkspaceProvider;
 import ro.sync.util.URLUtil;
 
 /**
@@ -23,8 +24,7 @@ public class DiffFragmentRepository {
   /**
    * Logger for logging.
    */
-  private static final Logger logger = Logger.getLogger(DiffFragmentRepository.class.getName());
-  
+  private static final Logger logger = LoggerFactory.getLogger(DiffFragmentRepository.class.getName());
   /**
    * Protocol name.
    */

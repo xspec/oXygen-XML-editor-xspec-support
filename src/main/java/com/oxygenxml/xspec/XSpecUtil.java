@@ -3,7 +3,8 @@ package com.oxygenxml.xspec;
 import java.net.MalformedURLException;
 import java.net.URL;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javafx.scene.web.WebEngine;
 import netscape.javascript.JSObject;
@@ -25,7 +26,7 @@ public class XSpecUtil {
   /**
    * Logger for logging.
    */
-  private static final Logger logger = Logger.getLogger(XSpecUtil.class.getName());
+  private static final Logger logger = LoggerFactory.getLogger(XSpecUtil.class.getName());
   /**
    * The name of the XSpec running scenario.
    */

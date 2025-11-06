@@ -19,7 +19,6 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
-import org.junit.Ignore;
 import org.mockito.Mockito;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
@@ -34,7 +33,6 @@ import javafx.scene.web.WebEngine;
 import junit.extensions.jfcunit.JFCTestCase;
 import net.sf.saxon.s9api.Processor;
 import net.sf.saxon.s9api.XPathCompiler;
-import net.sf.saxon.s9api.XPathExecutable;
 import net.sf.saxon.s9api.XdmItem;
 import net.sf.saxon.s9api.XdmNode;
 import ro.sync.exml.workspace.api.editor.WSEditor;
@@ -43,7 +41,6 @@ import ro.sync.exml.workspace.api.standalone.StandalonePluginWorkspace;
 import ro.sync.exml.workspace.api.util.UtilAccess;
 import ro.sync.util.URLUtil;
 
-@Ignore
 public class XSpecViewTestBase extends JFCTestCase {
   
   /**
@@ -300,7 +297,7 @@ public class XSpecViewTestBase extends JFCTestCase {
 
     // Build the classpath needed by the build.xml script.
     StringBuilder cl = new StringBuilder();
-    File saxon = URLUtil.getCanonicalFileFromFileUrl(getClass().getClassLoader().getResource("cmd/saxon-ee-10.6.jar"));
+    File saxon = URLUtil.getCanonicalFileFromFileUrl(getClass().getClassLoader().getResource("cmd/saxon-ee-12.9.jar"));
     cl.append("-lib ").append(saxon.getAbsolutePath()).append(" ");
     File extSaxon = new File("frameworks/xspec/oxygen-results-view/saxon-extension.jar");
     cl.append("-lib ").append(extSaxon.getAbsolutePath()).append(" ");
@@ -310,6 +307,15 @@ public class XSpecViewTestBase extends JFCTestCase {
     cl.append("-lib ").append(resolver.getAbsolutePath()).append(" ");
     File xmlApis = URLUtil.getCanonicalFileFromFileUrl(getClass().getClassLoader().getResource("cmd/xml-apis.jar"));
     cl.append("-lib ").append(xmlApis.getAbsolutePath()).append(" ");
+    
+    cl.append("-lib ").append(xerces.getAbsolutePath()).append(" ");
+    resolver = URLUtil.getCanonicalFileFromFileUrl(getClass().getClassLoader().getResource("cmd/xmlresolver-5.3.3.jar"));
+    cl.append("-lib ").append(resolver.getAbsolutePath()).append(" ");
+    
+    cl.append("-lib ").append(xerces.getAbsolutePath()).append(" ");
+    resolver = URLUtil.getCanonicalFileFromFileUrl(getClass().getClassLoader().getResource("cmd/xmlresolver-5.3.3-data.jar"));
+    cl.append("-lib ").append(resolver.getAbsolutePath()).append(" ");
+
 
 
     File compilerXSL = new File("frameworks/xspec/oxygen-results-view/compile-xslt-tests-oxygen.xsl");

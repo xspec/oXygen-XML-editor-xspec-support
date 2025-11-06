@@ -24,6 +24,14 @@
     </properties>
 	
 	<dependencies>
+      <dependency>
+        <groupId>ch.qos.logback</groupId>
+        <artifactId>logback-classic</artifactId>
+        <version>1.4.14</version>
+        <scope>test</scope>
+      </dependency>
+	
+	
 		<dependency>
       <groupId>org.openjfx</groupId>
       <artifactId>javafx-base</artifactId>
@@ -51,19 +59,20 @@
 		<dependency>
 			<groupId>com.oxygenxml</groupId>
 			<artifactId>oxygen-sdk</artifactId>
-			<version>24.1.0.0</version>
+			<version>26.1.0.1</version>
 		</dependency>
 		<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
-			<version>4.13.1</version>
+			<version>4.13.2</version>
 			<scope>test</scope>
 		</dependency>
-		<dependency>
-			<groupId>org.mockito</groupId>
-			<artifactId>mockito-all</artifactId>
-			<version>1.9.5</version>
-		</dependency>
+	    <dependency>
+	        <groupId>org.mockito</groupId>
+	        <artifactId>mockito-inline</artifactId>
+	        <version>5.2.0</version>
+	        <scope>test</scope>
+   		 </dependency>
 		<dependency>
 			<groupId>net.sf.jfcunit</groupId>
 			<artifactId>jfcunit</artifactId>
@@ -91,7 +100,16 @@
 	<build>
 		<plugins>
 		<plugin>
+        <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-surefire-plugin</artifactId>
+        <version>3.0.0-M7</version>
+        <configuration>
+          <argLine>
+            --add-opens java.base/java.lang=ALL-UNNAMED
+            --add-opens java.base/java.lang.reflect=ALL-UNNAMED
+            --add-opens java.base/java.util=ALL-UNNAMED
+          </argLine>
+        </configuration>
           <dependencies>
             <dependency>
               <groupId>org.openjfx</groupId>

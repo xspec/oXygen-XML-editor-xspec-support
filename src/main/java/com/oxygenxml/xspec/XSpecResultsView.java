@@ -16,7 +16,8 @@ import javax.swing.JToolBar;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.oxygenxml.xspec.jfx.BrowserInteractor;
 import com.oxygenxml.xspec.jfx.SwingBrowserPanel;
@@ -54,7 +55,7 @@ public class XSpecResultsView extends JPanel implements XSpecResultPresenter {
   /**
    * Logger for logging.
    */
-  private static final Logger logger = Logger.getLogger(XSpecResultsView.class.getName());
+  private static final Logger logger = LoggerFactory.getLogger(XSpecResultsView.class.getName());
   /**
    * A Javascript that will present just the failed tests.
    */

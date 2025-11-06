@@ -8,7 +8,8 @@ import javax.swing.JTextArea;
 import javax.swing.SwingUtilities;
 import javax.swing.text.BadLocationException;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.oxygenxml.xspec.XSpecResultPresenter;
 import com.oxygenxml.xspec.XSpecVariablesResolver;
@@ -36,7 +37,7 @@ public class Bridge {
   /**
    * Logger for logging.
    */
-  private static final Logger logger = Logger.getLogger(Bridge.class.getName());
+  private static final Logger logger = LoggerFactory.getLogger(Bridge.class.getName());
 
   /**
    * The executed XSpec file.
@@ -136,7 +137,19 @@ public class Bridge {
       WSXMLTextEditorPage textpage = (WSXMLTextEditorPage) currentPage;
       String xpath = 
           "if (/*:description/@schematron) then (\n" + 
-          "//*:scenario/*[\"" + testName + "\" = string-join((@label, tokenize(local-name(),'-')[.=('report','assert','not','rule')], @id, @role, @location, @context, .[@count]/string('count:'), @count), ' ')]\n" + 
+          "//*:scenario/*[\"" + testName + "\" = string-join"
+          + "                (\n"
+          + "                    @label,\n"
+          + "                    tokenize(local-name(), '-')[. = ('report', 'assert', 'not', 'rule')],\n"
+          + "                    @id,\n"
+          + "                    @role,\n"
+          + "                    @location,\n"
+          + "                    @context,\n"
+          + "                    (@count ! ('count:', .)),\n"
+          + "                    (normalize-space()[.] ! ('text:', .))\n"
+          + "                )\n"
+          + ""
+          + ", ' ')]\n" + 
           ") else (\n" +
           "//*:expect[@label=\"" + testName
           + "\" or *:label=\"" + testName
@@ -144,7 +157,7 @@ public class Bridge {
           + "\" or *:label/text()=\"" + scenarioName
           + "\"]]"+
           ")";
-
+      
       if (logger.isDebugEnabled()) {
         logger.debug("Show test XPath: " + xpath);
       }
