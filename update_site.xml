@@ -139,7 +139,7 @@ SOFTWARE.
             <body>
                 <div>
                     <p style="color:red">This framework is required for the <b>XSpec Helper view</b> plugin. Both add-ons must be installed.</p>
-                    <p>This add-on constributes a customized version of Oxygen's built-in XSpec framework. The <b>XSpec Helper view</b> add-on uses this framework for XSpec test scenarios.</p>
+                    <p>This add-on contributes a customized version of Oxygen's built-in XSpec framework. The <b>XSpec Helper view</b> add-on uses this framework for XSpec test scenarios.</p>
                 </div>
             </body>
         </html>
