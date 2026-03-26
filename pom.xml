@@ -1,23 +1,14 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
+	<artifactId>xspec.support</artifactId>
+	<version>3.3.2-SNAPSHOT</version>
+
+	<parent>
 		<groupId>com.oxygenxml</groupId>
-		<artifactId>xspec.support</artifactId>
-		<version>3.3.2-SNAPSHOT</version>
-	
-	<repositories>
-		<repository>
-			<id>public</id>
-			<name>oXygen public artifacts</name>
-			<url>http://www.oxygenxml.com/maven</url>
-			<releases>
-				<enabled>true</enabled>
-			</releases>
-			<snapshots>
-				<enabled>true</enabled>
-			</snapshots>
-		</repository>
-	</repositories>
+		<artifactId>oxygen-addons-superpom</artifactId>
+		<version>28.0-SNAPSHOT</version>
+	</parent>
 	
 	<properties>
       <openjfx.version>17.0.10</openjfx.version>
