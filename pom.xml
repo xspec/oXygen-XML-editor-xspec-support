@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 		<groupId>com.oxygenxml</groupId>
 		<artifactId>xspec.support</artifactId>
-		<version>1.0-SNAPSHOT</version>
+		<version>3.3.2-SNAPSHOT</version>
 	
 	<repositories>
 		<repository>
@@ -147,19 +147,6 @@
 						    <archiveBaseDirectory>${project.basedir}</archiveBaseDirectory>
 							<descriptors>
 								<descriptor>assembly.xml</descriptor>
-							</descriptors>
-						</configuration>
-					</execution>
-					<execution>
-						<id>make-framework-package</id>
-						<phase>package</phase>
-						<goals>
-							<goal>single</goal>
-						</goals>
-						<configuration>
-						    <archiveBaseDirectory>${project.basedir}</archiveBaseDirectory>
-							<descriptors>
-								<descriptor>assembly-framework.xml</descriptor>
 							</descriptors>
 						</configuration>
 					</execution>

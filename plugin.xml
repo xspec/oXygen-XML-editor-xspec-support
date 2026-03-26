@@ -24,4 +24,6 @@
  
  <toolbar id="com.oxygenxml.xspec" initialSide="NORTH" initialRow="1"/>
  
+ <extension type="AdditionalFrameworks" path="frameworks"/>
+ 
 </plugin>
