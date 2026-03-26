@@ -2,17 +2,19 @@ package com.oxygenxml.xspec.jfx;
 
 import java.awt.BorderLayout;
 import java.io.File;
-import java.io.InputStreamReader;
 import java.net.URL;
+import java.util.concurrent.Semaphore;
 
 import javax.swing.JFrame;
-
-import org.apache.commons.io.IOUtils;
 
 import com.oxygenxml.xspec.XSpecResultsView;
 import com.oxygenxml.xspec.XSpecUtil;
 
 import javafx.application.Platform;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
+import javafx.concurrent.Worker;
+import javafx.scene.web.WebEngine;
 
 /**
  * Some test cases for the JavaFx renderer.
@@ -24,6 +26,7 @@ public class XSpecResultsViewTest extends XSpecViewTestBase {
    * XSpec view.
    */
   private XSpecResultsView presenter;
+  private Semaphore s = new Semaphore(0);
   /**
    * A frame that presents the view.
    */
@@ -44,6 +47,8 @@ public class XSpecResultsViewTest extends XSpecViewTestBase {
     frame.getContentPane().add(presenter, BorderLayout.CENTER);
     
     frame.setVisible(true);
+    
+
     
     flushAWT();
   }
@@ -74,6 +79,8 @@ public class XSpecResultsViewTest extends XSpecViewTestBase {
     initXSpec(xspecURL);
     
     presenter.load(xspecURL, resultsURL);
+    
+    waitForWebEngineToLoad();
     flushAWT();
     waitForFX();
     
@@ -126,6 +133,32 @@ public class XSpecResultsViewTest extends XSpecViewTestBase {
   }
 
 
+  private void waitForWebEngineToLoad() throws InterruptedException {
+    invokeAndWaitOnFX(new Runnable() {
+      @Override
+      public void run() {
+        try {
+          WebEngine webEngine = presenter.getEngineForTests();
+          webEngine.getLoadWorker().stateProperty().addListener(new ChangeListener<Worker.State>() {
+            @Override
+            public void changed(ObservableValue<? extends Worker.State> obs, Worker.State oldState, Worker.State newState) {
+                if (newState == Worker.State.SUCCEEDED) {
+                    s.release();
+                    // Acum 'this' se referă la acest ChangeListener
+                    webEngine.getLoadWorker().stateProperty().removeListener(this);
+                }
+            }
+        });
+        } catch (Exception e) {
+          e.printStackTrace();
+        }
+      }
+    });
+    
+    s.acquire();
+  }
+
+
   /**
    * Tests the method that collects the names of the templates that correspond to the failed scenarios.
    * 
@@ -143,6 +176,7 @@ public class XSpecResultsViewTest extends XSpecViewTestBase {
     initXSpec(xspecURL);
     
     presenter.load(xspecURL, resultsURL);
+    waitForWebEngineToLoad();
     flushAWT();
     waitForFX();
     

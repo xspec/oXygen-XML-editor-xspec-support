@@ -1,4 +1,4 @@
-logScenarios = function logScenarios() {
+var logScenarios = function logScenarios() {
     
     var testsuites = document.getElementsByClassName("testsuite");
     
@@ -14,7 +14,7 @@ logScenarios = function logScenarios() {
     return log;
 };
 
-logTests = function logTests() {
+var logTests = function logTests() {
     
     var testsuites = document.getElementsByClassName("testcase");
     
