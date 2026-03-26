@@ -22,7 +22,7 @@
 		
 	<files>
 		<file>
-			<source>target/${project.build.finalName}.jar</source>
+			<source>target/build/${project.build.finalName}.jar</source>
 			<outputDirectory>/lib</outputDirectory>
 		</file>
 		<file>

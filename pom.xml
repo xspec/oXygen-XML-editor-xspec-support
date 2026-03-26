@@ -23,7 +23,7 @@
       </dependency>
 	
 	
-		<dependency>
+	<dependency>
       <groupId>org.openjfx</groupId>
       <artifactId>javafx-base</artifactId>
       <version>${openjfx.version}</version>
@@ -51,6 +51,7 @@
 			<groupId>com.oxygenxml</groupId>
 			<artifactId>oxygen-sdk</artifactId>
 			<version>26.1.0.1</version>
+			<scope>provided</scope>
 		</dependency>
 		<dependency>
 			<groupId>junit</groupId>
@@ -68,21 +69,25 @@
 			<groupId>net.sf.jfcunit</groupId>
 			<artifactId>jfcunit</artifactId>
 			<version>2.08</version>
+			<scope>test</scope>
 		</dependency>
 		<dependency>
 	    	<groupId>ant</groupId>
 		    <artifactId>ant-launcher</artifactId>
 	    	<version>1.6.5</version>
+	    	<scope>test</scope>
 		</dependency>
 		<dependency>
     		<groupId>ant</groupId>
     		<artifactId>ant</artifactId>
     		<version>1.7.0</version>
+    		<scope>test</scope>
 		</dependency>
 		<dependency>
    		 	<groupId>ant</groupId>
    		 	<artifactId>ant-trax</artifactId>
    		 	<version>1.6.5</version>
+   		 	<scope>test</scope>
 		</dependency>
 
 	</dependencies>
@@ -162,7 +167,7 @@
 								<resource>
 									<directory>${project.basedir}</directory>
 									<includes>
-										<include>update_site.xml</include>
+										<include>extension.xml</include>
 									</includes>
 									<filtering>true</filtering>
 								</resource>
