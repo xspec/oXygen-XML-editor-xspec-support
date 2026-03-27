@@ -17,7 +17,6 @@
             <body>
             	<div>
 			<p>This add-on contributes an <b>XSpec Test Results</b> view that provides the ability to run XSpec test scenarios and view the results directly in Oxygen. To use the new view, after installation, open an XSpec file and click the <b>Run XSpec test scenarios</b> button on the toolbar.</p>
-                    <p style="color:red">This plugin also requires the <b>XSpec Framework</b>. Please install them both.</p>
   	        </div>
                 
                 <div>
@@ -49,60 +48,6 @@
                       <li>For a failed test, you can click on it to open the diff comparison between the expected and actual results.</li>
                   </ul>
               </div>
-              <div>    
-                <h3>What's new in version 2.2.6</h3>
-                <ol>
-                    <li>Fixed Saxon 11 classpath issues and API changes that made it crash in Oxygen version 25.0.</li>
-                </ol>
-            </div>  
-              <div>    
-                <h3>What's new in version 2.2.5</h3>
-                <ol>
-                    <li>Fixed some classpath issues that made it crash in Oxygen version 24.1.</li>
-                </ol>
-            </div>  
-              <div>    
-                <h3>What's new in version 2.2.4</h3>
-                <ol>
-                    <li>Comes bundled with XSpec version 2.2.4.</li>
-                </ol>
-            </div>  
-            <div>    
-                <h3>What's new in version 2.0.0</h3>
-                <ol>
-                    <li>Comes bundled with XSpec version 2.0.7.</li>
-                    <li>Supports running XSpec tests for XQuery files.</li>
-                </ol>
-            </div>    
-            <div>    
-                <h3>What's new in version 1.5.0</h3>
-                <ol>
-                    <li>Comes bundled with XSpec version 1.5.0.</li>
-                    <li>Fixed some classpath issues that made it crash in Oxygen version 22.0.</li>
-                </ol>
-            </div>
-            <div>    
-                <h3>What's new in version 1.2.1</h3>
-                <ol>
-                    <li>Fixed bug that didn't allow running XSpec scenarios that needed Saxon EE.</li>
-                </ol>
-            </div>
-            <div>    
-                <h3>What's new in version 1.2.0</h3>
-                <ol>
-                    <li>Comes bundled with XSpec version 1.2.0.</li>
-                    <li>Better handling of witespaces in when presenting the diff. <a href="https://github.com/xspec/oXygen-XML-editor-xspec-support/issues/29">#29</a></li>
-                </ol>
-            </div>
-            <div>    
-                <h3>What's new in version 1.0.0</h3>
-                <ol>
-                   <li>Comes bundled with XSpec version 1.0.0.</li>
-                   <li>The plugin can now execute Schematron tests.</li>
-                   <li>Activating an Oxygen dark theme will also reflect in the view.</li>
-                   <li>The possibility to rerun only the failed scenario.</li>
-                </ol>
-             </div>
             </body>
         </html>
         </xt:description>
@@ -146,7 +91,6 @@ SOFTWARE.
             </head>
             <body>
                 <div>
-                    <p style="color:red">This framework is required for the <b>XSpec Helper view</b> plugin. Both add-ons must be installed.</p>
                     <p>This add-on constributes a customized version of Oxygen's built-in XSpec framework. The <b>XSpec Helper view</b> add-on uses this framework for XSpec test scenarios.</p>
                 </div>
             </body>
