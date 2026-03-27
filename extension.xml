@@ -4,8 +4,8 @@
 
     <xt:extension xmlns:xt="http://www.oxygenxml.com/ns/extension"
         id="com.oxygenxml.xspec.XSpecSupportPlugin">
-        <xt:location href="https://github.com/xspec/oXygen-XML-editor-xspec-support/releases/download/${project.version}/${project.build.finalName}-plugin.zip"/>
-        <xt:version>${project.version}</xt:version>
+        <xt:location href="${project.build.finalName}-plugin.jar"/>
+        <xt:version>${project.nosnapshot.version}</xt:version>
         <xt:oxy_version>24.1+</xt:oxy_version>
         <xt:type>plugin</xt:type>
         <xt:author>Syncro Soft</xt:author>
@@ -76,53 +76,5 @@ SOFTWARE.
 
 ]]></xt:license>
     </xt:extension>
-    
-    <xt:extension xmlns:xt="http://www.oxygenxml.com/ns/extension"
-        id="com.oxygenxml.xspec.XSpecSupportFramework">
-        <xt:location href="https://github.com/xspec/oXygen-XML-editor-xspec-support/releases/download/${project.version}/${project.build.finalName}-framework.zip"/>
-        <xt:version>${project.version}</xt:version>
-        <xt:oxy_version>24.1+</xt:oxy_version>
-        <xt:type>framework</xt:type>
-        <xt:author>Syncro Soft</xt:author>
-        <xt:name>XSpec Framework (required by the XSpec Helper view plugin)</xt:name>
-        <xt:description><html xmlns="http://www.w3.org/1999/xhtml">
-            <head>
-                <title>XSpec Helper View</title>
-            </head>
-            <body>
-                <div>
-                    <p>This add-on constributes a customized version of Oxygen's built-in XSpec framework. The <b>XSpec Helper view</b> add-on uses this framework for XSpec test scenarios.</p>
-                </div>
-            </body>
-        </html>
-        </xt:description>
-        <xt:license><![CDATA[
-                                 MIT License
-
-Copyright (c) 2017 XSpec
-
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.
-
-]]></xt:license>
-    </xt:extension>
-
-
-    
     
 </xt:extensions>
