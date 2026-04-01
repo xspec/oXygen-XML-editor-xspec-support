@@ -138,7 +138,7 @@ public class Bridge {
       String xpath = 
           "if (/*:description/@schematron) then (\n" + 
           "//*:scenario/*[\"" + testName + "\" = string-join"
-          + "                (\n"
+          + "                ((\n"
           + "                    @label,\n"
           + "                    tokenize(local-name(), '-')[. = ('report', 'assert', 'not', 'rule')],\n"
           + "                    @id,\n"
@@ -147,9 +147,7 @@ public class Bridge {
           + "                    @context,\n"
           + "                    (@count ! ('count:', .)),\n"
           + "                    (normalize-space()[.] ! ('text:', .))\n"
-          + "                )\n"
-          + ""
-          + ", ' ')]\n" + 
+          + "                ), ' ')]\n" + 
           ") else (\n" +
           "//*:expect[@label=\"" + testName
           + "\" or *:label=\"" + testName
