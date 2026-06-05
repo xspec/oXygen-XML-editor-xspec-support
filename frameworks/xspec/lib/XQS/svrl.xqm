@@ -188,7 +188,7 @@ as item()*
         {
           $node/@*, 
           output:assertion-message-content($node/node(), $prolog, $rule-context, $context)
-        } 
+        }
      case element(xqs:copy-of)
        return output:name-value-of($node/@select, $prolog, $rule-context, $context)
     default return $node
