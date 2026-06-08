@@ -6,7 +6,7 @@
         id="com.oxygenxml.xspec.XSpecSupportPlugin">
         <xt:location href="${project.build.finalName}-plugin.jar"/>
         <xt:version>${project.nosnapshot.version}</xt:version>
-        <xt:oxy_version>24.1+</xt:oxy_version>
+        <xt:oxy_version>28.0+</xt:oxy_version>
         <xt:type>plugin</xt:type>
         <xt:author>Syncro Soft</xt:author>
         <xt:name>XSpec Helper view</xt:name>
