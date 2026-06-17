@@ -6,8 +6,30 @@
                 xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
                 exclude-result-prefixes="#all">
 
-    <xsl:param name="sch-impl-name" as="xs:string" select="'schxslt'" static="yes"/>
+    <xsl:param name="sch-impl-name" as="xs:string" select="'schxslt2'" static="yes"/>
     <xsl:param name="xqs-home" as="xs:string" select="'../../lib/XQS/'"/>
+
+    <!--
+        When SchXslt2 is the built-in XSLT-based implementation of Schematron, use of
+        the SCHEMATRON_XSLT_COMPILE environment variable or xspec.schematron.preprocessor.step3
+        Ant property makes this stylesheet generate a different XPath predicate expression
+        for matching @id values.
+    -->
+    <xsl:param name="skeleton-schxslt-compatibility" as="xs:boolean" select="false()"/>
+
+    <!--
+        SchXslt2 and XQS use @patternId and @ruleId on svrl:failed-assert and svrl:successful-report.
+        https://codeberg.org/SchXslt/schxslt2/commit/1bb1f1683daaa4c8e9885cd4a510cba7cadde206
+        https://github.com/AndrewSales/XQS/pull/74
+    -->
+    <xsl:variable name="ancestor-id-xpath-expr" as="xs:string">
+        <xsl:choose>
+            <xsl:when test="$skeleton-schxslt-compatibility"
+                expand-text="yes">preceding-sibling::{x:known-UQName('svrl:fired-rule')}[1]/@id, preceding-sibling::{x:known-UQName('svrl:active-pattern')}[1]/@id</xsl:when>
+            <xsl:otherwise>@ruleId, @patternId, @groupId</xsl:otherwise>
+        </xsl:choose>
+    </xsl:variable>
+
     <xsl:variable name="result-path-start" as="xs:string?">
         <xsl:sequence expand-text="yes"
             use-when="$sch-impl-name eq 'xqs'">${x:known-UQName('x:result')}/self::</xsl:sequence>
@@ -15,7 +37,7 @@
 
     <!--
         $stylesheet-doc is for ../../bin/xspec.* who can pass a document node as a stylesheet
-        parameter but can not handle URI natively.
+        parameter but cannot handle URI natively.
         Those who can pass a URI as a stylesheet parameter natively will probably prefer
         $stylesheet-uri.
     -->
@@ -36,7 +58,9 @@
     <xsl:include href="../common/uri-utils.xsl" />
     <xsl:include href="../common/user-content-utils.xsl" />
     <xsl:include href="../common/yes-no-utils.xsl" />
+    <xsl:include href="../compiler/base/declare-variable/sequencetype-with-uqnames.xsl" />
     <xsl:include href="../compiler/base/resolve-import/resolve-import.xsl" />
+    <xsl:include href="../compiler/base/util/compiler-eqname-utils.xsl" />
     <xsl:include href="../compiler/base/util/compiler-misc-utils.xsl" />
 
     <xsl:output indent="yes" />
@@ -121,7 +145,11 @@
                             <!-- Define $impl:phase variable for use in xqs:validate calling syntax. -->
                             <xsl:element name="{x:xspec-name('variable',.)}" namespace="{namespace-uri()}">
                                 <xsl:attribute name="name" select="x:known-UQName('impl:phase')"/>
-                                <xsl:copy-of select="(@* except @name) | node()"/>
+                                <xsl:if test="exists(@as)">
+                                    <xsl:attribute name="as"
+                                        select="x:lexical-to-UQName-in-sequence-type(., 'as')"/>
+                                </xsl:if>
+                                <xsl:copy-of select="(@* except (@name | @as)) | node()"/>
                             </xsl:element>
                         </xsl:for-each>
                         <xsl:sequence select="$specs[not(self::x:param[@name='phase'])]"/>
@@ -344,8 +372,12 @@
         </xsl:value-of>
     </xsl:template>
 
-    <xsl:template match="@id | @role" as="text()" mode="make-predicate">
+    <xsl:template match="@role" as="text()" mode="make-predicate">
         <xsl:text expand-text="yes">[(@{local-name()}, preceding-sibling::{x:known-UQName('svrl:fired-rule')}[1]/@{local-name()}, preceding-sibling::{x:known-UQName('svrl:active-pattern')}[1]/@{local-name()})[1] = '{.}']</xsl:text>
+    </xsl:template>
+
+    <xsl:template match="@id" as="text()" mode="make-predicate">
+        <xsl:text expand-text="yes">[(@id, {$ancestor-id-xpath-expr})[1] = '{.}']</xsl:text>
     </xsl:template>
 
     <xsl:template match="(@id | @context)[parent::x:expect-rule]" as="text()" mode="make-predicate">
