@@ -450,12 +450,12 @@
             <style type="text/css">
                <xsl:for-each select="$uri-or-default">
                   <xsl:variable name="css-string" as="xs:string" select="unparsed-text(.)" />
-
-            <!-- Replace CR LF with LF -->
-            <xsl:variable name="css-string" as="xs:string" select="replace($css-string, '&#x0D;(&#x0A;)', '$1')" />
-
+   
+                  <!-- Replace CR LF with LF -->
+                  <xsl:variable name="css-string" as="xs:string" select="replace($css-string, '&#x0D;(&#x0A;)', '$1')" />
+   
                   <xsl:text>&#xA;</xsl:text>
-               <xsl:value-of select="fmt:disable-escaping($css-string)" />
+                  <xsl:value-of select="fmt:disable-escaping($css-string)" />
                </xsl:for-each>
             </style>
          </xsl:when>

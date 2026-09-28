@@ -61,7 +61,6 @@
         | XSLT:package
 
         | XSLT:accept
-        | XSLT:accumulator
         | XSLT:attribute-set
         | XSLT:character-map
         | XSLT:decimal-format
@@ -118,18 +117,45 @@
 
     <!-- Ignore Element and All Descendants -->
     <xsl:template match="
-        XSLT:attribute-set/XSLT:attribute/descendant-or-self::node()
-        | XSLT:accumulator-rule/descendant-or-self::node()"
+        XSLT:attribute-set/XSLT:attribute/descendant-or-self::node()"
         as="xs:string"
         mode="coverage"
         priority="20">
         <xsl:sequence select="'ignored'"/>
     </xsl:template>
 
+    <!-- Use Trace Data else Descendant Data else miss -->
+    <xsl:template
+        match="
+            XSLT:apply-imports
+            | XSLT:choose
+            | XSLT:fork
+            | XSLT:merge
+            | XSLT:next-match
+            | XSLT:value-of
+            | XSLT:variable"
+        as="xs:string"
+        mode="coverage">
+        <xsl:variable name="use-trace-data" as="xs:string" select="accumulator-before('category-based-on-trace-data')" />
+        <xsl:choose>
+            <xsl:when test="$use-trace-data = 'hit'">
+                <xsl:sequence select="'hit'"/>
+            </xsl:when>
+            <xsl:when test="descendant::node()/accumulator-before('category-based-on-trace-data') = 'hit'">
+                <!-- If at least one descendant is hit, mark as hit -->
+                <xsl:sequence select="'hit'"/>
+            </xsl:when>
+            <xsl:otherwise>
+                <xsl:sequence select="'missed'"/>
+            </xsl:otherwise>
+        </xsl:choose>
+    </xsl:template>
+
     <!-- Use Descendant Data -->
     <xsl:template
         match="
-        XSLT:assert[child::node()]
+        XSLT:accumulator
+        | XSLT:assert[child::node()]
         | XSLT:catch
         | XSLT:fallback
         | XSLT:map
@@ -137,6 +163,8 @@
         | XSLT:matching-substring
         | XSLT:non-matching-substring
         | XSLT:on-completion
+        | XSLT:on-empty[not(exists(@select))]
+        | XSLT:on-non-empty[not(exists(@select))]
         | XSLT:perform-sort
         | XSLT:otherwise
         | XSLT:try[not(exists(@select))]
@@ -208,8 +236,6 @@
     <!-- Use Parent Data (directly) -->
     <xsl:template match="
         XSLT:context-item (: xspec/xspec#1410 :)
-        | XSLT:merge-action
-        | XSLT:merge-source
         | XSLT:param[not(parent::XSLT:stylesheet or parent::XSLT:transform)]"
         as="xs:string"
         mode="coverage">
@@ -218,7 +244,9 @@
 
     <!-- Use Parent Status (computed) -->
     <xsl:template match="
-        XSLT:sort
+        XSLT:merge-action
+        | XSLT:merge-source
+        | XSLT:sort
         | XSLT:with-param"
         as="xs:string"
         mode="coverage"
@@ -231,29 +259,6 @@
         as="xs:string"
         mode="coverage">
         <xsl:sequence select="accumulator-before('category-based-on-trace-data')"/>
-    </xsl:template>
-
-    <!-- Element-Specific rule for XSLT:variable -->
-    <xsl:template match="XSLT:variable"
-        as="xs:string"
-        mode="coverage">
-        <xsl:choose>
-            <xsl:when test="accumulator-before('category-based-on-trace-data') eq 'hit'">
-                <xsl:sequence select="'hit'"/>
-            </xsl:when>
-            <xsl:when test="parent::XSLT:stylesheet or parent::XSLT:transform">
-                <!-- Global variables effectively follow the Use Trace Data rule. -->
-                <xsl:sequence select="'missed'"/>
-            </xsl:when>
-            <xsl:when test="following-sibling::*[not(self::XSLT:variable)]">
-                <xsl:apply-templates select="following-sibling::*[not(self::XSLT:variable)][1]"
-                    mode="#current"/>
-            </xsl:when>
-            <xsl:otherwise>
-                <!-- Local variable with no following siblings except other local variables -->
-                <xsl:sequence select="'missed'"/>
-            </xsl:otherwise>
-        </xsl:choose>
     </xsl:template>
 
     <!-- Element-Specific rule for XSLT:merge-key -->
@@ -379,8 +384,6 @@
         | XSLT:merge-source
         | XSLT:non-matching-substring
         | XSLT:on-completion
-        | XSLT:on-empty
-        | XSLT:on-non-empty
         | XSLT:otherwise
         | XSLT:perform-sort[@select]
         | XSLT:perform-sort[XSLT:sort][count(*) = 1]

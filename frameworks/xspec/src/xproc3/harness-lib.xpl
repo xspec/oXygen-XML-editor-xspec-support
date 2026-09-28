@@ -35,7 +35,7 @@
    -->
    <p:declare-step type="x:log" name="log">
       <!-- the port declarations -->
-      <p:input  port="source" primary="true"/>
+      <p:input port="source" primary="true"/>
       <p:output port="result" primary="true"/>
 
       <p:option name="parameters" as="map(xs:QName,item()*)" select="map{}"/>
@@ -60,34 +60,49 @@
    </p:declare-step>
 
    <!--
+       Error checking for $xspec-home or catalog
+   -->
+   <p:declare-step type="x:check-xspec-home">
+      <p:input port="source"/>
+      <p:output port="result"/>
+      <p:option name="xspec-home" as="xs:string?"/>
+      <p:variable name="report-stylesheet" as="xs:anyURI"
+         select="xs:anyURI('http://www.jenitennison.com/xslt/xspec/format-xspec-report.xsl')"/>
+      <p:if test="not($xspec-home != '') and
+         ($report-stylesheet eq p:lookup-uri($report-stylesheet))">
+         <p:error code="x:ERR003">
+            <p:with-input port="source">
+               <p:inline>
+                  <message>Provide either an 'xspec-home' option value or an XML catalog containing XSpec system identifiers.</message>
+               </p:inline>
+            </p:with-input>
+         </p:error>
+      </p:if>
+      <p:identity/>
+   </p:declare-step>
+
+   <!--
        Compile the suite on source into a stylesheet on result.
    -->
-   <p:declare-step type="x:compile-xslt" name="compile-xsl">
+   <p:declare-step type="x:compile-test-for-xslt-or-xproc" name="compile-xsl-xproc"
+      visibility="private">
       <!-- the port declarations -->
-      <p:input  port="source" primary="true"/>
+      <p:input port="source" primary="true"/>
       <p:output port="result" primary="true"/>
 
-      <p:option name="xspec-home" as="xs:string?"/>
+      <p:option name="compiler-resolved" required="true"/>
       <p:option name="force-focus" as="xs:string?"/>
       <p:option name="parameters" as="map(xs:QName,item()*)" select="map{}"/>
 
-
       <p:group>
-         <!-- if xspec-home is not passed, then use the packaging public URI -->
-         <p:variable name="compiler"
-            select="if ( $xspec-home != '') then
-                  resolve-uri('src/compiler/compile-xslt-tests.xsl', $xspec-home)
-               else
-                  'http://www.jenitennison.com/xslt/xspec/compile-xslt-tests.xsl'"/>
-
          <!-- load the compiler -->
          <p:load name="compiler" pkg:kind="xslt">
-            <p:with-option name="href" select="$compiler"/>
+            <p:with-option name="href" select="$compiler-resolved"/>
          </p:load>
 
          <!-- actually compile the suite in a stylesheet -->
          <p:xslt>
-            <p:with-input port="source" pipe="source@compile-xsl"/>
+            <p:with-input port="source" pipe="source@compile-xsl-xproc"/>
             <p:with-input port="stylesheet" pipe="@compiler"/>
             <p:with-option name="parameters" select="map{
                xs:QName('force-focus'): $force-focus
@@ -99,6 +114,55 @@
       <x:log if-set="log-compilation">
          <p:with-option name="parameters" select="$parameters"/>
       </x:log>
+   </p:declare-step>
+
+   <p:declare-step type="x:compile-xslt" name="compile-xsl">
+      <!-- the port declarations -->
+      <p:input port="source" primary="true"/>
+      <p:output port="result" primary="true"/>
+
+      <p:option name="xspec-home" as="xs:string?"/>
+      <p:option name="force-focus" as="xs:string?"/>
+      <p:option name="parameters" as="map(xs:QName,item()*)" select="map{}"/>
+
+      <!-- if xspec-home is not passed, then use the packaging public URI -->
+      <p:variable name="compiler"
+         select="if ( $xspec-home != '') then
+               resolve-uri('src/compiler/compile-xslt-tests.xsl', $xspec-home)
+            else
+               'http://www.jenitennison.com/xslt/xspec/compile-xslt-tests.xsl'"/>
+
+      <x:compile-test-for-xslt-or-xproc>
+         <p:with-option name="force-focus" select="$force-focus"/>
+         <p:with-option name="compiler-resolved" select="$compiler"/>
+         <p:with-option name="parameters" select="$parameters"/>
+      </x:compile-test-for-xslt-or-xproc>
+   </p:declare-step>
+
+   <!--
+       Compile the suite on source into a stylesheet on result.
+   -->
+   <p:declare-step type="x:compile-xproc" name="compile-xproc">
+      <!-- the port declarations -->
+      <p:input port="source" primary="true"/>
+      <p:output port="result" primary="true"/>
+
+      <p:option name="xspec-home" as="xs:string?"/>
+      <p:option name="force-focus" as="xs:string?"/>
+      <p:option name="parameters" as="map(xs:QName,item()*)" select="map{}"/>
+
+      <!-- if xspec-home is not passed, then use the packaging public URI -->
+      <p:variable name="compiler"
+         select="if ( $xspec-home != '') then
+         resolve-uri('src/compiler/compile-xproc-tests.xsl', $xspec-home)
+         else
+         'http://www.jenitennison.com/xslt/xspec/compile-xproc-tests.xsl'"/>
+
+      <x:compile-test-for-xslt-or-xproc>
+         <p:with-option name="force-focus" select="$force-focus"/>
+         <p:with-option name="compiler-resolved" select="$compiler"/>
+         <p:with-option name="parameters" select="$parameters"/>
+      </x:compile-test-for-xslt-or-xproc>
    </p:declare-step>
 
    <!--
@@ -136,7 +200,7 @@
    -->
    <p:declare-step type="x:compile-xquery" name="compile-xq">
       <!-- the port declarations -->
-      <p:input  port="source" primary="true"/>
+      <p:input port="source" primary="true"/>
       <p:output port="result" primary="true"/>
 
       <p:option name="xspec-home" as="xs:string?"/>
@@ -203,6 +267,7 @@
       <p:option name="xspec-home" as="xs:string?"/>
       <p:option name="force-focus" as="xs:string?"/>
       <p:option name="html-report-theme" as="xs:string" select="'default'"/>
+      <p:option name="inline-css" as="xs:string" values="('true','false')" select="'true'"/>
       <p:option name="parameters" as="map(xs:QName,item()*)" select="map{}"/>
 
       <p:group>
@@ -233,7 +298,8 @@
                   <p:with-input port="stylesheet" pipe="@formatter"/>
                   <p:with-option name="parameters" select="map{
                      xs:QName('force-focus'): $force-focus,
-                     xs:QName('report-theme'): $html-report-theme
+                     xs:QName('report-theme'): $html-report-theme,
+                     xs:QName('inline-css'): $inline-css
                      }"/>
                </p:xslt>
             </p:when>
@@ -256,10 +322,59 @@
       </x:log>
    </p:declare-step>
 
+
+   <!--
+       Get the XML result on source, and give the JUnit XML result on result, if
+       the Junit report has been enabled.
+
+       If xspec-home is set, it is used to resolve the XSLT that formats the
+       report.  If not, its public URI is used, to be resolved through the
+       EXPath packaging system or an XML catalog.
+
+       The document element has already been checked by x:format-report.
+   -->
+   <p:declare-step type="x:maybe-format-junit-report" name="junit">
+      <!-- the port declarations -->
+      <p:input port="source" primary="true" content-types="xml"/>
+      <!-- the result port is empty if the Junit report has not been enabled. -->
+      <p:output port="result" primary="true" sequence="true" content-types="xml"/>
+
+      <p:option name="xspec-home" as="xs:string?"/>
+      <p:option name="junit-enabled" as="xs:string"/>
+
+      <p:choose>
+         <p:when test="$junit-enabled eq 'true'">
+            <p:group>
+               <p:variable name="formatter"
+                  select="if ( $xspec-home ) then
+                        resolve-uri('src/reporter/junit-report.xsl', $xspec-home)
+                     else
+                        'http://www.jenitennison.com/xslt/xspec/junit-report.xsl'"/>
+
+               <p:load name="formatter" pkg:kind="xslt">
+                  <p:with-option name="href" select="$formatter"/>
+               </p:load>
+
+               <p:xslt name="format-junit-report" message="&#10;Generating JUnit Report...">
+                  <p:with-input port="source" pipe="@junit"/>
+                  <p:with-input port="stylesheet" pipe="@formatter"/>
+               </p:xslt>
+            </p:group>
+         </p:when>
+         <p:otherwise>
+            <p:identity>
+               <p:with-input port="source">
+                  <p:empty />
+               </p:with-input>
+            </p:identity>
+         </p:otherwise>
+      </p:choose>
+   </p:declare-step>
+
    <!-- Escapes markup. Also mimics @use-character-maps="x:disable-escaping" in
       ../compiler/xquery/main.xsl. -->
    <p:declare-step type="x:escape-markup" name="escape-markup">
-      <p:input  port="source" primary="true"/>
+      <p:input port="source" primary="true"/>
       <p:output port="result" primary="true"/>
 
       <p:cast-content-type content-type="text/plain"/>
@@ -270,7 +385,7 @@
    <!-- Extract XQuery script as text from the XML document that is generated by the compile step.
       That generates the script inside a query XML element -->
    <p:declare-step type="x:extract-xquery" name="extract-xquery">
-      <p:input  port="source" primary="true"/>
+      <p:input port="source" primary="true"/>
       <p:output port="result" primary="true"/>
 
       <x:escape-markup/>

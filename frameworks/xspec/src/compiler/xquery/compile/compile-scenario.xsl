@@ -39,10 +39,19 @@
             </xsl:call-template>
          </xsl:message>
       </xsl:if>
+      <xsl:if test="$call/@step">
+         <xsl:message terminate="yes">
+            <xsl:call-template name="x:prefix-diag-message">
+               <xsl:with-param name="message" as="xs:string">
+                  <xsl:text expand-text="yes">{name($call)}/@step not supported for XQuery</xsl:text>
+               </xsl:with-param>
+            </xsl:call-template>
+         </xsl:message>
+      </xsl:if>
       <xsl:if test="$run-sut-now">
          <xsl:call-template name="x:check-param-max-position" />
       </xsl:if>
-      <xsl:if test="x:expect and empty($call)">
+      <xsl:if test="x:expect[not(@pending)] and empty($call) and empty($reason-for-pending)">
          <xsl:message terminate="yes">
             <xsl:call-template name="x:prefix-diag-message">
                <xsl:with-param name="message" as="xs:string">
