@@ -28,7 +28,7 @@ public class DiffFragmentRepository {
   /**
    * Protocol name.
    */
-  public static final String DIFF_PROTOCOL = "diff";
+  public static final String DIFF_PROTOCOL = "xspec-diff";
   
   /**
    * Singleton instance.

@@ -59,14 +59,14 @@ public class DiffURLStreamHandlerTest extends TestCase {
     String fragment = "<fragment></fragment>";
     URL cache = instance.cache(fragment, "something.com");
     
-    assertEquals("diff:/something.com/369136489.xml", cache.toString());
+    assertEquals("xspec-diff:/something.com/369136489.xml", cache.toString());
     
     assertEquals(fragment, read(cache));
     
     fragment = "1 + 1 = 2";
     cache = instance.cache(fragment, "something.com");
     
-    assertEquals("diff:/something.com/2034751356.txt", cache.toString());
+    assertEquals("xspec-diff:/something.com/2034751356.txt", cache.toString());
     
     assertEquals(fragment, read(cache));
   }
