@@ -8,8 +8,8 @@
         <xt:version>${project.nosnapshot.version}</xt:version>
         <xt:oxy_version>28.0+</xt:oxy_version>
         <xt:type>plugin</xt:type>
-        <xt:author>Syncro Soft</xt:author>
-        <xt:name>XSpec Helper view</xt:name>
+        <xt:author>XSpec organization</xt:author>
+        <xt:name>XSpec Helper View for Oxygen XML</xt:name>
         <xt:description><html xmlns="http://www.w3.org/1999/xhtml">
             <head>
                 <title>XSpec Helper View</title>
@@ -20,10 +20,9 @@
   	        </div>
                 
                 <div>
-                    <h3>What's new in version 3.3.2</h3>
+                    <h3>What's new in version 4.1.2</h3>
                     <ol>
-                        <li>Compatible with newer Oxygen versions.</li>
-                        <li>Bundles XSpec 3.3.2.</li>
+                        <li>Bundles XSpec 4.1.2.</li>
                     </ol>
                 </div>
                 
