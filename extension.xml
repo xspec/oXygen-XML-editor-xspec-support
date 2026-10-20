@@ -8,7 +8,7 @@
         <xt:version>${project.nosnapshot.version}</xt:version>
         <xt:oxy_version>28.0+</xt:oxy_version>
         <xt:type>plugin</xt:type>
-        <xt:author>XSpec organization</xt:author>
+        <xt:author>XSpec</xt:author>
         <xt:name>XSpec Helper View for Oxygen XML</xt:name>
         <xt:description><html xmlns="http://www.w3.org/1999/xhtml">
             <head>
